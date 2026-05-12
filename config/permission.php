@@ -178,6 +178,17 @@ return [
      */
     // 'wildcard_permission' => Spatie\Permission\WildcardPermission::class,
 
+    /*
+    |--------------------------------------------------------------------------
+    | Super Admin Role
+    |--------------------------------------------------------------------------
+    |
+    | This is the name of the role that will be granted all permissions.
+    |
+    */
+
+    'super_admin_role' => 'Super Admin',
+
     /* Cache-specific settings */
 
     'cache' => [
