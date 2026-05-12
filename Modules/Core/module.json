@@ -1,0 +1,14 @@
+{
+    "name": "Core",
+    "alias": "core",
+    "description": "Core platform module. Authentication, users, roles, settings, and module management.",
+    "keywords": [],
+    "priority": 0,
+    "version": "1.0.0",
+    "requires": [],
+    "providers": [
+        "Modules\\Core\\app\\Providers\\CoreServiceProvider"
+    ],
+    "aliases": {},
+    "files": []
+}
