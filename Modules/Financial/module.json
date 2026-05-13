@@ -1,0 +1,14 @@
+{
+    "name": "Financial",
+    "alias": "financial",
+    "description": "Invoicing, quotations, payments and financial reporting.",
+    "keywords": [],
+    "priority": 10,
+    "version": "1.0.0",
+    "requires": ["Core"],
+    "providers": [
+        "Modules\\Financial\\app\\Providers\\FinancialServiceProvider"
+    ],
+    "aliases": {},
+    "files": []
+}
