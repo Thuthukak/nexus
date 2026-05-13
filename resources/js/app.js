@@ -3,29 +3,31 @@ import { createInertiaApp } from '@inertiajs/vue3'
 import { createPinia } from 'pinia'
 import '../css/app.css'
 
-// Auto-discover all page components across modules and core
 const pages = import.meta.glob([
     './Pages/**/*.vue',
-    '../../Modules/*/Resources/js/Pages/**/*.vue',
+    '../../Modules/*/resources/js/Pages/**/*.vue',
 ], { eager: true })
 
+if (import.meta.env.DEV) {
+    console.log('Discovered pages:', Object.keys(pages))
+}
+
 function resolvePage(name) {
-    // Try module-namespaced path first: "Financial/Pages/Invoices/Index"
-    const candidates = [
-        `./Pages/${name}.vue`,
-        `../../Modules/${name}.vue`,
-    ]
-    for (const key of Object.keys(pages)) {
-        // Match ModuleName/Pages/... pattern
-        const moduleMatch = key.match(/Modules\/(\w+)\/Resources\/js\/Pages\/(.+)\.vue$/)
-        if (moduleMatch) {
-            const resolved = `${moduleMatch[1]}/Pages/${moduleMatch[2]}`
-            if (resolved === name) return pages[key].default
-        }
-        // Match core Pages/... pattern
-        const coreMatch = key.match(/\.\/Pages\/(.+)\.vue$/)
-        if (coreMatch && coreMatch[1] === name) return pages[key].default
+    // Core pages: "Auth/Login" → ./Pages/Auth/Login.vue
+    const corePath = `./Pages/${name}.vue`
+    if (pages[corePath]) return pages[corePath].default
+
+    // Module pages: "Core/Pages/Dashboard"
+    // → ../../Modules/Core/resources/js/Pages/Dashboard.vue
+    const parts = name.split('/')
+    if (parts.length >= 3 && parts[1] === 'Pages') {
+        const moduleName = parts[0]
+        const pagePath   = parts.slice(2).join('/')
+        const key = `../../Modules/${moduleName}/resources/js/Pages/${pagePath}.vue`
+        if (pages[key]) return pages[key].default
     }
+
+    console.error(`Page not found: "${name}"\nAvailable:`, Object.keys(pages))
     throw new Error(`Inertia page not found: ${name}`)
 }
 
