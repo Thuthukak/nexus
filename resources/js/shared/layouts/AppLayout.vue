@@ -4,13 +4,10 @@ import { usePage } from '@inertiajs/vue3'
 import Sidebar from '@shared/components/navigation/Sidebar.vue'
 import Topbar from '@shared/components/navigation/Topbar.vue'
 import { useThemeStore } from '@shared/stores/useThemeStore.js'
-import { useNotificationStore } from '@shared/stores/useNotificationStore.js'
 
-const page          = usePage()
-const theme         = useThemeStore()
-const notifications = useNotificationStore()
+const page  = usePage()
+const theme = useThemeStore()
 
-// Apply theme CSS variables whenever shared props update
 watchEffect(() => {
   const t = page.props.theme
   if (!t) return
@@ -29,15 +26,9 @@ watchEffect(() => {
 
 <template>
   <div class="flex h-screen bg-background overflow-hidden">
-    <!-- Sidebar -->
     <Sidebar />
-
-    <!-- Main content area -->
     <div class="flex flex-col flex-1 min-w-0 overflow-hidden">
-      <!-- Topbar -->
       <Topbar />
-
-      <!-- Page content -->
       <main class="flex-1 overflow-y-auto">
         <div class="max-w-7xl mx-auto px-6 py-6">
           <slot />
