@@ -89,4 +89,16 @@ class InvoiceController extends Controller
             ],
         ]);
     }
+
+    public function destroy(Invoice $invoice)
+    {
+        $invoice->delete();
+
+        return redirect()
+            ->route('financial.invoices.index')
+            ->with('toast', [
+                'type'  => 'success',
+                'title' => 'Invoice deleted',
+            ]);
+    }
 }

@@ -1,13 +1,17 @@
 <script setup>
-import { watchEffect } from 'vue'
-import { usePage } from '@inertiajs/vue3'
-import Sidebar from '@shared/components/navigation/Sidebar.vue'
-import Topbar from '@shared/components/navigation/Topbar.vue'
-import { useThemeStore } from '@shared/stores/useThemeStore.js'
+import { watchEffect, watch } from 'vue'
+import { usePage }            from '@inertiajs/vue3'
+import Sidebar                from '@shared/components/navigation/Sidebar.vue'
+import Topbar                 from '@shared/components/navigation/Topbar.vue'
+import ToastContainer         from '@shared/components/feedback/ToastContainer.vue'
+import { useThemeStore }      from '@shared/stores/useThemeStore.js'
+import { useToastStore }      from '@shared/stores/useToastStore.js'
 
 const page  = usePage()
 const theme = useThemeStore()
+const toast = useToastStore()
 
+// Apply theme CSS variables whenever shared props update
 watchEffect(() => {
   const t = page.props.theme
   if (!t) return
@@ -22,18 +26,34 @@ watchEffect(() => {
   r.style.setProperty('--color-background',   t.background)
   r.style.setProperty('--color-text',         t.text)
 })
+
+// Watch for flash toasts from server redirects
+watch(
+  () => page.props.flash?.toast,
+  (flashToast) => {
+    if (flashToast?.title) {
+      toast.add(flashToast)
+    }
+  },
+  { immediate: true }
+)
 </script>
 
 <template>
   <div class="flex h-screen bg-background overflow-hidden">
     <Sidebar />
+
     <div class="flex flex-col flex-1 min-w-0 overflow-hidden">
       <Topbar />
+
       <main class="flex-1 overflow-y-auto">
         <div class="max-w-7xl mx-auto px-6 py-6">
           <slot />
         </div>
       </main>
     </div>
+
+    <!-- Global toast notifications -->
+    <ToastContainer />
   </div>
 </template>
