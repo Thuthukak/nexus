@@ -1,0 +1,14 @@
+{
+    "name": "HR",
+    "alias": "hr",
+    "description": "Human resources, employee management and learning management system.",
+    "keywords": [],
+    "priority": 20,
+    "version": "1.0.0",
+    "requires": ["Core"],
+    "providers": [
+        "Modules\\HR\\app\\Providers\\HRServiceProvider"
+    ],
+    "aliases": {},
+    "files": []
+}

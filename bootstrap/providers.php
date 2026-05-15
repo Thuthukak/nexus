@@ -5,4 +5,5 @@ return [
     App\Providers\FortifyServiceProvider::class,
     Modules\Core\app\Providers\CoreServiceProvider::class,
     Modules\Financial\app\Providers\FinancialServiceProvider::class,
+    Modules\HR\app\Providers\HRServiceProvider::class,
 ];
