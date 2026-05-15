@@ -1,0 +1,14 @@
+{
+    "name": "Bookings",
+    "alias": "bookings",
+    "description": "Resource and appointment booking management with customer-facing portal.",
+    "keywords": [],
+    "priority": 30,
+    "version": "1.0.0",
+    "requires": ["Core"],
+    "providers": [
+        "Modules\\Bookings\\app\\Providers\\BookingsServiceProvider"
+    ],
+    "aliases": {},
+    "files": []
+}

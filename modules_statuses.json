@@ -1,5 +1,6 @@
 {
     "Core": true,
     "Financial": true,
-    "HR": true
+    "HR": true,
+    "Bookings": true
 }
