@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
+use App\Facades\Settings;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -31,19 +33,42 @@ class HandleInertiaRequests extends Middleware
                 'error'   => $request->session()->get('error'),
             ],
             'app' => [
-                'name' => config('app.name'),
+                'name' => $this->appName(),
             ],
-            'theme' => [
-                'primary'      => '#1E3A5F',
-                'primary_text' => '#FFFFFF',
-                'secondary'    => '#2E86AB',
-                'accent'       => '#F39C12',
-                'sidebar_bg'   => '#1E3A5F',
-                'sidebar_text' => '#CBD5E1',
-                'surface'      => '#FFFFFF',
-                'background'   => '#F8F9FA',
-                'text'         => '#2C3E50',
-            ],
+            'theme' => $this->theme(),
         ]);
+    }
+
+    private function theme(): array
+    {
+        $defaults = [
+            'primary'      => '#1E3A5F',
+            'primary_text' => '#FFFFFF',
+            'secondary'    => '#2E86AB',
+            'accent'       => '#F39C12',
+            'sidebar_bg'   => '#1E3A5F',
+            'sidebar_text' => '#CBD5E1',
+            'surface'      => '#FFFFFF',
+            'background'   => '#F8F9FA',
+            'text'         => '#2C3E50',
+        ];
+
+        try {
+            if (! Schema::hasTable('settings')) return $defaults;
+            $stored = Settings::group('theme')->all();
+            return array_merge($defaults, array_filter($stored));
+        } catch (\Throwable) {
+            return $defaults;
+        }
+    }
+
+    private function appName(): string
+    {
+        try {
+            if (! Schema::hasTable('settings')) return config('app.name');
+            return Settings::group('general')->get('app_name', config('app.name'));
+        } catch (\Throwable) {
+            return config('app.name');
+        }
     }
 }
