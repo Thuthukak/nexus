@@ -10,17 +10,25 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        // Production-safe Seeders (Always Run)
         $this->call([
-            // Core
+            // Core platform
             ThemeSeeder::class,
             CorePermissionSeeder::class,
             RoleSeeder::class,
             SuperAdminSeeder::class,
 
-            // Modules — run after roles exist
+            // Module permissions
             \Modules\Financial\database\seeders\FinancialPermissionSeeder::class,
             \Modules\HR\database\seeders\HRPermissionSeeder::class,
             \Modules\Bookings\database\seeders\BookingsPermissionSeeder::class,
         ]);
+
+        // Development-only Seeders (Gated)
+        if (app()->isLocal()) {
+            $this->call([
+                DevDataSeeder::class,
+            ]);
+        }
     }
 }
