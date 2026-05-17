@@ -11,7 +11,7 @@ use Modules\Financial\app\Models\Customer;
 use Modules\Financial\app\Models\Invoice;
 use Modules\Financial\app\Models\TaxRate;
 use Modules\Financial\app\Services\InvoiceService;
-
+use Illuminate\Support\Facades\Log;
 class InvoiceController extends Controller
 {
     public function __construct(private InvoiceService $service) {}
@@ -257,5 +257,25 @@ class InvoiceController extends Controller
             'created_by'  => $invoice->createdBy?->name,
             'currency'    => $invoice->currency,
         ];
+    }
+
+    public function send(Invoice $invoice)
+    {
+        $this->service->queueSend($invoice);
+
+        return back()->with('toast', [
+            'type'    => 'success',
+            'title'   => 'Invoice queued for delivery',
+            'message' => "Invoice {$invoice->reference} will be emailed to {$invoice->customer->email} shortly.",
+        ]);
+    }
+
+    public function downloadPdf(Invoice $invoice)
+    {
+        $pdfService = app(\Modules\Financial\app\Services\InvoicePdfService::class);
+        $pdf        = $pdfService->generate($invoice);
+        $filename   = $pdfService->filename($invoice);
+
+        return $pdf->download($filename);
     }
 }

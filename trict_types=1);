@@ -1,0 +1,163 @@
+[33mcommit fa6e6d992f0da38a7abca3885e38496026af0bb2[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m
+Author: Thuthuka <thuthukakhoza@gmail.com>
+Date:   Sun May 17 19:16:06 2026 +0200
+
+    fix(ui): full-width stacked show pages, computed action buttons for reactivity
+    
+    Replaced 2/3 column sidebar layout with full-width stacked sections on
+    all show pages. Summary metrics moved to top bar. Action buttons converted
+    from const to computed so they react to Inertia prop updates without a
+    reload. Sidebar rebuilt with collapsible module groups and sub-navigation.
+
+[33mcommit b9f6fed98aa824c6c3fab670d285d69128eafd5a[m[33m ([m[1;31morigin/main[m[33m)[m
+Author: Thuthuka <thuthukakhoza@gmail.com>
+Date:   Sun May 17 13:31:33 2026 +0200
+
+    chore: clean seed test, dev data seeder and production checklist
+    
+    migrate:fresh --seed verified clean on all modules. DevDataSeeder adds
+    realistic test data for all three modules. Production deployment checklist
+    documented covering environment, security, build, database and queue setup.
+
+[33mcommit dd105bc64e661af728cb206eb6cc60efa3ef3141[m
+Author: Thuthuka <thuthukakhoza@gmail.com>
+Date:   Sun May 17 13:04:48 2026 +0200
+
+    feat(core): settings UI, theme colour picker and user profile pages
+    
+    Appearance settings page with 9 semantic colour token pickers, 4 preset
+    palettes, live preview panel, and WCAG AA contrast ratio warnings.
+    Theme changes persist to the settings table and apply instantly via
+    Inertia shared props without a page reload.
+    
+    General settings page for app name and timezone. Profile page with
+    name/email update and password change forms. Topbar updated with
+    user dropdown menu linking to profile and settings. Click-outside
+    directive registered globally for dropdown dismissal.
+
+[33mcommit edcd084a697f9cdc354a5c1d6fcded08a46f669e[m
+Author: Thuthuka <thuthukakhoza@gmail.com>
+Date:   Fri May 15 19:49:38 2026 +0200
+
+    feat(ui): toast notification system and modal components
+    
+    Adds Toast, ToastContainer, Modal and ConfirmDialog shared components.
+    ToastStore manages ephemeral notifications with 5s auto-dismiss and a
+    3-toast cap. AppLayout watches Inertia flash props and forwards server
+    flash messages into the toast queue automatically.
+    
+    ConfirmDialog demonstrated on invoice delete with danger variant styling.
+    Modal supports sm/md/lg/xl sizes, Escape key dismissal, and Teleport
+    to body to avoid z-index conflicts.
+
+[33mcommit 357c5c5c41de3ca5ee25304193c7b0c2131becb3[m
+Author: Thuthuka <thuthukakhoza@gmail.com>
+Date:   Fri May 15 17:59:41 2026 +0200
+
+    feat(bookings): Bookings module with resources, services and appointment management
+    
+    Adds Bookings module with full scaffold. Five migrations covering resources,
+    services, availability rules, bookings and blocked dates with UUID keys.
+    
+    BookingService auto-calculates end time from service duration plus buffer.
+    Resource and Service management pages with card grid layout. Booking
+    create/show with confirm, cancel and complete status transitions.
+    
+    Permission seeders added for all three business modules. DatabaseSeeder
+    updated to run all module permission seeders in correct order.
+
+[33mcommit 401b8c1fb6865b0dff3077a854f8b7d425c10a7f[m
+Author: Thuthuka <thuthukakhoza@gmail.com>
+Date:   Fri May 15 13:44:31 2026 +0200
+
+    feat(hr): HR module scaffold, migrations, models, controllers and pages
+    
+    Adds HR module with departments, job titles, employees and leave management.
+    Five migrations with UUID primary keys and soft deletes. Employee creation
+    creates a linked User account with Staff role assigned automatically.
+    
+    Leave application workflow with pending/approved/rejected states, weekday
+    day calculation, and approve/reject controller actions. Dashboard, employee
+    list/create/show, leave index/create, and departments pages all built.
+
+[33mcommit 64307febffce7f467fff539b9a403bf25de6037c[m
+Author: Thuthuka <thuthukakhoza@gmail.com>
+Date:   Fri May 15 00:44:40 2026 +0200
+
+    docs: add module development guide for collaborators
+
+[33mcommit 189f65ad15b48fac63a9b39d720449e029e5c906[m
+Author: Thuthuka <thuthukakhoza@gmail.com>
+Date:   Thu May 14 22:01:25 2026 +0200
+
+    feat(financial): migrations, models, invoice CRUD and show page
+    
+    Adds Financial module database layer with fin_customers, fin_tax_rates,
+    fin_invoices, fin_invoice_lines and fin_payments tables using UUID primary
+    keys and soft deletes.
+    
+    InvoiceService handles creation with automatic reference generation and
+    line total calculation. InvoiceController wired to real models with
+    validation. Create, Index and Show pages built with live total calculation
+    on the create form and full line item breakdown on the show page.
+
+[33mcommit 67508da9c69590b02e26465642255f401aaef5c5[m
+Author: Thuthuka <thuthukakhoza@gmail.com>
+Date:   Wed May 13 23:40:58 2026 +0200
+
+    feat(ui): shared component library and Financial module scaffold
+    
+    Adds Button, Badge, Input and DataTable shared components with variant,
+    size and slot support. DataTable includes client-side sorting and loading
+    skeleton rows.
+    
+    Scaffolds the Financial module with service providers, routes, dashboard
+    and invoice list controllers, and corresponding Inertia page components.
+    Sidebar updated to data-driven nav with active state detection.
+
+[33mcommit b0ae33ec04471f42cad96daedd3458099323e1a3[m
+Author: Thuthuka <thuthukakhoza@gmail.com>
+Date:   Wed May 13 23:12:42 2026 +0200
+
+    feat(core): AppLayout shell, login page and dashboard rendering
+    
+    Builds the foundational UI shell. AuthLayout and AppLayout implemented
+    with Sidebar (collapsible, zone-based), Topbar (dark mode toggle, logout),
+    and CSS custom property theme binding via watchEffect.
+    
+    Login page wired to Fortify with form validation display. Dashboard page
+    scaffolded under Core module with welcome card and status indicators.
+    
+    Inertia page resolver fixed to correctly map module pages using the
+    Modules/*/resources/js/Pages/** glob pattern. Fortify service provider
+    registered in bootstrap/providers.php to resolve LoginViewResponse binding.
+
+[33mcommit 06e314596057f8a344f9c00dc4b592a8138f5a87[m
+Author: Thuthuka <thuthukakhoza@gmail.com>
+Date:   Wed May 13 00:44:08 2026 +0200
+
+    feat(core): settings facade, RBAC roles and base seeders
+    
+    Introduces the Settings service and facade for group-scoped key/value
+    storage with cache-busting. Seeds the full permission hierarchy for the
+    Core module and creates base platform roles (Super Admin through Read Only)
+    using spatie/laravel-permission.
+    
+    Default super admin created at admin@nexus.local for local development.
+
+[33mcommit 75681ab48891f3ac6b0aa7764f8d96f0a022f32f[m
+Author: Thuthuka <thuthukakhoza@gmail.com>
+Date:   Tue May 12 23:50:48 2026 +0200
+
+    feat(scaffold): initial Laravel 11 + Vue 3 modular platform setup
+    
+    Bootstraps the Nexus platform with the full backend and frontend stack.
+    Installs and configures nwidart/laravel-modules, spatie/laravel-permission,
+    Laravel Fortify, Inertia.js, Vue 3, Pinia, and Tailwind CSS v3.
+    
+    Scaffolds the Core module with service providers, LicenceService (RSA
+    offline validation with local dev bypass), BaseDTO, and HandleInertiaRequests
+    middleware sharing auth, theme, and flash props on every request.
+    
+    Frontend wired with Vite multi-entry module discovery, CSS custom property
+    theming system, shared Pinia stores, and usePermission composable.

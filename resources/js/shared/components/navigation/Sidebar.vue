@@ -86,10 +86,25 @@ function groupIsActive(base) {
   >
     <!-- Zone 1: Logo -->
     <div class="h-14 flex items-center px-4 flex-shrink-0 border-b border-white/10">
-      <span v-if="!collapsed" class="text-white font-bold text-lg tracking-tight truncate">
-        {{ page.props.app?.name ?? 'Nexus' }}
-      </span>
-      <span v-else class="text-white font-bold text-lg mx-auto">N</span>
+      <template v-if="!collapsed">
+        <img
+          v-if="page.props.app?.logo_url"
+          :src="page.props.app.logo_url"
+          :alt="page.props.app?.name ?? 'Nexus'"
+          class="h-8 w-auto object-contain max-w-[140px]"
+        />
+        <span v-else class="text-white font-bold text-lg tracking-tight truncate">
+          {{ page.props.app?.name ?? 'Nexus' }}
+        </span>
+      </template>
+      <div v-else class="mx-auto">
+        <img
+          v-if="page.props.app?.logo_url"
+          :src="page.props.app.logo_url"
+          class="h-7 w-7 object-contain rounded"
+        />
+        <span v-else class="text-white font-bold text-lg">N</span>
+      </div>
     </div>
 
     <!-- Zone 2: Navigation -->

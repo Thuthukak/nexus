@@ -28,11 +28,20 @@ const canApprove  = computed(() => props.invoice.status === 'draft')
 const canMarkSent = computed(() => ['approved', 'draft'].includes(props.invoice.status))
 const canPay      = computed(() => ['approved', 'sent', 'part_paid', 'overdue'].includes(props.invoice.status))
 const canCancel   = computed(() => !['paid', 'cancelled'].includes(props.invoice.status))
+const canSend     = computed(() => ['draft', 'approved'].includes(props.invoice.status))
 
 // Status transitions
 function approve()  { router.patch(`/financial/invoices/${props.invoice.id}/approve`) }
 function markSent() { router.patch(`/financial/invoices/${props.invoice.id}/mark-sent`) }
 function duplicate(){ router.post(`/financial/invoices/${props.invoice.id}/duplicate`) }
+
+const sendLoading = ref(false)
+function sendInvoice() {
+  sendLoading.value = true
+  router.post(`/financial/invoices/${props.invoice.id}/send`, {}, {
+    onFinish: () => sendLoading.value = false,
+  })
+}
 
 const confirmCancel = ref(false)
 function cancel() {
@@ -90,8 +99,8 @@ const paymentMethods = [
         <!-- Top action bar -->
         <div class="flex items-center gap-2 flex-wrap">
           <a v-if="canEdit"
-             :href="`/financial/invoices/${invoice.id}/edit`"
-             class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 text-sm text-app-text/70 hover:text-app-text hover:border-gray-300 transition-colors">
+              :href="`/financial/invoices/${invoice.id}/edit`"
+              class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 text-sm text-app-text/70 hover:text-app-text hover:border-gray-300 transition-colors">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -106,10 +115,26 @@ const paymentMethods = [
             </svg>
             Duplicate
           </button>
+          <a :href="`/financial/invoices/${invoice.id}/download-pdf`"
+              target="_blank"
+              class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 text-sm text-app-text/70 hover:text-app-text transition-colors">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            Download PDF
+          </a>
           <Button v-if="canApprove"  variant="secondary" size="sm" @click="approve">Approve</Button>
           <Button v-if="canMarkSent" variant="secondary" size="sm" @click="markSent">Mark as Sent</Button>
-          <Button v-if="canPay"      size="sm"           @click="showPayment = true">Record Payment</Button>
-          <Button v-if="canCancel"   variant="danger"    size="sm" @click="confirmCancel = true">Cancel</Button>
+          <Button v-if="canSend"     size="sm" :loading="sendLoading" @click="sendInvoice">
+            <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+            Send
+          </Button>
+          <Button v-if="canPay"      size="sm" @click="showPayment = true">Record Payment</Button>
+          <Button v-if="canCancel"   variant="danger" size="sm" @click="confirmCancel = true">Cancel</Button>
         </div>
       </div>
     </div>
@@ -129,7 +154,7 @@ const paymentMethods = [
         <p class="text-sm font-bold text-app-text">{{ currency(invoice.total) }}</p>
       </div>
       <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 px-4 py-3"
-           :class="invoice.balance_due > 0 ? 'border-red-200 dark:border-red-900/50' : ''">
+            :class="invoice.balance_due > 0 ? 'border-red-200 dark:border-red-900/50' : ''">
         <p class="text-xs text-app-text/50 mb-1">Balance Due</p>
         <p class="text-sm font-bold" :class="invoice.balance_due > 0 ? 'text-red-500' : 'text-green-600'">
           {{ currency(invoice.balance_due) }}
@@ -146,7 +171,7 @@ const paymentMethods = [
         <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6">
           <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider mb-3">Bill To</h2>
           <a :href="`/financial/customers/${invoice.customer?.id}`"
-             class="font-semibold text-primary hover:underline text-base">
+              class="font-semibold text-primary hover:underline text-base">
             {{ invoice.customer?.company_name }}
           </a>
           <p v-if="invoice.customer?.contact_name" class="text-sm text-app-text/60 mt-1">
@@ -216,7 +241,7 @@ const paymentMethods = [
 
       <!-- Payments history — full width -->
       <div v-if="invoice.payments?.length"
-           class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
+            class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-800">
           <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider">Payment History</h2>
         </div>
@@ -246,7 +271,7 @@ const paymentMethods = [
 
       <!-- Notes -->
       <div v-if="invoice.notes"
-           class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6">
+            class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6">
         <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider mb-2">Notes</h2>
         <p class="text-sm text-app-text/70 leading-relaxed whitespace-pre-line">{{ invoice.notes }}</p>
       </div>
@@ -264,8 +289,8 @@ const paymentMethods = [
       <div class="flex flex-col gap-1">
         <label class="text-sm font-medium text-app-text">Amount <span class="text-red-500">*</span></label>
         <input v-model="paymentForm.amount" type="number" step="0.01"
-               :max="invoice.balance_due" min="0.01" placeholder="0.00"
-               class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
+              :max="invoice.balance_due" min="0.01" placeholder="0.00"
+              class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
         <p v-if="paymentForm.errors.amount" class="text-xs text-red-500">{{ paymentForm.errors.amount }}</p>
       </div>
 
@@ -281,12 +306,12 @@ const paymentMethods = [
         <div class="flex flex-col gap-1">
           <label class="text-sm font-medium text-app-text">Payment Date</label>
           <input v-model="paymentForm.paid_at" type="date"
-                 class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
+                class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
         </div>
         <div class="flex flex-col gap-1">
           <label class="text-sm font-medium text-app-text">Reference</label>
           <input v-model="paymentForm.reference" type="text" placeholder="EFT ref, cheque no…"
-                 class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
+                class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
         </div>
       </div>
 

@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Modules\Financial\app\Models\Invoice;
 use Modules\Financial\app\Models\InvoiceLine;
 use Modules\Financial\app\Models\Payment;
+use Illuminate\Support\Facades\Log;
 
 class InvoiceService
 {
@@ -165,12 +166,33 @@ class InvoiceService
     {
         $prefix = config('financial.invoice_prefix', 'INV-');
         $last   = Invoice::withTrashed()
-                         ->orderByDesc('created_at')
-                         ->value('reference');
+                        ->orderByDesc('created_at')
+                        ->value('reference');
 
         if (! $last) return $prefix . '0001';
 
         $number = (int) str_replace($prefix, '', $last);
         return $prefix . str_pad((string) ($number + 1), 4, '0', STR_PAD_LEFT);
+    }
+
+    public function queueSend(Invoice $invoice): void
+    {
+        abort_if(
+            ! in_array($invoice->status, ['draft', 'approved']),
+            422,
+            'Only draft or approved invoices can be sent.'
+        );
+
+        abort_if(
+            ! $invoice->customer->email,
+            422,
+            'This customer has no email address. Please update the customer record first.'
+        );
+
+        // Dispatch the job to the queue
+        \App\Jobs\SendInvoiceJob::dispatch($invoice->id);
+
+        // Optimistically mark as queued so UI reflects intent immediately
+        $invoice->update(['status' => 'sent']);
     }
 }

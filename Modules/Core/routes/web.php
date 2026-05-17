@@ -24,3 +24,7 @@ Route::prefix('settings')->name('settings.')->group(function () {
     Route::get('/appearance',      [SettingsController::class, 'appearance'])->name('appearance');
     Route::patch('/appearance',    [SettingsController::class, 'updateAppearance'])->name('appearance.update');
 });
+
+// Logo
+Route::post('/settings/logo',   [\Modules\Core\app\Http\Controllers\LogoController::class, 'upload'])->name('settings.logo.upload');
+Route::delete('/settings/logo', [\Modules\Core\app\Http\Controllers\LogoController::class, 'destroy'])->name('settings.logo.destroy');

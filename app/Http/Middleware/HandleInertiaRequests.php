@@ -33,7 +33,8 @@ class HandleInertiaRequests extends Middleware
                 'error'   => $request->session()->get('error'),
             ],
             'app' => [
-                'name' => $this->appName(),
+                'name'     => $this->appName(),
+                'logo_url' => $this->logoUrl(),
             ],
             'theme' => $this->theme(),
         ]);
@@ -69,6 +70,16 @@ class HandleInertiaRequests extends Middleware
             return Settings::group('general')->get('app_name', config('app.name'));
         } catch (\Throwable) {
             return config('app.name');
+        }
+    }
+
+    private function logoUrl(): ?string
+    {
+        try {
+            if (! Schema::hasTable('settings')) return null;
+            return Settings::group('general')->get('logo_url');
+        } catch (\Throwable) {
+            return null;
         }
     }
 }
