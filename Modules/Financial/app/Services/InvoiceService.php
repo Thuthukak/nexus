@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Modules\Financial\app\Services;
 
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Modules\Financial\app\Models\Invoice;
 use Modules\Financial\app\Models\InvoiceLine;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
+use Modules\Financial\app\Models\Payment;
 
 class InvoiceService
 {
@@ -25,30 +26,139 @@ class InvoiceService
                 'notes'       => $data['notes'] ?? null,
             ]);
 
-            foreach ($data['lines'] ?? [] as $i => $line) {
-                $lineTotal = round($line['qty'] * $line['unit_price'], 2);
-                InvoiceLine::create([
-                    'invoice_id'  => $invoice->id,
-                    'description' => $line['description'],
-                    'qty'         => $line['qty'],
-                    'unit_price'  => $line['unit_price'],
-                    'tax_rate'    => $line['tax_rate'] ?? 0,
-                    'line_total'  => $lineTotal,
-                    'sort_order'  => $i,
-                ]);
-            }
-
-            $invoice->load('lines');
+            $this->syncLines($invoice, $data['lines'] ?? []);
             $invoice->recalculate();
 
             return $invoice->fresh(['lines', 'customer']);
         });
     }
 
-    public function updateStatus(Invoice $invoice, string $status): Invoice
+    public function update(Invoice $invoice, array $data): Invoice
     {
-        $invoice->update(['status' => $status]);
+        return DB::transaction(function () use ($invoice, $data) {
+            $invoice->update([
+                'customer_id' => $data['customer_id'],
+                'due_date'    => $data['due_date'],
+                'issue_date'  => $data['issue_date'] ?? $invoice->issue_date,
+                'notes'       => $data['notes'] ?? null,
+            ]);
+
+            $this->syncLines($invoice, $data['lines'] ?? []);
+            $invoice->recalculate();
+
+            return $invoice->fresh(['lines', 'customer']);
+        });
+    }
+
+    public function approve(Invoice $invoice): Invoice
+    {
+        abort_if(
+            ! in_array($invoice->status, ['draft']),
+            422,
+            'Only draft invoices can be approved.'
+        );
+
+        $invoice->update(['status' => 'approved']);
         return $invoice->fresh();
+    }
+
+    public function markSent(Invoice $invoice): Invoice
+    {
+        abort_if(
+            ! in_array($invoice->status, ['approved', 'draft']),
+            422,
+            'Invoice cannot be marked as sent.'
+        );
+
+        $invoice->update(['status' => 'sent']);
+        return $invoice->fresh();
+    }
+
+    public function recordPayment(Invoice $invoice, array $data): Payment
+    {
+        return DB::transaction(function () use ($invoice, $data) {
+            $payment = Payment::create([
+                'invoice_id' => $invoice->id,
+                'amount'     => $data['amount'],
+                'method'     => $data['method'],
+                'reference'  => $data['reference'] ?? null,
+                'notes'      => $data['notes']     ?? null,
+                'paid_at'    => $data['paid_at']   ?? now(),
+            ]);
+
+            $totalPaid = Payment::where('invoice_id', $invoice->id)->sum('amount');
+            $invoice->update(['paid_total' => $totalPaid]);
+
+            // Update status based on payment
+            $status = match (true) {
+                $totalPaid >= $invoice->total               => 'paid',
+                $totalPaid > 0 && $totalPaid < $invoice->total => 'part_paid',
+                default                                     => $invoice->status,
+            };
+
+            $invoice->update(['status' => $status]);
+
+            return $payment;
+        });
+    }
+
+    public function cancel(Invoice $invoice): Invoice
+    {
+        abort_if(
+            in_array($invoice->status, ['paid', 'cancelled']),
+            422,
+            'This invoice cannot be cancelled.'
+        );
+
+        $invoice->update(['status' => 'cancelled']);
+        return $invoice->fresh();
+    }
+
+    public function duplicate(Invoice $invoice): Invoice
+    {
+        return DB::transaction(function () use ($invoice) {
+            $invoice->load('lines');
+
+            $newInvoice = Invoice::create([
+                'reference'   => $this->nextReference(),
+                'customer_id' => $invoice->customer_id,
+                'created_by'  => auth()->id(),
+                'status'      => 'draft',
+                'issue_date'  => today(),
+                'due_date'    => today()->addDays(30),
+                'currency'    => $invoice->currency,
+                'notes'       => $invoice->notes,
+            ]);
+
+            $this->syncLines($newInvoice, $invoice->lines->map(fn ($l) => [
+                'description' => $l->description,
+                'qty'         => $l->qty,
+                'unit_price'  => $l->unit_price,
+                'tax_rate'    => $l->tax_rate,
+            ])->toArray());
+
+            $newInvoice->recalculate();
+
+            return $newInvoice->fresh(['lines', 'customer']);
+        });
+    }
+
+    private function syncLines(Invoice $invoice, array $lines): void
+    {
+        $invoice->lines()->delete();
+
+        foreach ($lines as $i => $line) {
+            $lineTotal = round($line['qty'] * $line['unit_price'], 2);
+            InvoiceLine::create([
+                'invoice_id'  => $invoice->id,
+                'description' => $line['description'],
+                'qty'         => $line['qty'],
+                'unit_price'  => $line['unit_price'],
+                'tax_rate'    => $line['tax_rate'] ?? 0,
+                'line_total'  => $lineTotal,
+                'sort_order'  => $i,
+            ]);
+        }
     }
 
     private function nextReference(): string

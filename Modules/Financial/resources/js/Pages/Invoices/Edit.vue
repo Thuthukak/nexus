@@ -1,48 +1,46 @@
 <script setup>
-import { computed, watch, ref } from 'vue'
-import { useForm, router }      from '@inertiajs/vue3'
-import AppLayout  from '@shared/layouts/AppLayout.vue'
-import Input      from '@shared/components/form/Input.vue'
-import Button     from '@shared/components/buttons/Button.vue'
+import { computed }  from 'vue'
+import { useForm }   from '@inertiajs/vue3'
+import AppLayout     from '@shared/layouts/AppLayout.vue'
+import Input         from '@shared/components/form/Input.vue'
+import Button        from '@shared/components/buttons/Button.vue'
 
 defineOptions({ layout: AppLayout })
 
 const props = defineProps({
+  invoice:   { type: Object, required: true },
   customers: { type: Array,  default: () => [] },
   taxRates:  { type: Array,  default: () => [] },
-  defaults:  { type: Object, default: () => ({}) },
 })
 
-// Pre-fill customer if passed in query string
-const urlParams      = new URLSearchParams(window.location.search)
-const preselectedCustomer = urlParams.get('customer_id') ?? ''
-
-const defaultTaxRate = props.taxRates.find(r => r.is_default)?.rate ?? 15
-
-const today         = new Date().toISOString().split('T')[0]
-const defaultDueDate= new Date(Date.now() + (props.defaults.due_days ?? 30) * 864e5)
-  .toISOString().split('T')[0]
-
 const form = useForm({
-  customer_id: preselectedCustomer,
-  issue_date:  today,
-  due_date:    defaultDueDate,
-  notes:       '',
-  lines: [
-    { description: '', qty: 1, unit_price: 0, tax_rate: defaultTaxRate },
-  ],
+  customer_id: props.invoice.customer_id,
+  issue_date:  props.invoice.issue_date,
+  due_date:    props.invoice.due_date,
+  notes:       props.invoice.notes ?? '',
+  lines:       props.invoice.lines.map(l => ({
+    description: l.description,
+    qty:         Number(l.qty),
+    unit_price:  Number(l.unit_price),
+    tax_rate:    Number(l.tax_rate),
+  })),
 })
 
 function addLine() {
-  form.lines.push({ description: '', qty: 1, unit_price: 0, tax_rate: defaultTaxRate })
+  const defaultTax = props.taxRates.find(r => r.is_default)?.rate ?? 15
+  form.lines.push({ description: '', qty: 1, unit_price: 0, tax_rate: defaultTax })
 }
 
 function removeLine(i) {
-  if (form.lines.length > 1) form.lines.splice(i, 1)
+  form.lines.splice(i, 1)
 }
 
-const subtotal   = computed(() => form.lines.reduce((s, l) => s + l.qty * l.unit_price, 0))
-const taxTotal   = computed(() => form.lines.reduce((s, l) => s + l.qty * l.unit_price * l.tax_rate / 100, 0))
+const subtotal = computed(() =>
+  form.lines.reduce((s, l) => s + l.qty * l.unit_price, 0)
+)
+const taxTotal = computed(() =>
+  form.lines.reduce((s, l) => s + (l.qty * l.unit_price * l.tax_rate / 100), 0)
+)
 const grandTotal = computed(() => subtotal.value + taxTotal.value)
 
 function currency(val) {
@@ -50,19 +48,20 @@ function currency(val) {
 }
 
 function submit() {
-  form.post('/financial/invoices')
+  form.put(`/financial/invoices/${props.invoice.id}`)
 }
 </script>
 
 <template>
   <div class="max-w-4xl">
     <div class="mb-6">
-      <a href="/financial/invoices" class="text-sm text-primary hover:underline">← Invoices</a>
-      <h1 class="text-2xl font-bold text-app-text mt-2">New Invoice</h1>
+      <a :href="`/financial/invoices/${invoice.id}`"
+         class="text-sm text-primary hover:underline">← Invoice</a>
+      <h1 class="text-2xl font-bold text-app-text mt-2">Edit Invoice</h1>
     </div>
 
     <form @submit.prevent="submit" class="space-y-6">
-      <!-- Details -->
+      <!-- Customer + dates -->
       <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6">
         <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider mb-4">Invoice Details</h2>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -73,7 +72,6 @@ function submit() {
               <option value="">Select customer…</option>
               <option v-for="c in customers" :key="c.id" :value="c.id">{{ c.company_name }}</option>
             </select>
-            <p v-if="form.errors.customer_id" class="text-xs text-red-500">{{ form.errors.customer_id }}</p>
           </div>
           <Input v-model="form.issue_date" label="Issue Date" type="date" required :error="form.errors.issue_date" />
           <Input v-model="form.due_date"   label="Due Date"   type="date" required :error="form.errors.due_date" />
@@ -88,7 +86,7 @@ function submit() {
         <div class="p-6 space-y-3">
           <div v-for="(line, i) in form.lines" :key="i" class="grid grid-cols-12 gap-3 items-start">
             <div class="col-span-12 sm:col-span-5">
-              <Input v-model="line.description" :label="i === 0 ? 'Description' : ''" placeholder="Item or service description" />
+              <Input v-model="line.description" :label="i === 0 ? 'Description' : ''" placeholder="Item description" />
             </div>
             <div class="col-span-4 sm:col-span-2">
               <Input v-model.number="line.qty" :label="i === 0 ? 'Qty' : ''" type="number" min="0.01" step="0.01" />
@@ -98,17 +96,18 @@ function submit() {
             </div>
             <div class="col-span-3 sm:col-span-2">
               <div class="flex flex-col gap-1">
-                <label v-if="i === 0" class="text-sm font-medium text-app-text">Tax</label>
+                <label v-if="i === 0" class="text-sm font-medium text-app-text">Tax %</label>
                 <select v-model.number="line.tax_rate"
                         class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50">
                   <option v-for="t in taxRates" :key="t.id" :value="Number(t.rate)">
-                    {{ t.name }}
+                    {{ t.name }} ({{ t.rate }}%)
                   </option>
                 </select>
               </div>
             </div>
             <div class="col-span-1 flex items-end pb-1">
-              <button v-if="form.lines.length > 1" type="button" @click="removeLine(i)"
+              <button type="button" @click="removeLine(i)"
+                      v-if="form.lines.length > 1"
                       class="p-1.5 text-red-400 hover:text-red-600 transition-colors">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -145,14 +144,14 @@ function submit() {
         <div class="flex flex-col gap-1">
           <label class="text-sm font-medium text-app-text">Notes</label>
           <textarea v-model="form.notes" rows="3"
-                    placeholder="Payment terms, bank details, or any additional notes…"
                     class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none" />
         </div>
       </div>
 
       <div class="flex items-center justify-end gap-3">
-        <a href="/financial/invoices" class="px-4 py-2 text-sm text-app-text/60 hover:text-app-text">Cancel</a>
-        <Button type="submit" :loading="form.processing">Create Invoice</Button>
+        <a :href="`/financial/invoices/${invoice.id}`"
+           class="px-4 py-2 text-sm text-app-text/60 hover:text-app-text">Cancel</a>
+        <Button type="submit" :loading="form.processing">Save Changes</Button>
       </div>
     </form>
   </div>
