@@ -58,6 +58,7 @@ class InvoiceController extends Controller
         return Inertia::render('Financial/Pages/Invoices/Create', [
             'customers' => Customer::active()->orderBy('company_name')->get(['id', 'company_name', 'email', 'vat_number']),
             'taxRates'  => TaxRate::active()->orderBy('name')->get(['id', 'name', 'rate', 'is_default']),
+            'products'  => \Modules\Financial\app\Models\Product::active()->orderBy('name')->get(['id', 'name', 'default_price', 'default_tax_rate', 'unit']),
             'defaults'  => [
                 'currency'   => config('financial.currency', 'ZAR'),
                 'due_days'   => 30,
@@ -126,6 +127,7 @@ class InvoiceController extends Controller
             ],
             'customers' => Customer::active()->orderBy('company_name')->get(['id', 'company_name']),
             'taxRates'  => TaxRate::active()->get(['id', 'name', 'rate', 'is_default']),
+            'products'  => \Modules\Financial\app\Models\Product::active()->orderBy('name')->get(['id', 'name', 'default_price', 'default_tax_rate', 'unit']),
         ]);
     }
 

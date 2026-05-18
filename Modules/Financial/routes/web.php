@@ -25,3 +25,10 @@ Route::get('/tax-rates',              [TaxRateController::class, 'index'])->name
 Route::post('/tax-rates',             [TaxRateController::class, 'store'])->name('tax-rates.store');
 Route::patch('/tax-rates/{taxRate}',  [TaxRateController::class, 'update'])->name('tax-rates.update');
 Route::delete('/tax-rates/{taxRate}', [TaxRateController::class, 'destroy'])->name('tax-rates.destroy');
+
+// Internal JSON API — used by inline form creation
+Route::prefix('api')->name('api.')->group(function () {
+    Route::post('/customers',       [\Modules\Financial\app\Http\Controllers\Api\CustomerApiController::class, 'store'])->name('customers.store');
+    Route::get('/products',         [\Modules\Financial\app\Http\Controllers\Api\ProductApiController::class, 'index'])->name('products.index');
+    Route::post('/products',        [\Modules\Financial\app\Http\Controllers\Api\ProductApiController::class, 'store'])->name('products.store');
+});
