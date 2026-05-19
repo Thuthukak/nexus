@@ -113,8 +113,10 @@ const defaultDueDate      = new Date(Date.now() + (props.defaults.due_days ?? 30
 const form = useForm({
   customer_id: urlParams.get('customer_id') ?? '',
   issue_date:  today,
-  due_date:    defaultDueDate,
-  notes:       '',
+  due_date:          defaultDueDate,
+  notes:             '',
+  deposit_required:  false,
+  deposit_percentage: 50,
   lines: [
     { _productId: '', description: '', qty: 1, unit_price: 0, tax_rate: defaultTaxRate.value },
   ],
@@ -417,6 +419,47 @@ function submit() {
                     placeholder="Payment terms, bank details, or any additional notes for the customer…"
                     class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none" />
         </div>
+      </div>
+
+      <!-- ── Deposit ─────────────────────────────────────────────── -->
+      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider">Deposit / Partial Payment</h2>
+            <p class="text-xs text-app-text/40 mt-0.5">Require a deposit before work begins</p>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input v-model="form.deposit_required" type="checkbox" class="sr-only peer" />
+            <div class="w-10 h-6 bg-gray-200 peer-focus:ring-2 peer-focus:ring-primary/50 rounded-full peer peer-checked:bg-primary transition-colors"></div>
+            <span class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-4"></span>
+          </label>
+        </div>
+
+        <Transition
+          enter-active-class="transition-all duration-200 ease-out"
+          enter-from-class="opacity-0 -translate-y-2"
+          enter-to-class="opacity-100 translate-y-0"
+        >
+          <div v-if="form.deposit_required" class="grid grid-cols-2 gap-4">
+            <div class="flex flex-col gap-1">
+              <label class="text-sm font-medium text-app-text">Deposit Percentage</label>
+              <div class="flex items-center gap-2">
+                <input v-model.number="form.deposit_percentage" type="number" min="1" max="99" step="1"
+                       class="w-24 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 text-center" />
+                <span class="text-sm text-app-text/60">%</span>
+              </div>
+            </div>
+            <div class="flex flex-col gap-1 justify-end">
+              <p class="text-xs text-app-text/50">Deposit amount</p>
+              <p class="text-lg font-bold text-primary">
+                {{ currency(grandTotal * form.deposit_percentage / 100) }}
+              </p>
+              <p class="text-xs text-app-text/40">
+                Remaining after deposit: {{ currency(grandTotal * (1 - form.deposit_percentage / 100)) }}
+              </p>
+            </div>
+          </div>
+        </Transition>
       </div>
 
       <!-- ── Actions ──────────────────────────────────────────── -->

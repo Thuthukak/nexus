@@ -15,7 +15,7 @@ const props = defineProps({
 
 const statusType = {
   paid: 'success', draft: 'neutral', overdue: 'danger',
-  sent: 'info', approved: 'warning', cancelled: 'neutral', part_paid: 'warning',
+  sent: 'info', approved: 'warning', cancelled: 'neutral', part_paid: 'warning', deposit_paid: 'info',
 }
 
 function currency(val) {
@@ -319,6 +319,25 @@ function openRecurring() {
           {{ currency(invoice.balance_due) }}
         </p>
       </div>
+
+      <!-- Deposit card — only when deposit is required -->
+      <div v-if="invoice.deposit_required"
+           class="bg-surface rounded-xl border border-blue-100 dark:border-blue-900/40 px-4 py-3 sm:col-span-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-xs text-app-text/50 mb-1">Deposit ({{ invoice.deposit_percentage }}%)</p>
+            <p class="text-sm font-bold text-blue-600">{{ currency(invoice.deposit_amount) }}</p>
+          </div>
+          <span v-if="invoice.deposit_paid_at"
+                class="text-xs font-medium text-green-600 bg-green-50 dark:bg-green-900/20 px-2 py-0.5 rounded-full">
+            Deposit Paid
+          </span>
+          <span v-else
+                class="text-xs font-medium text-orange-600 bg-orange-50 dark:bg-orange-900/20 px-2 py-0.5 rounded-full">
+            Deposit Outstanding
+          </span>
+        </div>
+      </div>
     </div>
 
     <!-- ── Content ─────────────────────────────────────────── -->
@@ -444,6 +463,21 @@ function openRecurring() {
   <!-- ── Payment Modal ──────────────────────────────────────── -->
   <Modal :show="showPayment" title="Record Payment" size="md" @close="showPayment = false">
     <form @submit.prevent="submitPayment" class="space-y-4">
+      <!-- Deposit shortcut buttons -->
+      <div v-if="invoice.deposit_required && !invoice.deposit_paid_at"
+           class="flex gap-2 mb-1">
+        <button type="button"
+                @click="paymentForm.amount = invoice.deposit_amount"
+                class="flex-1 py-2 px-3 text-xs font-medium border-2 border-blue-200 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors">
+          Pay Deposit ({{ invoice.deposit_percentage }}%) — {{ currency(invoice.deposit_amount) }}
+        </button>
+        <button type="button"
+                @click="paymentForm.amount = invoice.balance_due"
+                class="flex-1 py-2 px-3 text-xs font-medium border-2 border-green-200 text-green-600 rounded-lg hover:bg-green-50 transition-colors">
+          Pay Full Balance — {{ currency(invoice.balance_due) }}
+        </button>
+      </div>
+
       <div class="bg-gray-50 dark:bg-gray-800/50 rounded-lg px-4 py-3 flex justify-between text-sm">
         <span class="text-app-text/60">Balance Due</span>
         <span class="font-bold text-app-text">{{ currency(invoice.balance_due) }}</span>

@@ -24,7 +24,10 @@ class InvoiceService
                 'issue_date'  => $data['issue_date'] ?? today(),
                 'due_date'    => $data['due_date'],
                 'currency'    => $data['currency'] ?? config('financial.currency', 'ZAR'),
-                'notes'       => $data['notes'] ?? null,
+                'notes'              => $data['notes'] ?? null,
+                'deposit_required'   => $data['deposit_required'] ?? false,
+                'deposit_percentage' => $data['deposit_percentage'] ?? 50,
+                'deposit_amount'     => $data['deposit_amount'] ?? 0,
             ]);
 
             $this->syncLines($invoice, $data['lines'] ?? []);
@@ -90,14 +93,23 @@ class InvoiceService
             $totalPaid = Payment::where('invoice_id', $invoice->id)->sum('amount');
             $invoice->update(['paid_total' => $totalPaid]);
 
-            // Update status based on payment
+            // Determine new status
+            $depositPaid = $invoice->deposit_required && $totalPaid >= $invoice->deposit_amount;
+            $fullyPaid   = $totalPaid >= $invoice->total;
+
             $status = match (true) {
-                $totalPaid >= $invoice->total               => 'paid',
-                $totalPaid > 0 && $totalPaid < $invoice->total => 'part_paid',
-                default                                     => $invoice->status,
+                $fullyPaid  => 'paid',
+                $depositPaid => 'deposit_paid',
+                $totalPaid > 0 => 'part_paid',
+                default     => $invoice->status,
             };
 
-            $invoice->update(['status' => $status]);
+            $updates = ['status' => $status];
+            if ($depositPaid && ! $invoice->deposit_paid_at) {
+                $updates['deposit_paid_at'] = now();
+            }
+
+            $invoice->update($updates);
 
             return $payment;
         });

@@ -26,8 +26,12 @@ class Invoice extends Model
         return [
             'issue_date'      => 'date',
             'due_date'        => 'date',
-            'receipt_sent_at' => 'datetime',
-            'last_sent_at'    => 'datetime',
+            'receipt_sent_at'   => 'datetime',
+            'last_sent_at'      => 'datetime',
+            'deposit_paid_at'   => 'datetime',
+            'deposit_required'  => 'boolean',
+            'deposit_percentage'=> 'decimal:2',
+            'deposit_amount'    => 'decimal:2',
             'subtotal'   => 'decimal:2',
             'tax_total'  => 'decimal:2',
             'total'      => 'decimal:2',
@@ -73,5 +77,21 @@ class Invoice extends Model
     public function getBalanceDueAttribute(): float
     {
         return (float) $this->total - (float) $this->paid_total;
+    }
+
+    public function getDepositDueAttribute(): float
+    {
+        if (! $this->deposit_required) return 0;
+        return max(0, (float) $this->deposit_amount - (float) $this->paid_total);
+    }
+
+    public function isDepositPaid(): bool
+    {
+        return $this->deposit_required && $this->paid_total >= $this->deposit_amount;
+    }
+
+    public function computeDepositAmount(): float
+    {
+        return round((float) $this->total * ($this->deposit_percentage / 100), 2);
     }
 }

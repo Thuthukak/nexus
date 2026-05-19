@@ -74,6 +74,8 @@ class InvoiceController extends Controller
             'issue_date'          => 'required|date',
             'due_date'            => 'required|date',
             'notes'               => 'nullable|string',
+            'deposit_required'   => 'boolean',
+            'deposit_percentage' => 'nullable|numeric|min:1|max:99',
             'lines'               => 'required|array|min:1',
             'lines.*.description' => 'required|string',
             'lines.*.qty'         => 'required|numeric|min:0.01',
@@ -81,7 +83,19 @@ class InvoiceController extends Controller
             'lines.*.tax_rate'    => 'nullable|numeric|min:0|max:100',
         ]);
 
+         // Compute deposit amount from percentage after invoice total is known
+        if (! empty($validated['deposit_required'])) {
+            $validated['deposit_amount'] = 0; // will be computed after lines are saved
+        }
+
         $invoice = $this->service->create($validated, $request->user()->id);
+
+        // Update deposit_amount now that we have the total
+        if ($invoice->deposit_required) {
+            $invoice->update([
+                'deposit_amount' => $invoice->computeDepositAmount(),
+            ]);
+        }
 
         return redirect()
             ->route('financial.invoices.show', $invoice)
@@ -144,6 +158,8 @@ class InvoiceController extends Controller
             'issue_date'          => 'required|date',
             'due_date'            => 'required|date',
             'notes'               => 'nullable|string',
+            'deposit_required'   => 'boolean',
+            'deposit_percentage' => 'nullable|numeric|min:1|max:99',
             'lines'               => 'required|array|min:1',
             'lines.*.description' => 'required|string',
             'lines.*.qty'         => 'required|numeric|min:0.01',
@@ -258,7 +274,12 @@ class InvoiceController extends Controller
             'notes'       => $invoice->notes,
             'created_by'  => $invoice->createdBy?->name,
             'currency'    => $invoice->currency,
-            'receipt_sent_at' => $invoice->receipt_sent_at?->format('d M Y H:i'),
+            'receipt_sent_at'    => $invoice->receipt_sent_at?->format('d M Y H:i'),
+            'last_sent_at'       => $invoice->last_sent_at?->format('d M Y H:i'),
+            'deposit_required'   => $invoice->deposit_required,
+            'deposit_percentage' => $invoice->deposit_percentage,
+            'deposit_amount'     => $invoice->deposit_amount,
+            'deposit_paid_at'    => $invoice->deposit_paid_at?->format('d M Y H:i'),
         ];
     }
 
