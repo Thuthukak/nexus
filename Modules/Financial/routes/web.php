@@ -42,6 +42,10 @@ Route::post('/tax-rates',             [TaxRateController::class, 'store'])->name
 Route::patch('/tax-rates/{taxRate}',  [TaxRateController::class, 'update'])->name('tax-rates.update');
 Route::delete('/tax-rates/{taxRate}', [TaxRateController::class, 'destroy'])->name('tax-rates.destroy');
 
+// Payment settings
+Route::get('/settings/payments',   [\Modules\Financial\app\Http\Controllers\PaymentSettingsController::class, 'show'])->name('settings.payments');
+Route::patch('/settings/payments', [\Modules\Financial\app\Http\Controllers\PaymentSettingsController::class, 'update'])->name('settings.payments.update');
+
 // Internal JSON API
 Route::prefix('api')->name('api.')->group(function () {
     Route::post('/customers',  [\Modules\Financial\app\Http\Controllers\Api\CustomerApiController::class, 'store'])->name('customers.store');

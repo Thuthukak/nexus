@@ -28,6 +28,7 @@ const navGroups = [
       { label: 'Overview',   href: '/financial/dashboard' },
       { label: 'Invoices',   href: '/financial/invoices' },
       { label: 'Recurring',   href: '/financial/recurring' },
+      { label: 'Payments',    href: '/financial/settings/payments' },
       { label: 'Customers',  href: '/financial/customers' },
       { label: 'Tax Rates',  href: '/financial/tax-rates' },
     ],

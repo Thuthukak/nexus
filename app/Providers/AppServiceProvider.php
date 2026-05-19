@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\PaymentGateways\GatewayManager;
+use App\PaymentGateways\PayfastGateway;
+use App\PaymentGateways\PaystackGateway;
 use App\Services\LicenceService;
 use App\Settings\SettingsService;
 use Illuminate\Support\ServiceProvider;
@@ -20,6 +23,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(SettingsService::class, function () {
             return new SettingsService();
         });
+
+        $this->app->singleton(GatewayManager::class);
+        $this->app->bind(PayfastGateway::class);
+        $this->app->bind(PaystackGateway::class);
     }
 
     public function boot(): void
