@@ -28,7 +28,8 @@ class Invoice extends Model
             'due_date'        => 'date',
             'receipt_sent_at'   => 'datetime',
             'last_sent_at'      => 'datetime',
-            'deposit_paid_at'   => 'datetime',
+            'deposit_paid_at'            => 'datetime',
+            'payment_token_expires_at'   => 'datetime',
             'deposit_required'  => 'boolean',
             'deposit_percentage'=> 'decimal:2',
             'deposit_amount'    => 'decimal:2',
@@ -77,6 +78,29 @@ class Invoice extends Model
     public function getBalanceDueAttribute(): float
     {
         return (float) $this->total - (float) $this->paid_total;
+    }
+
+    public function generatePaymentToken(): string
+    {
+        $token = bin2hex(random_bytes(32));
+        $this->update([
+            'payment_token'            => $token,
+            'payment_token_expires_at' => now()->addDays(30),
+        ]);
+        return $token;
+    }
+
+    public function isPaymentTokenValid(): bool
+    {
+        return $this->payment_token
+            && $this->payment_token_expires_at
+            && $this->payment_token_expires_at->isFuture();
+    }
+
+    public function getPaymentUrlAttribute(): ?string
+    {
+        if (! $this->payment_token) return null;
+        return url('/pay/' . $this->payment_token);
     }
 
     public function getDepositDueAttribute(): float

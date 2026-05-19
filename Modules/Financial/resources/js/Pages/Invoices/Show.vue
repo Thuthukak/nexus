@@ -389,6 +389,19 @@ function openRecurring() {
               <dt class="text-xs text-app-text/50">Receipt Sent</dt>
               <dd class="text-sm font-medium text-green-600 mt-0.5">{{ invoice.receipt_sent_at }}</dd>
             </div>
+            <div v-if="invoice.payment_url" class="col-span-2">
+              <dt class="text-xs text-app-text/50 mb-1">Payment Link</dt>
+              <dd class="flex items-center gap-2">
+                <a :href="invoice.payment_url" target="_blank"
+                   class="text-xs text-primary hover:underline font-mono truncate max-w-[200px]">
+                  {{ invoice.payment_url }}
+                </a>
+                <button @click="navigator.clipboard.writeText(invoice.payment_url)"
+                        class="text-xs text-app-text/40 hover:text-app-text transition-colors flex-shrink-0">
+                  Copy
+                </button>
+              </dd>
+            </div>
           </dl>
         </div>
       </div>

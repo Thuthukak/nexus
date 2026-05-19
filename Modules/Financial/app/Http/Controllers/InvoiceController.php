@@ -276,6 +276,7 @@ class InvoiceController extends Controller
             'currency'    => $invoice->currency,
             'receipt_sent_at'    => $invoice->receipt_sent_at?->format('d M Y H:i'),
             'last_sent_at'       => $invoice->last_sent_at?->format('d M Y H:i'),
+            'payment_url'        => $invoice->payment_url,
             'deposit_required'   => $invoice->deposit_required,
             'deposit_percentage' => $invoice->deposit_percentage,
             'deposit_amount'     => $invoice->deposit_amount,

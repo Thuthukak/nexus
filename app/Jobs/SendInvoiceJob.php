@@ -38,6 +38,11 @@ class SendInvoiceJob implements ShouldQueue
             return;
         }
 
+        // Generate/refresh payment token
+        if ($invoice->balance_due > 0) {
+            $invoice->generatePaymentToken();
+        }
+
         // Generate PDF and save temporarily
         $pdf      = $pdfService->generate($invoice);
         $filename = $pdfService->filename($invoice);
