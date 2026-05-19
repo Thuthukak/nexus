@@ -256,6 +256,43 @@
     line-height: 1.6;
   }
 
+  /* PAID stamp */
+  .paid-stamp {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-35deg);
+    font-size: 80px;
+    font-weight: 900;
+    color: rgba(5, 150, 105, 0.15);
+    border: 12px solid rgba(5, 150, 105, 0.15);
+    border-radius: 16px;
+    padding: 10px 30px;
+    letter-spacing: 8px;
+    text-transform: uppercase;
+    pointer-events: none;
+    z-index: 1000;
+    white-space: nowrap;
+  }
+
+  .part-paid-stamp {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-35deg);
+    font-size: 55px;
+    font-weight: 900;
+    color: rgba(217, 119, 6, 0.15);
+    border: 10px solid rgba(217, 119, 6, 0.15);
+    border-radius: 16px;
+    padding: 10px 24px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    pointer-events: none;
+    z-index: 1000;
+    white-space: nowrap;
+  }
+
   /* Footer */
   .footer {
     margin-top: 48px;
@@ -391,6 +428,14 @@
     <div class="label">Notes</div>
     <p>{{ $invoice->notes }}</p>
   </div>
+  @endif
+
+  @if($showPaidStamp ?? false)
+    @if($invoice->status === 'paid')
+      <div class="paid-stamp">PAID</div>
+    @elseif($invoice->status === 'part_paid')
+      <div class="part-paid-stamp">PART PAID</div>
+    @endif
   @endif
 
   <!-- Footer -->

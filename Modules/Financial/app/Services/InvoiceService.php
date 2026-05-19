@@ -193,6 +193,6 @@ class InvoiceService
         \App\Jobs\SendInvoiceJob::dispatch($invoice->id);
 
         // Optimistically mark as queued so UI reflects intent immediately
-        $invoice->update(['status' => 'sent']);
+        $invoice->update(['status' => 'sent', 'last_sent_at' => now()]);
     }
 }

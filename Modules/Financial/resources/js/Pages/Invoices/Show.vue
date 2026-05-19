@@ -30,6 +30,7 @@ const canSend      = computed(() => ['draft', 'approved'].includes(props.invoice
 const canPay       = computed(() => ['approved', 'sent', 'part_paid', 'overdue'].includes(props.invoice.status))
 const canCancel    = computed(() => !['paid', 'cancelled'].includes(props.invoice.status))
 const canRecur     = computed(() => !['cancelled'].includes(props.invoice.status))
+const canReceipt   = computed(() => ['paid', 'part_paid'].includes(props.invoice.status))
 
 // ── Kebab menu ────────────────────────────────────────────────
 const kebabOpen = ref(false)
@@ -125,6 +126,15 @@ function submitRecurring() {
   })
 }
 
+const receiptLoading = ref(false)
+function sendReceipt() {
+  receiptLoading.value = true
+  kebabOpen.value      = false
+  router.post(`/financial/invoices/${props.invoice.id}/send-receipt`, {}, {
+    onFinish: () => receiptLoading.value = false,
+  })
+}
+
 function openRecurring() {
   kebabOpen.value     = false
   showRecurring.value = true
@@ -178,6 +188,15 @@ function openRecurring() {
             Send
           </Button>
 
+          <!-- Send Receipt — primary when paid -->
+          <Button v-if="canReceipt" variant="secondary" size="sm" :loading="receiptLoading" @click="sendReceipt">
+            <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Send Receipt
+          </Button>
+
           <!-- Kebab menu — everything else -->
           <div class="relative">
             <button
@@ -212,6 +231,19 @@ function openRecurring() {
                       d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                   Download PDF
+                </a>
+
+                <!-- Download Receipt -->
+                <a v-if="canReceipt"
+                   :href="`/financial/invoices/${invoice.id}/download-receipt`"
+                   target="_blank"
+                   @click="kebabOpen = false"
+                   class="flex items-center gap-2.5 px-4 py-2 text-sm text-app-text hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                  <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Download Receipt
                 </a>
 
                 <!-- Edit -->
@@ -329,6 +361,14 @@ function openRecurring() {
             <div>
               <dt class="text-xs text-app-text/50">Currency</dt>
               <dd class="text-sm font-medium text-app-text mt-0.5">{{ invoice.currency }}</dd>
+            </div>
+            <div v-if="invoice.last_sent_at">
+              <dt class="text-xs text-app-text/50">Last Sent</dt>
+              <dd class="text-sm font-medium text-app-text mt-0.5">{{ invoice.last_sent_at }}</dd>
+            </div>
+            <div v-if="invoice.receipt_sent_at">
+              <dt class="text-xs text-app-text/50">Receipt Sent</dt>
+              <dd class="text-sm font-medium text-green-600 mt-0.5">{{ invoice.receipt_sent_at }}</dd>
             </div>
           </dl>
         </div>

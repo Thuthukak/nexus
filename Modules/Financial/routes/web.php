@@ -19,6 +19,8 @@ Route::prefix('invoices/{invoice}')->name('invoices.')->group(function () {
     Route::post('/duplicate',           [InvoiceController::class, 'duplicate'])->name('duplicate');
     Route::post('/record-payment',      [InvoiceController::class, 'recordPayment'])->name('record-payment');
     Route::get('/download-pdf',         [InvoiceController::class, 'downloadPdf'])->name('download-pdf');
+    Route::post('/send-receipt',        [InvoiceController::class, 'sendReceipt'])->name('send-receipt');
+    Route::get('/download-receipt',     [InvoiceController::class, 'downloadReceipt'])->name('download-receipt');
     Route::post('/make-recurring',      [RecurringInvoiceController::class, 'store'])->name('make-recurring');
 });
 

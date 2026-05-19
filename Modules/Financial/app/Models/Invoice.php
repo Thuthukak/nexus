@@ -24,8 +24,10 @@ class Invoice extends Model
     protected function casts(): array
     {
         return [
-            'issue_date' => 'date',
-            'due_date'   => 'date',
+            'issue_date'      => 'date',
+            'due_date'        => 'date',
+            'receipt_sent_at' => 'datetime',
+            'last_sent_at'    => 'datetime',
             'subtotal'   => 'decimal:2',
             'tax_total'  => 'decimal:2',
             'total'      => 'decimal:2',

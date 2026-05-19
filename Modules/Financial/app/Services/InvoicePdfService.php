@@ -10,7 +10,7 @@ use Modules\Financial\app\Models\Invoice;
 
 class InvoicePdfService
 {
-    public function generate(Invoice $invoice): \Barryvdh\DomPDF\PDF
+    public function generate(Invoice $invoice, bool $withStamp = false): \Barryvdh\DomPDF\PDF
     {
         $invoice->load(['customer', 'lines']);
 
@@ -18,6 +18,7 @@ class InvoicePdfService
         $primaryColor = Settings::group('theme')->get('primary', '#1E3A5F');
         $appName      = Settings::group('general')->get('app_name', config('app.name'));
         $currency     = config('financial.currency', 'ZAR');
+        $showPaidStamp = $withStamp && in_array($invoice->status, ['paid', 'part_paid']);
 
         $pdf = Pdf::loadView('financial::pdf.invoice', compact(
             'invoice',
@@ -25,6 +26,7 @@ class InvoicePdfService
             'primaryColor',
             'appName',
             'currency',
+            'showPaidStamp',
         ));
 
         $pdf->setPaper('A4', 'portrait');
@@ -32,9 +34,10 @@ class InvoicePdfService
         return $pdf;
     }
 
-    public function filename(Invoice $invoice): string
+    public function filename(Invoice $invoice, bool $withStamp = false): string
     {
-        return 'Invoice-' . $invoice->reference . '.pdf';
+        $suffix = $withStamp ? '-RECEIPT' : '';
+        return 'Invoice-' . $invoice->reference . $suffix . '.pdf';
     }
 
     private function resolveLogoUrl(): ?string
@@ -42,7 +45,6 @@ class InvoicePdfService
         $path = Settings::group('general')->get('logo_path');
         if (! $path) return null;
 
-        // dompdf needs an absolute file path, not a URL
         $absolutePath = storage_path('app/public/' . $path);
         return file_exists($absolutePath) ? $absolutePath : null;
     }

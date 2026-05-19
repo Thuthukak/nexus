@@ -11,7 +11,7 @@ use Modules\Financial\app\Models\Customer;
 use Modules\Financial\app\Models\Invoice;
 use Modules\Financial\app\Models\TaxRate;
 use Modules\Financial\app\Services\InvoiceService;
-use Illuminate\Support\Facades\Log;
+use App\Jobs\SendReceiptJob;
 class InvoiceController extends Controller
 {
     public function __construct(private InvoiceService $service) {}
@@ -29,9 +29,9 @@ class InvoiceController extends Controller
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
                 $q->where('reference', 'like', '%' . $request->search . '%')
-                  ->orWhereHas('customer', fn ($cq) =>
-                      $cq->where('company_name', 'like', '%' . $request->search . '%')
-                  );
+                    ->orWhereHas('customer', fn ($cq) =>
+                        $cq->where('company_name', 'like', '%' . $request->search . '%')
+                );
             });
         }
 
@@ -258,6 +258,7 @@ class InvoiceController extends Controller
             'notes'       => $invoice->notes,
             'created_by'  => $invoice->createdBy?->name,
             'currency'    => $invoice->currency,
+            'receipt_sent_at' => $invoice->receipt_sent_at?->format('d M Y H:i'),
         ];
     }
 
@@ -272,11 +273,51 @@ class InvoiceController extends Controller
         ]);
     }
 
+    public function sendReceipt(Invoice $invoice)
+    {
+        abort_if(
+            ! in_array($invoice->status, ['paid', 'part_paid']),
+            422,
+            'Receipts can only be sent for paid or part-paid invoices.'
+        );
+
+        abort_if(
+            ! $invoice->customer->email,
+            422,
+            'This customer has no email address.'
+        );
+
+        SendReceiptJob::dispatch($invoice->id);
+
+        $invoice->update(['receipt_sent_at' => now()]);
+
+        return back()->with('toast', [
+            'type'    => 'success',
+            'title'   => 'Receipt queued',
+            'message' => "Receipt will be emailed to {$invoice->customer->email} shortly.",
+        ]);
+    }
+
     public function downloadPdf(Invoice $invoice)
     {
         $pdfService = app(\Modules\Financial\app\Services\InvoicePdfService::class);
         $pdf        = $pdfService->generate($invoice);
         $filename   = $pdfService->filename($invoice);
+
+        return $pdf->download($filename);
+    }
+
+    public function downloadReceipt(Invoice $invoice)
+    {
+        abort_if(
+            ! in_array($invoice->status, ['paid', 'part_paid']),
+            422,
+            'Receipts are only available for paid invoices.'
+        );
+
+        $pdfService = app(\Modules\Financial\app\Services\InvoicePdfService::class);
+        $pdf        = $pdfService->generate($invoice, withStamp: true);
+        $filename   = $pdfService->filename($invoice, withStamp: true);
 
         return $pdf->download($filename);
     }
