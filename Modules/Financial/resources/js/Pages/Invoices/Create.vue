@@ -1,10 +1,12 @@
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, vModelCheckbox } from 'vue'
 import { useForm }              from '@inertiajs/vue3'
 import axios                    from 'axios'
 import AppLayout from '@shared/layouts/AppLayout.vue'
 import Input     from '@shared/components/form/Input.vue'
 import Button    from '@shared/components/buttons/Button.vue'
+import Checkbox  from '@shared/components/buttons/Checkbox.vue'
+import RadioButton   from '@shared/components/buttons/RadioButton.vue'
 
 defineOptions({ layout: AppLayout })
 
@@ -12,14 +14,29 @@ const props = defineProps({
   customers: { type: Array,  default: () => [] },
   taxRates:  { type: Array,  default: () => [] },
   products:  { type: Array,  default: () => [] },
+  netTerms:  { type: Object, default: () => ({}) },
   defaults:  { type: Object, default: () => ({}) },
 })
 
+// ─── Net Terms ────────────────────────────────────────────────
+const today          = new Date().toISOString().split('T')[0]
+const selectedTerm   = ref('net_30')
+
+function applyNetTerm(termKey) {
+  selectedTerm.value = termKey
+  const term = props.netTerms[termKey]
+  if (term && term.days !== null) {
+    const dueDate = new Date(Date.now() + term.days * 864e5)
+    form.due_date = dueDate.toISOString().split('T')[0]
+  }
+  form.net_terms = termKey
+}
+
 // ─── Customer ────────────────────────────────────────────────
-const customerList      = ref([...props.customers])
-const showNewCustomer   = ref(false)
-const savingCustomer    = ref(false)
-const customerErrors    = ref({})
+const customerList    = ref([...props.customers])
+const showNewCustomer = ref(false)
+const savingCustomer  = ref(false)
+const customerErrors  = ref({})
 
 const newCustomer = ref({
   company_name: '', contact_name: '', email: '', phone: '', vat_number: '',
@@ -31,60 +48,41 @@ async function createCustomer() {
   try {
     const { data } = await axios.post('/financial/api/customers', newCustomer.value)
     customerList.value.push(data)
-    form.customer_id     = data.id
+    form.customer_id      = data.id
     showNewCustomer.value = false
-    newCustomer.value    = { company_name: '', contact_name: '', email: '', phone: '', vat_number: '' }
+    newCustomer.value     = { company_name: '', contact_name: '', email: '', phone: '', vat_number: '' }
   } catch (err) {
-    if (err.response?.status === 422) {
-      customerErrors.value = err.response.data.errors ?? {}
-    }
+    if (err.response?.status === 422) customerErrors.value = err.response.data.errors ?? {}
   } finally {
     savingCustomer.value = false
   }
 }
 
-function cancelNewCustomer() {
-  showNewCustomer.value = false
-  customerErrors.value  = {}
-  newCustomer.value     = { company_name: '', contact_name: '', email: '', phone: '', vat_number: '' }
-}
+// ─── Products ─────────────────────────────────────────────────
+const productList    = ref([...props.products])
+const showNewProduct = ref({ index: -1 })
+const savingProduct  = ref(false)
+const productErrors  = ref({})
 
-// ─── Products catalogue ───────────────────────────────────────
-const productList       = ref([...props.products])
-const showNewProduct    = ref({ index: -1 })   // which line is expanding
-const savingProduct     = ref(false)
-const productErrors     = ref({})
-
-const newProduct = ref({
-  name: '', default_price: '', default_tax_rate: '', unit: '',
-})
+const newProduct = ref({ name: '', default_price: '', default_tax_rate: '', unit: '' })
 
 async function createProduct(lineIndex) {
-  savingProduct.value  = true
-  productErrors.value  = {}
+  savingProduct.value = true
+  productErrors.value = {}
   try {
     const { data } = await axios.post('/financial/api/products', {
       ...newProduct.value,
       default_tax_rate: newProduct.value.default_tax_rate || defaultTaxRate.value,
     })
     productList.value.push(data)
-    // Auto-fill the line with the new product
     applyProduct(lineIndex, data)
     showNewProduct.value = { index: -1 }
     newProduct.value     = { name: '', default_price: '', default_tax_rate: '', unit: '' }
   } catch (err) {
-    if (err.response?.status === 422) {
-      productErrors.value = err.response.data.errors ?? {}
-    }
+    if (err.response?.status === 422) productErrors.value = err.response.data.errors ?? {}
   } finally {
     savingProduct.value = false
   }
-}
-
-function cancelNewProduct() {
-  showNewProduct.value = { index: -1 }
-  productErrors.value  = {}
-  newProduct.value     = { name: '', default_price: '', default_tax_rate: '', unit: '' }
 }
 
 function applyProduct(lineIndex, product) {
@@ -105,21 +103,49 @@ function onProductSelect(lineIndex, productId) {
 }
 
 // ─── Form ─────────────────────────────────────────────────────
-const urlParams           = new URLSearchParams(window.location.search)
-const defaultTaxRate      = computed(() => props.taxRates.find(r => r.is_default)?.rate ?? 15)
-const today               = new Date().toISOString().split('T')[0]
-const defaultDueDate      = new Date(Date.now() + (props.defaults.due_days ?? 30) * 864e5).toISOString().split('T')[0]
+const urlParams      = new URLSearchParams(window.location.search)
+const defaultTaxRate = computed(() => Number(props.taxRates.find(r => r.is_default)?.rate ?? 15))
 
 const form = useForm({
-  customer_id: urlParams.get('customer_id') ?? '',
-  issue_date:  today,
-  due_date:          defaultDueDate,
-  notes:             '',
-  deposit_required:  false,
+  customer_id:        urlParams.get('customer_id') ?? '',
+  issue_date:         today,
+  due_date:           '',
+  net_terms:          'net_30',
+  notes:              '',
+  deposit_required:   false,
+  deposit_type:       'percentage',
   deposit_percentage: 50,
+  deposit_amount:     0,
   lines: [
     { _productId: '', description: '', qty: 1, unit_price: 0, tax_rate: defaultTaxRate.value },
   ],
+})
+
+// Set default
+applyNetTerm('net_30')
+
+// Keep deposit_amount in sync with live total when using percentage
+const subtotal    = computed(() => form.lines.reduce((s, l) => s + l.qty * l.unit_price, 0))
+const taxTotal    = computed(() => form.lines.reduce((s, l) => s + l.qty * l.unit_price * l.tax_rate / 100, 0))
+const grandTotal  = computed(() => subtotal.value + taxTotal.value)
+
+const depositPreview = computed(() => {
+  if (! form.deposit_required) return 0
+  if (form.deposit_type === 'fixed') return form.deposit_amount
+  return grandTotal.value * form.deposit_percentage / 100
+})
+
+const balanceAfterDeposit = computed(() => grandTotal.value - depositPreview.value)
+
+// When type switches, reset values
+watch(() => form.deposit_type, (type) => {
+  if (type === 'percentage') {
+    form.deposit_percentage = 50
+    form.deposit_amount     = 0
+  } else {
+    form.deposit_percentage = 0
+    form.deposit_amount     = Math.round(grandTotal.value / 2 * 100) / 100
+  }
 })
 
 function addLine() {
@@ -127,22 +153,14 @@ function addLine() {
 }
 
 function removeLine(i) {
-  if (form.lines.length > 1) {
-    form.lines.splice(i, 1)
-    if (showNewProduct.value.index === i) showNewProduct.value = { index: -1 }
-  }
+  if (form.lines.length > 1) form.lines.splice(i, 1)
 }
-
-const subtotal   = computed(() => form.lines.reduce((s, l) => s + l.qty * l.unit_price, 0))
-const taxTotal   = computed(() => form.lines.reduce((s, l) => s + l.qty * l.unit_price * l.tax_rate / 100, 0))
-const grandTotal = computed(() => subtotal.value + taxTotal.value)
 
 function currency(val) {
   return 'R ' + Number(val ?? 0).toLocaleString('en-ZA', { minimumFractionDigits: 2 })
 }
 
 function submit() {
-  // Strip the internal _productId before posting
   const payload = {
     ...form.data(),
     lines: form.lines.map(({ _productId, ...line }) => line),
@@ -167,28 +185,19 @@ function submit() {
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <!-- Customer selector -->
           <div class="sm:col-span-2 flex flex-col gap-1">
-            <label class="text-sm font-medium text-app-text">
-              Customer <span class="text-red-500">*</span>
-            </label>
+            <label class="text-sm font-medium text-app-text">Customer <span class="text-red-500">*</span></label>
             <div class="flex gap-2">
-              <select
-                v-model="form.customer_id"
-                class="flex-1 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
-                :class="form.errors.customer_id ? 'border-red-400' : ''"
-              >
+              <select v-model="form.customer_id"
+                      class="flex-1 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      :class="form.errors.customer_id ? 'border-red-400' : ''">
                 <option value="">Select a customer…</option>
-                <option v-for="c in customerList" :key="c.id" :value="c.id">
-                  {{ c.company_name }}
-                </option>
+                <option v-for="c in customerList" :key="c.id" :value="c.id">{{ c.company_name }}</option>
               </select>
-              <button
-                type="button"
-                @click="showNewCustomer = !showNewCustomer"
-                class="flex-shrink-0 px-3 py-2 rounded-lg border text-sm font-medium transition-colors"
-                :class="showNewCustomer
-                  ? 'border-primary bg-primary/10 text-primary'
-                  : 'border-gray-300 dark:border-gray-600 text-app-text/60 hover:text-app-text hover:border-gray-400'"
-              >
+              <button type="button" @click="showNewCustomer = !showNewCustomer"
+                      class="flex-shrink-0 px-3 py-2 rounded-lg border text-sm transition-colors"
+                      :class="showNewCustomer
+                        ? 'border-primary bg-primary/10 text-primary'
+                        : 'border-gray-300 dark:border-gray-600 text-app-text/60 hover:text-app-text'">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     :d="showNewCustomer ? 'M6 18L18 6M6 6l12 12' : 'M12 4v16m8-8H4'" />
@@ -198,20 +207,14 @@ function submit() {
             <p v-if="form.errors.customer_id" class="text-xs text-red-500">{{ form.errors.customer_id }}</p>
           </div>
 
-          <!-- Inline new customer form -->
-          <Transition
-            enter-active-class="transition-all duration-200 ease-out"
-            enter-from-class="opacity-0 -translate-y-2"
-            enter-to-class="opacity-100 translate-y-0"
-            leave-active-class="transition-all duration-150 ease-in"
-            leave-from-class="opacity-100 translate-y-0"
-            leave-to-class="opacity-0 -translate-y-2"
-          >
+          <!-- Inline new customer -->
+          <Transition enter-active-class="transition-all duration-200 ease-out"
+                      enter-from-class="opacity-0 -translate-y-2" enter-to-class="opacity-100 translate-y-0">
             <div v-if="showNewCustomer"
-                 class="sm:col-span-2 rounded-xl border-2 border-primary/20 bg-primary/5 dark:bg-primary/10 p-5">
-              <div class="flex items-center justify-between mb-4">
+                 class="sm:col-span-2 p-4 rounded-xl border-2 border-primary/20 bg-primary/5 dark:bg-primary/10 p-5">
+              <div class="flex items-center justify-between mb-3">
                 <p class="text-sm font-semibold text-primary">New Customer</p>
-                <button type="button" @click="cancelNewCustomer"
+                <button type="button" @click="showNewCustomer = false"
                         class="text-xs text-app-text/50 hover:text-app-text">Cancel</button>
               </div>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -220,9 +223,7 @@ function submit() {
                   <input v-model="newCustomer.company_name" type="text" placeholder="Acme Corporation"
                          class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
                          :class="customerErrors.company_name ? 'border-red-400' : ''" />
-                  <p v-if="customerErrors.company_name" class="text-xs text-red-500">
-                    {{ customerErrors.company_name?.[0] }}
-                  </p>
+                  <p v-if="customerErrors.company_name" class="text-xs text-red-500">{{ customerErrors.company_name?.[0] }}</p>
                 </div>
                 <div class="flex flex-col gap-1">
                   <label class="text-sm font-medium text-app-text">Contact Person</label>
@@ -231,27 +232,25 @@ function submit() {
                 </div>
                 <div class="flex flex-col gap-1">
                   <label class="text-sm font-medium text-app-text">Email</label>
-                  <input v-model="newCustomer.email" type="email" placeholder="john@acme.co.za"
+                  <input v-model="newCustomer.email" type="email"
                          class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
                          :class="customerErrors.email ? 'border-red-400' : ''" />
                   <p v-if="customerErrors.email" class="text-xs text-red-500">{{ customerErrors.email?.[0] }}</p>
                 </div>
                 <div class="flex flex-col gap-1">
                   <label class="text-sm font-medium text-app-text">Phone</label>
-                  <input v-model="newCustomer.phone" type="text" placeholder="011 555 0100"
+                  <input v-model="newCustomer.phone" type="text"
                          class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
                 </div>
                 <div class="flex flex-col gap-1">
                   <label class="text-sm font-medium text-app-text">VAT Number</label>
-                  <input v-model="newCustomer.vat_number" type="text" placeholder="4120123456"
+                  <input v-model="newCustomer.vat_number" type="text"
                          class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
                 </div>
               </div>
               <div class="mt-4 flex justify-end gap-2">
-                <button type="button" @click="cancelNewCustomer"
-                        class="px-4 py-2 text-sm text-app-text/60 hover:text-app-text transition-colors">
-                  Cancel
-                </button>
+                <button type="button" @click="showNewCustomer = false"
+                        class="px-4 py-2 text-sm text-app-text/60 hover:text-app-text">Cancel</button>
                 <Button type="button" size="sm" :loading="savingCustomer" @click="createCustomer">
                   Save Customer
                 </Button>
@@ -259,13 +258,31 @@ function submit() {
             </div>
           </Transition>
 
-          <!-- Dates — side by side -->
-          <Input v-model="form.issue_date" label="Issue Date" type="date" required :error="form.errors.issue_date" />
-          <Input v-model="form.due_date"   label="Due Date"   type="date" required :error="form.errors.due_date" />
+          <!-- Issue date -->
+          <Input v-model="form.issue_date" label="Issue Date" type="date" required
+                 :error="form.errors.issue_date" />
+
+          <!-- Net terms + due date -->
+          <div class="flex flex-col gap-1">
+            <label class="text-sm font-medium text-app-text">Payment Terms and Due Date</label>
+            <div class="flex gap-2">
+              <select @change="applyNetTerm($event.target.value)"
+                      :value="selectedTerm"
+                      class="flex-1 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50">
+                <option v-for="(term, key) in netTerms" :key="key" :value="key">
+                  {{ term.label }}
+                </option>
+              </select>
+              <input v-model="form.due_date" type="date"
+                     class="w-36 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                     :class="form.errors.due_date ? 'border-red-400' : ''" />
+            </div>
+            <p v-if="form.errors.due_date" class="text-xs text-red-500">{{ form.errors.due_date }}</p>
+          </div>
         </div>
       </div>
 
-      <!-- ── Line Items ───────────────────────────────────────── -->
+      <!-- ── Line Items ─────────────────────────────────────── -->
       <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-800">
           <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider">Line Items</h2>
@@ -273,47 +290,34 @@ function submit() {
 
         <div class="p-6 space-y-4">
           <div v-for="(line, i) in form.lines" :key="i" class="space-y-2">
-
-            <!-- Line row -->
             <div class="grid grid-cols-12 gap-2 items-end">
-              <!-- Product selector + description -->
+              <!-- Description + product picker -->
               <div class="col-span-12 sm:col-span-5">
-                <label v-if="i === 0" class="text-sm font-medium text-app-text block mb-1">
-                  Product / Description
-                </label>
+                <label v-if="i === 0" class="text-sm font-medium text-app-text block mb-1">Product / Description</label>
                 <div class="flex gap-1">
-                  <select
-                    v-model="line._productId"
-                    @change="onProductSelect(i, line._productId)"
-                    class="w-32 flex-shrink-0 px-2 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-xs focus:outline-none focus:ring-2 focus:ring-primary/50"
-                  >
+                  <select v-model="line._productId"
+                          @change="onProductSelect(i, line._productId)"
+                          class="w-28 flex-shrink-0 px-2 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-xs focus:outline-none focus:ring-2 focus:ring-primary/50">
                     <option value="">— Pick —</option>
                     <option v-for="p in productList" :key="p.id" :value="p.id">{{ p.name }}</option>
-                    <option value="__new__">+ New product…</option>
+                    <option value="__new__">+ New…</option>
                   </select>
-                  <input
-                    v-model="line.description"
-                    type="text"
-                    placeholder="Description"
-                    class="flex-1 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
-                  />
+                  <input v-model="line.description" type="text" placeholder="Description"
+                         class="flex-1 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
                 </div>
               </div>
-
               <!-- Qty -->
               <div class="col-span-3 sm:col-span-2">
                 <label v-if="i === 0" class="text-sm font-medium text-app-text block mb-1">Qty</label>
                 <input v-model.number="line.qty" type="number" min="0.01" step="0.01"
                        class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 text-right" />
               </div>
-
               <!-- Unit price -->
               <div class="col-span-4 sm:col-span-2">
                 <label v-if="i === 0" class="text-sm font-medium text-app-text block mb-1">Unit Price</label>
                 <input v-model.number="line.unit_price" type="number" min="0" step="0.01"
                        class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 text-right" />
               </div>
-
               <!-- Tax -->
               <div class="col-span-4 sm:col-span-2">
                 <label v-if="i === 0" class="text-sm font-medium text-app-text block mb-1">Tax</label>
@@ -322,14 +326,13 @@ function submit() {
                   <option v-for="t in taxRates" :key="t.id" :value="Number(t.rate)">{{ t.name }}</option>
                 </select>
               </div>
-
               <!-- Line total + remove -->
-              <div class="col-span-1 flex items-end gap-1 justify-end pb-0.5">
-                <span class="text-xs font-medium text-app-text/50 whitespace-nowrap hidden sm:block">
+              <div class="col-span-1 flex items-end justify-end pb-0.5 gap-1">
+                <span class="text-xs font-medium text-app-text/40 hidden sm:block whitespace-nowrap">
                   {{ currency(line.qty * line.unit_price) }}
                 </span>
                 <button v-if="form.lines.length > 1" type="button" @click="removeLine(i)"
-                        class="p-1.5 text-red-400 hover:text-red-600 transition-colors flex-shrink-0">
+                        class="p-1.5 text-red-400 hover:text-red-600 transition-colors">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                   </svg>
@@ -337,20 +340,14 @@ function submit() {
               </div>
             </div>
 
-            <!-- Inline new product panel -->
-            <Transition
-              enter-active-class="transition-all duration-200 ease-out"
-              enter-from-class="opacity-0 -translate-y-1"
-              enter-to-class="opacity-100 translate-y-0"
-              leave-active-class="transition-all duration-150 ease-in"
-              leave-from-class="opacity-100"
-              leave-to-class="opacity-0"
-            >
+            <!-- Inline new product -->
+            <Transition enter-active-class="transition-all duration-200 ease-out"
+                        enter-from-class="opacity-0 -translate-y-1" enter-to-class="opacity-100 translate-y-0">
               <div v-if="showNewProduct.index === i"
-                   class="ml-4 rounded-xl border-2 border-accent/30 bg-accent/5 dark:bg-accent/10 p-4">
+                   class="ml-4 rounded-xl border-2 border-accent/30 bg-accent/5 p-4">
                 <div class="flex items-center justify-between mb-3">
                   <p class="text-sm font-semibold text-app-text">New Product / Service</p>
-                  <button type="button" @click="cancelNewProduct"
+                  <button type="button" @click="showNewProduct = { index: -1 }"
                           class="text-xs text-app-text/50 hover:text-app-text">Cancel</button>
                 </div>
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -359,11 +356,10 @@ function submit() {
                     <input v-model="newProduct.name" type="text" placeholder="e.g. Consulting (hourly)"
                            class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
                            :class="productErrors.name ? 'border-red-400' : ''" />
-                    <p v-if="productErrors.name" class="text-xs text-red-500">{{ productErrors.name?.[0] }}</p>
                   </div>
                   <div class="flex flex-col gap-1">
                     <label class="text-sm font-medium text-app-text">Default Price</label>
-                    <input v-model.number="newProduct.default_price" type="number" min="0" step="0.01" placeholder="0.00"
+                    <input v-model.number="newProduct.default_price" type="number" min="0" step="0.01"
                            class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
                   </div>
                   <div class="flex flex-col gap-1">
@@ -373,7 +369,7 @@ function submit() {
                   </div>
                 </div>
                 <div class="mt-3 flex justify-end gap-2">
-                  <button type="button" @click="cancelNewProduct"
+                  <button type="button" @click="showNewProduct = { index: -1 }"
                           class="px-3 py-1.5 text-sm text-app-text/60 hover:text-app-text">Cancel</button>
                   <Button type="button" size="sm" :loading="savingProduct" @click="createProduct(i)">
                     Save Product
@@ -383,7 +379,6 @@ function submit() {
             </Transition>
           </div>
 
-          <!-- Add line -->
           <button type="button" @click="addLine"
                   class="flex items-center gap-1.5 text-sm text-primary hover:underline mt-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -411,7 +406,97 @@ function submit() {
         </div>
       </div>
 
-      <!-- ── Notes ────────────────────────────────────────────── -->
+      <!-- ── Deposit ─────────────────────────────────────────── -->
+      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider">Deposit Required?</h2>
+            <p class="text-xs text-app-text/40 mt-0.5">
+              Customer pays deposit first, remainder on completion
+            </p>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <Checkbox v-model="form.deposit_required"/>
+          </label>
+        </div>
+
+        <Transition enter-active-class="transition-all duration-200 ease-out"
+                    enter-from-class="opacity-0 -translate-y-2" enter-to-class="opacity-100 translate-y-0">
+          <div v-if="form.deposit_required" class="space-y-4">
+
+            <!-- Type toggle -->
+            <div class="flex gap-3">
+  <button
+    type="button"
+    @click="form.deposit_type = 'percentage'"
+    class="flex-1 flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-all text-left"
+    :style="form.deposit_type === 'percentage'
+      ? { borderColor: 'var(--color-primary)', backgroundColor: 'color-mix(in srgb, var(--color-primary) 5%, transparent)' }
+      : {}"
+    :class="form.deposit_type !== 'percentage' && 'border-gray-200 dark:border-gray-700 hover:border-gray-300'"
+  >
+    <RadioButton :modelValue="form.deposit_type === 'percentage'" @update:modelValue="form.deposit_type = 'percentage'" />
+    <span class="text-sm font-medium text-app-text">Percentage (%)</span>
+  </button>
+
+  <button
+    type="button"
+    @click="form.deposit_type = 'fixed'"
+    class="flex-1 flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-all text-left"
+    :style="form.deposit_type === 'fixed'
+      ? { borderColor: 'var(--color-primary)', backgroundColor: 'color-mix(in srgb, var(--color-primary) 5%, transparent)' }
+      : {}"
+    :class="form.deposit_type !== 'fixed' && 'border-gray-200 dark:border-gray-700 hover:border-gray-300'"
+  >
+    <RadioButton :modelValue="form.deposit_type === 'fixed'" @update:modelValue="form.deposit_type = 'fixed'" />
+    <span class="text-sm font-medium text-app-text">Fixed Amount (R)</span>
+  </button>
+</div>
+
+            <!-- Input + live preview -->
+            <div class="grid grid-cols-2 gap-4 items-end">
+              <div class="flex flex-col gap-1">
+                <label class="text-sm font-medium text-app-text">
+                  {{ form.deposit_type === 'percentage' ? 'Deposit Percentage' : 'Deposit Amount' }}
+                </label>
+                <div class="flex items-center gap-2">
+                  <span v-if="form.deposit_type === 'fixed'"
+                        class="text-sm font-medium text-app-text/50 flex-shrink-0">R</span>
+                  <input v-if="form.deposit_type === 'percentage'"
+                         v-model.number="form.deposit_percentage"
+                         type="number" min="1" max="99" step="1"
+                         class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 text-center" />
+                  <input v-else
+                         v-model.number="form.deposit_amount"
+                         type="number" min="0" step="0.01"
+                         :max="grandTotal"
+                         class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 text-right" />
+                  <span v-if="form.deposit_type === 'percentage'"
+                        class="text-sm font-medium text-app-text/50 flex-shrink-0">%</span>
+                </div>
+              </div>
+
+              <!-- Live calculation -->
+              <div class="bg-gray-50 dark:bg-gray-800/50 rounded-lg px-4 py-3 space-y-1.5">
+                <div class="flex justify-between text-xs text-app-text/50">
+                  <span>Invoice Total</span>
+                  <span>{{ currency(grandTotal) }}</span>
+                </div>
+                <div class="flex justify-between text-sm font-semibold text-primary">
+                  <span>Deposit Due</span>
+                  <span>{{ currency(depositPreview) }}</span>
+                </div>
+                <div class="flex justify-between text-xs text-app-text/50 pt-1 border-t border-gray-200 dark:border-gray-700">
+                  <span>Balance After Deposit</span>
+                  <span>{{ currency(balanceAfterDeposit) }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Transition>
+      </div>
+
+      <!-- ── Notes ───────────────────────────────────────────── -->
       <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6">
         <div class="flex flex-col gap-1">
           <label class="text-sm font-medium text-app-text">Notes</label>
@@ -421,54 +506,17 @@ function submit() {
         </div>
       </div>
 
-      <!-- ── Deposit ─────────────────────────────────────────────── -->
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6">
-        <div class="flex items-center justify-between mb-4">
-          <div>
-            <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider">Deposit / Partial Payment</h2>
-            <p class="text-xs text-app-text/40 mt-0.5">Require a deposit before work begins</p>
-          </div>
-          <label class="relative inline-flex items-center cursor-pointer">
-            <input v-model="form.deposit_required" type="checkbox" class="sr-only peer" />
-            <div class="w-10 h-6 bg-gray-200 peer-focus:ring-2 peer-focus:ring-primary/50 rounded-full peer peer-checked:bg-primary transition-colors"></div>
-            <span class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-4"></span>
-          </label>
-        </div>
-
-        <Transition
-          enter-active-class="transition-all duration-200 ease-out"
-          enter-from-class="opacity-0 -translate-y-2"
-          enter-to-class="opacity-100 translate-y-0"
-        >
-          <div v-if="form.deposit_required" class="grid grid-cols-2 gap-4">
-            <div class="flex flex-col gap-1">
-              <label class="text-sm font-medium text-app-text">Deposit Percentage</label>
-              <div class="flex items-center gap-2">
-                <input v-model.number="form.deposit_percentage" type="number" min="1" max="99" step="1"
-                       class="w-24 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 text-center" />
-                <span class="text-sm text-app-text/60">%</span>
-              </div>
-            </div>
-            <div class="flex flex-col gap-1 justify-end">
-              <p class="text-xs text-app-text/50">Deposit amount</p>
-              <p class="text-lg font-bold text-primary">
-                {{ currency(grandTotal * form.deposit_percentage / 100) }}
-              </p>
-              <p class="text-xs text-app-text/40">
-                Remaining after deposit: {{ currency(grandTotal * (1 - form.deposit_percentage / 100)) }}
-              </p>
-            </div>
-          </div>
-        </Transition>
-      </div>
-
-      <!-- ── Actions ──────────────────────────────────────────── -->
+      <!-- ── Actions ─────────────────────────────────────────── -->
       <div class="flex items-center justify-between">
-        <a href="/financial/invoices" class="px-4 py-2 text-sm text-app-text/60 hover:text-app-text">
-          Cancel
-        </a>
+        <a href="/financial/invoices"
+           class="px-4 py-2 text-sm text-app-text/60 hover:text-app-text">Cancel</a>
         <div class="flex items-center gap-3">
-          <span class="text-sm text-app-text/40">Total: <strong class="text-app-text">{{ currency(grandTotal) }}</strong></span>
+          <span class="text-sm text-app-text/40">
+            Total: <strong class="text-app-text">{{ currency(grandTotal) }}</strong>
+            <span v-if="form.deposit_required" class="ml-2 text-primary">
+              · Deposit: <strong>{{ currency(depositPreview) }}</strong>
+            </span>
+          </span>
           <Button type="submit" :loading="form.processing">Create Invoice</Button>
         </div>
       </div>

@@ -55,13 +55,12 @@ class PaymentController extends Controller
             return back()->with('error', 'Online payments are not configured.');
         }
 
-        $validated = $request->validate([
-            'amount_type' => 'required|in:deposit,full',
-        ]);
+        // Backend determines what to charge — no client input needed
+        $amount = $invoice->amountDueNow();
 
-        $amount = $validated['amount_type'] === 'deposit' && $invoice->deposit_required
-            ? $invoice->deposit_amount
-            : $invoice->balance_due;
+        if ($amount <= 0) {
+            return redirect(route('pay.show', $token));
+        }
 
         $returnUrl = route('pay.return', $token);
         $cancelUrl = route('pay.cancel', $token);
@@ -78,8 +77,27 @@ class PaymentController extends Controller
     {
         $invoice = $this->findByToken($token);
 
-        // PayFast sends payment data back — we trust the ITN webhook for real recording
-        // This just shows a "thank you, processing" page
+        if ($invoice->status === 'paid') {
+            return inertia('Payment/Success', [
+                'invoice' => $this->formatInvoice($invoice),
+                'app'     => [
+                    'name'     => Settings::group('general')->get('app_name', config('app.name')),
+                    'logo_url' => Settings::group('general')->get('logo_url'),
+                ],
+            ]);
+        }
+
+        if ($invoice->status === 'cancelled') {
+            return inertia('Payment/Cancelled', [
+                'invoice' => $this->formatInvoice($invoice),
+                'app'     => [
+                    'name'     => Settings::group('general')->get('app_name', config('app.name')),
+                    'logo_url' => Settings::group('general')->get('logo_url'),
+                ],
+            ]);
+        }
+
+        // ITN hasn't arrived yet — show processing page
         return inertia('Payment/Processing', [
             'invoice' => $this->formatInvoice($invoice),
             'app'     => [
@@ -91,7 +109,9 @@ class PaymentController extends Controller
 
     public function handleCancel(string $token)
     {
-        $invoice = $this->findByToken($token);
+        $invoice = Invoice::with(['customer', 'lines'])
+            ->where('payment_token', $token)
+            ->firstOrFail();
 
         return inertia('Payment/Cancelled', [
             'invoice' => $this->formatInvoice($invoice),
@@ -110,7 +130,6 @@ class PaymentController extends Controller
 
         abort_if(! $invoice, 404, 'Payment link not found.');
         abort_if(! $invoice->isPaymentTokenValid(), 410, 'This payment link has expired.');
-        abort_if(in_array($invoice->status, ['paid', 'cancelled']), 410, 'This invoice has already been settled.');
 
         return $invoice;
     }

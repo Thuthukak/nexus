@@ -23,6 +23,10 @@ Schedule::command('financial:process-recurring')
     ->dailyAt('06:00')
     ->withoutOverlapping();
 
+Schedule::command('financial:process-overdue')
+    ->dailyAt('06:05')
+    ->withoutOverlapping();
+
 /*
 |--------------------------------------------------------------------------
 | Daily maintenance

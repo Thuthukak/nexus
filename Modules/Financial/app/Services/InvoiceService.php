@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\DB;
 use Modules\Financial\app\Models\Invoice;
 use Modules\Financial\app\Models\InvoiceLine;
 use Modules\Financial\app\Models\Payment;
-use Illuminate\Support\Facades\Log;
 
 class InvoiceService
 {
@@ -26,6 +25,7 @@ class InvoiceService
                 'currency'    => $data['currency'] ?? config('financial.currency', 'ZAR'),
                 'notes'              => $data['notes'] ?? null,
                 'deposit_required'   => $data['deposit_required'] ?? false,
+                'deposit_type'       => $data['deposit_type'] ?? 'percentage',
                 'deposit_percentage' => $data['deposit_percentage'] ?? 50,
                 'deposit_amount'     => $data['deposit_amount'] ?? 0,
             ]);

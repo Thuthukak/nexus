@@ -1,35 +1,31 @@
 <script setup>
-import { ref } from 'vue'
-
-const props = defineProps({
+defineProps({
   invoice: { type: Object, required: true },
   app:     { type: Object, required: true },
 })
-
-// Show the payment link again so they can retry
-const paymentUrl = ref(window.location.origin + '/pay/' + props.invoice.token)
 </script>
 
 <template>
   <div class="pf-page">
     <div class="pf-card">
-      <!-- X icon -->
-      <div class="icon-wrap icon-cancelled">
-        <svg class="cancel-ring" viewBox="0 0 50 50">
-          <circle cx="25" cy="25" r="22" fill="none" stroke="#f87171" stroke-width="2"
+      <!-- Animated checkmark -->
+      <div class="icon-wrap icon-success">
+        <svg class="check-ring" viewBox="0 0 50 50">
+          <circle cx="25" cy="25" r="22" fill="none" stroke="#22c55e" stroke-width="2"
                   stroke-dasharray="138" stroke-dashoffset="138"
                   style="animation: drawRing 0.6s 0.1s ease forwards;"/>
         </svg>
         <svg class="icon-inner" fill="none" stroke="currentColor" viewBox="0 0 24 24"
              style="animation: popIn 0.3s 0.65s ease both; opacity: 0;">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M6 18L18 6M6 6l12 12"/>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M5 13l4 4L19 7"/>
         </svg>
       </div>
 
-      <h1 class="pf-title">Payment Cancelled</h1>
+      <h1 class="pf-title">Payment Confirmed</h1>
       <p class="pf-body">
-        Your payment for <strong>{{ invoice.reference }}</strong> was cancelled.
-        No charge has been made. You can try again using the button below.
+        Thank you, <strong>{{ invoice.customer_name }}</strong>. Your payment for
+        <strong>{{ invoice.reference }}</strong> has been successfully processed.
+        A receipt has been sent to your email.
       </p>
 
       <div class="pf-detail-card">
@@ -41,18 +37,17 @@ const paymentUrl = ref(window.location.origin + '/pay/' + props.invoice.token)
           <span class="pf-label">Billed to</span>
           <span class="pf-value">{{ invoice.customer_name }}</span>
         </div>
+        <div class="pf-row">
+          <span class="pf-label">Amount paid</span>
+          <span class="pf-value pf-amount-success">R {{ Number(invoice.paid_total).toLocaleString('en-ZA', { minimumFractionDigits: 2 }) }}</span>
+        </div>
         <div class="pf-row pf-row-last">
-          <span class="pf-label">Balance due</span>
-          <span class="pf-amount-due">R {{ Number(invoice.balance_due).toLocaleString('en-ZA', { minimumFractionDigits: 2 }) }}</span>
+          <span class="pf-label">Status</span>
+          <span class="pf-badge-success">Paid</span>
         </div>
       </div>
 
-      <!-- Retry button — sends them back to the payment page -->
-      <a :href="`/pay/${invoice.token}`" class="pf-btn">
-        Try Again
-      </a>
-
-      <p class="pf-hint">If you continue to have issues, please contact us directly.</p>
+      <p class="pf-hint">A receipt has been emailed to {{ invoice.customer_email }}.</p>
       <p class="pf-brand">{{ app.name }}</p>
     </div>
   </div>
@@ -99,9 +94,9 @@ const paymentUrl = ref(window.location.origin + '/pay/' + props.invoice.token)
   position: relative;
 }
 
-.icon-cancelled { background: #fff5f5; }
+.icon-success { background: #f0fdf4; }
 
-.cancel-ring, .check-ring {
+.check-ring {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -111,12 +106,13 @@ const paymentUrl = ref(window.location.origin + '/pay/' + props.invoice.token)
 @keyframes drawRing {
   to { stroke-dashoffset: 0; }
 }
+
 @keyframes popIn {
   from { opacity: 0; transform: scale(0.5); }
   to   { opacity: 1; transform: scale(1); }
 }
 
-.icon-inner { width: 30px; height: 30px; color: #ef4444; position: relative; z-index: 1; }
+.icon-inner { width: 30px; height: 30px; color: #16a34a; position: relative; z-index: 1; }
 
 .pf-title {
   font-size: 1.35rem;
@@ -155,23 +151,19 @@ const paymentUrl = ref(window.location.origin + '/pay/' + props.invoice.token)
 
 .pf-label { color: #9b9b93; }
 .pf-value { font-weight: 500; color: #1a1a18; font-family: 'DM Mono', monospace; font-size: 0.82rem; }
-.pf-amount-due { color: #dc2626; font-size: 0.9rem; font-weight: 600; font-family: 'DM Mono', monospace; }
 
-.pf-btn {
-  display: block;
-  width: 100%;
-  background: #1a1a18;
-  color: #fff;
-  text-decoration: none;
-  font-size: 0.9rem;
-  font-weight: 500;
-  padding: 0.875rem 1.5rem;
-  border-radius: 10px;
-  margin-bottom: 1.25rem;
-  transition: background 0.15s;
-  letter-spacing: -0.01em;
+.pf-amount-success { color: #16a34a; font-size: 0.9rem; font-weight: 600; font-family: 'DM Mono', monospace; }
+
+.pf-badge-success {
+  background: #dcfce7;
+  color: #15803d;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.2rem 0.65rem;
+  border-radius: 99px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
-.pf-btn:hover { background: #2d2d2a; }
 
 .pf-hint {
   font-size: 0.8rem;

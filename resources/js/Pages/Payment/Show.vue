@@ -2,18 +2,17 @@
 import { ref, computed } from 'vue'
 import { useForm }       from '@inertiajs/vue3'
 
-defineProps({
+const props = defineProps({
   invoice: { type: Object, required: true },
   gateway: { type: Object, required: true },
   bank:    { type: Object, required: true },
   app:     { type: Object, required: true },
 })
 
-const form = useForm({ amount_type: 'full' })
+const form = useForm({})
 
-function pay(amountType) {
-  form.amount_type = amountType
-  form.post(`/pay/${props.invoice.token}/initiate`)
+function pay() {
+  window.location.href = `/pay/${props.invoice.token}/initiate`
 }
 
 function currency(val) {
@@ -108,24 +107,34 @@ function currency(val) {
           <p class="text-sm text-gray-500 mt-1">Secure payment via {{ gateway.name }}</p>
         </div>
         <div class="px-6 py-5 space-y-3">
-          <!-- Deposit option -->
-          <button v-if="invoice.deposit_required && !invoice.deposit_paid_at"
-                  @click="pay('deposit')"
-                  :disabled="form.processing"
-                  class="w-full py-3 px-4 rounded-xl border-2 border-blue-200 bg-blue-50 text-blue-700 font-semibold text-sm hover:bg-blue-100 transition-colors disabled:opacity-50">
-            Pay Deposit ({{ invoice.deposit_percentage }}%) — {{ currency(invoice.deposit_amount) }}
-          </button>
+          <!-- Deposit context message -->
+          <div v-if="invoice.deposit_required && !invoice.deposit_paid_at"
+               class="bg-blue-50 border border-blue-100 rounded-lg px-4 py-3 text-sm text-blue-700">
+            A deposit of <strong>{{ currency(invoice.deposit_amount) }}</strong>
+            ({{ invoice.deposit_percentage }}%) is required to confirm your order.
+            The remaining balance of
+            <strong>{{ currency(invoice.total - invoice.deposit_amount) }}</strong>
+            will be due on completion.
+          </div>
 
-          <!-- Full payment -->
-          <button @click="pay('full')"
+          <div v-if="invoice.deposit_required && invoice.deposit_paid_at && invoice.balance_due > 0"
+               class="bg-green-50 border border-green-100 rounded-lg px-4 py-3 text-sm text-green-700">
+            ✓ Deposit paid. The outstanding balance of
+            <strong>{{ currency(invoice.balance_due) }}</strong> is now due.
+          </div>
+
+          <!-- Single smart pay button — backend decides amount -->
+          <button @click="pay"
                   :disabled="form.processing"
-                  class="w-full py-3 px-4 rounded-xl bg-gray-900 text-white font-semibold text-sm hover:bg-gray-800 transition-colors disabled:opacity-50">
+                  class="w-full py-3.5 px-4 rounded-xl bg-gray-900 text-white font-semibold text-sm hover:bg-gray-800 transition-colors disabled:opacity-50">
             <span v-if="form.processing">Redirecting to payment…</span>
-            <span v-else>Pay {{ currency(invoice.balance_due) }} Now</span>
+            <span v-else>
+              {{ invoice.payment_stage }} — {{ currency(invoice.amount_due_now) }}
+            </span>
           </button>
 
           <p class="text-xs text-gray-400 text-center">
-            You will be redirected to {{ gateway.name }} to complete payment securely.
+            Redirected to {{ gateway.name }} for secure payment.
           </p>
         </div>
       </div>

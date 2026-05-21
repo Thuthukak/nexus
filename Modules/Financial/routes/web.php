@@ -11,6 +11,7 @@ Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard
 
 // Invoices
 Route::resource('invoices', InvoiceController::class);
+
 Route::prefix('invoices/{invoice}')->name('invoices.')->group(function () {
     Route::patch('/approve',            [InvoiceController::class, 'approve'])->name('approve');
     Route::patch('/mark-sent',          [InvoiceController::class, 'markSent'])->name('mark-sent');

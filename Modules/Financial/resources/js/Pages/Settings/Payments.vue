@@ -4,6 +4,7 @@ import { useForm } from '@inertiajs/vue3'
 import AppLayout   from '@shared/layouts/AppLayout.vue'
 import Input       from '@shared/components/form/Input.vue'
 import Button      from '@shared/components/buttons/Button.vue'
+import Checkbox    from '@shared/components/buttons/Checkbox.vue'
 
 defineOptions({ layout: AppLayout })
 
@@ -59,11 +60,7 @@ function submit() {
               No real payments processed. Use sandbox credentials.
             </p>
           </div>
-          <label class="relative inline-flex items-center cursor-pointer">
-            <input v-model="form.test_mode" type="checkbox" class="sr-only peer" />
-            <div class="w-10 h-6 bg-gray-300 peer-focus:ring-2 peer-focus:ring-yellow-400 rounded-full peer peer-checked:bg-yellow-500 transition-colors"></div>
-            <span class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-4"></span>
-          </label>
+          <Checkbox v-model="form.test_mode" />
         </div>
       </div>
 

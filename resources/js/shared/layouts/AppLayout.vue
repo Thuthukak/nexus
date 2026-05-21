@@ -25,6 +25,24 @@ watchEffect(() => {
   r.style.setProperty('--color-surface',      t.surface)
   r.style.setProperty('--color-background',   t.background)
   r.style.setProperty('--color-text',         t.text)
+
+  // RGB channel versions for Tailwind opacity modifiers (bg-primary/10 etc)
+  function hexToRgb(hex) {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+    return result
+      ? `${parseInt(result[1], 16)} ${parseInt(result[2], 16)} ${parseInt(result[3], 16)}`
+      : '0 0 0'
+  }
+
+  r.style.setProperty('--color-primary-rgb',      hexToRgb(t.primary))
+  r.style.setProperty('--color-primary-text-rgb', hexToRgb(t.primary_text))
+  r.style.setProperty('--color-secondary-rgb',    hexToRgb(t.secondary))
+  r.style.setProperty('--color-accent-rgb',       hexToRgb(t.accent))
+  r.style.setProperty('--color-sidebar-bg-rgb',   hexToRgb(t.sidebar_bg))
+  r.style.setProperty('--color-sidebar-text-rgb', hexToRgb(t.sidebar_text))
+  r.style.setProperty('--color-surface-rgb',      hexToRgb(t.surface))
+  r.style.setProperty('--color-background-rgb',   hexToRgb(t.background))
+  r.style.setProperty('--color-text-rgb',         hexToRgb(t.text))
 })
 
 // Watch for flash toasts from server redirects

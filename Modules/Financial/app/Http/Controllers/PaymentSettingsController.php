@@ -18,11 +18,24 @@ class PaymentSettingsController extends Controller
         ]);
     }
 
+    // Credential fields — never overwrite with masked placeholder
+    private const CREDENTIAL_FIELDS = [
+        'payfast_merchant_id',
+        'payfast_merchant_key',
+        'payfast_passphrase',
+        'paystack_public_key',
+        'paystack_secret_key',
+    ];
+
+    private const MASK_PATTERN = '/^[•\*]+$/u';
+
     public function update(Request $request)
     {
         $validated = $request->validate([
             'gateway'              => 'required|in:payfast,paystack,none',
             'test_mode'            => 'boolean',
+            'grace_days'           => 'nullable|integer|min:1|max:90',
+            'reminder_interval_days' => 'nullable|integer|min:1|max:30',
 
             // PayFast
             'payfast_merchant_id'  => 'nullable|string',
@@ -43,7 +56,14 @@ class PaymentSettingsController extends Controller
         ]);
 
         $group = Settings::group('payments');
+
         foreach ($validated as $key => $value) {
+            // Skip credential fields if the value is masked (user didn't change it)
+            if (in_array($key, self::CREDENTIAL_FIELDS, true)) {
+                if (! $value || preg_match(self::MASK_PATTERN, $value)) {
+                    continue; // don't overwrite with masked value
+                }
+            }
             $group->set($key, $value);
         }
 
@@ -70,8 +90,19 @@ class PaymentSettingsController extends Controller
             'bank_branch_code'     => '',
             'bank_reference_prefix'=> 'INV-',
             'payment_instructions' => '',
+            'grace_days'           => 7,
+            'reminder_interval_days' => 7,
         ];
 
-        return array_merge($defaults, array_filter($group->all(), fn($v) => $v !== null));
+        $settings = array_merge($defaults, array_filter($group->all(), fn($v) => $v !== null));
+
+        // Mask credential values for frontend display
+        foreach (self::CREDENTIAL_FIELDS as $field) {
+            if (! empty($settings[$field])) {
+                $settings[$field] = str_repeat('•', min(strlen($settings[$field]), 32));
+            }
+        }
+
+        return $settings;
     }
 }

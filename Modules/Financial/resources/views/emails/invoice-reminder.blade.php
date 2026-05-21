@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<style>
+  body { font-family: Arial, sans-serif; color: #374151; background: #f9fafb; margin: 0; padding: 0; }
+  .wrapper { max-width: 600px; margin: 32px auto; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+  .header { background: #dc2626; padding: 28px 32px; }
+  .header h1 { color: #fff; font-size: 20px; margin: 0 0 4px; }
+  .header p  { color: rgba(255,255,255,0.8); font-size: 13px; margin: 0; }
+  .body { padding: 32px; }
+  .body p { line-height: 1.6; margin-bottom: 16px; font-size: 14px; }
+  .overdue-box { background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 20px 24px; margin: 20px 0; }
+  .overdue-box table { width: 100%; border-collapse: collapse; }
+  .overdue-box td { padding: 6px 0; font-size: 14px; }
+  .overdue-box td:first-child { color: #6b7280; width: 160px; }
+  .overdue-box td:last-child { font-weight: 600; color: #111827; }
+  .total-row td { font-size: 16px; font-weight: 700; color: #dc2626; border-top: 1px solid #fecaca; padding-top: 10px; }
+  .pay-btn { display: block; background: #dc2626; color: #fff; text-decoration: none; text-align: center; padding: 14px 24px; border-radius: 8px; font-weight: 700; font-size: 15px; margin: 20px 0; }
+  .section-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #9ca3af; margin: 24px 0 10px; }
+  .bank-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .bank-table td { padding: 6px 0; border-bottom: 1px solid #f3f4f6; }
+  .bank-table td:first-child { color: #6b7280; width: 160px; }
+  .bank-table td:last-child { font-weight: 600; }
+  .ref-highlight { font-size: 16px; font-weight: 700; color: #dc2626; letter-spacing: 1px; }
+  .reminder-badge { display: inline-block; background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; margin-bottom: 12px; }
+  .footer { padding: 20px 32px; background: #f9fafb; border-top: 1px solid #e5e7eb; font-size: 12px; color: #9ca3af; text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <div class="header">
+    <h1>{{ $appName }}</h1>
+    <p>Payment Reminder</p>
+  </div>
+  <div class="body">
+    <div class="reminder-badge">REMINDER #{{ $reminderCount }}</div>
+
+    <p>Dear {{ $invoice->customer->contact_name ?? $invoice->customer->company_name }},</p>
+    <p>
+      This is a reminder that invoice <strong>{{ $invoice->reference }}</strong> is overdue.
+      Payment was due on <strong>{{ $invoice->due_date->format('d F Y') }}</strong>.
+    </p>
+
+    <div class="overdue-box">
+      <table>
+        <tr><td>Invoice</td><td>{{ $invoice->reference }}</td></tr>
+        <tr><td>Original Due Date</td><td>{{ $invoice->due_date->format('d F Y') }}</td></tr>
+        <tr><td>Invoice Total</td><td>{{ $currency }} {{ number_format($invoice->total, 2) }}</td></tr>
+        @if($invoice->paid_total > 0)
+        <tr><td>Amount Paid</td><td>{{ $currency }} {{ number_format($invoice->paid_total, 2) }}</td></tr>
+        @endif
+        @if($invoice->deposit_required && !$invoice->deposit_paid_at)
+        <tr><td>Deposit Due</td><td>{{ $currency }} {{ number_format($invoice->deposit_amount, 2) }} ({{ $invoice->deposit_percentage }}%)</td></tr>
+        @endif
+        <tr class="total-row">
+          <td>Outstanding Balance</td>
+          <td>{{ $currency }} {{ number_format($invoice->balance_due, 2) }}</td>
+        </tr>
+      </table>
+    </div>
+
+    @if($paymentUrl)
+    <a href="{{ $paymentUrl }}" class="pay-btn">
+      Pay {{ $currency }} {{ number_format($invoice->amountDueNow(), 2) }} Now →
+    </a>
+    @endif
+
+    @if($bankDetails['account_number'] ?? false)
+    <div class="section-label">Pay via EFT / Bank Transfer</div>
+    <table class="bank-table">
+      @if($bankDetails['account_name'] ?? false)
+        <tr><td>Account Name</td><td>{{ $bankDetails['account_name'] }}</td></tr>
+      @endif
+      @if($bankDetails['bank_name'] ?? false)
+        <tr><td>Bank</td><td>{{ $bankDetails['bank_name'] }}</td></tr>
+      @endif
+      <tr><td>Account Number</td><td>{{ $bankDetails['account_number'] }}</td></tr>
+      @if($bankDetails['branch_code'] ?? false)
+        <tr><td>Branch Code</td><td>{{ $bankDetails['branch_code'] }}</td></tr>
+      @endif
+      <tr>
+        <td>Reference</td>
+        <td><span class="ref-highlight">{{ $bankDetails['reference'] }}</span></td>
+      </tr>
+    </table>
+    @if($bankDetails['instructions'] ?? false)
+      <p style="font-size:13px;color:#6b7280;margin-top:12px;">{{ $bankDetails['instructions'] }}</p>
+    @endif
+    @endif
+
+    <p style="margin-top: 20px;">
+      If you have already made payment, please disregard this notice.
+      If you have any queries regarding this invoice, please contact us immediately.
+    </p>
+  </div>
+  <div class="footer">
+    <p>{{ $appName }} &mdash; Automated reminder. Please do not reply to this email directly.</p>
+  </div>
+</div>
+</body>
+</html>

@@ -24,7 +24,7 @@ class SendReceiptJob implements ShouldQueue
     public int $timeout = 120;
 
     public function __construct(
-        public readonly int $invoiceId,
+        public readonly string $invoiceId,
     ) {}
 
     public function handle(InvoicePdfService $pdfService): void

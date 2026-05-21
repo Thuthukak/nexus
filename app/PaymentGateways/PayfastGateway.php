@@ -41,48 +41,49 @@ class PayfastGateway implements PaymentGatewayInterface
         string  $cancelUrl,
         string  $notifyUrl,
     ): string {
-        $data = [
-            'merchant_id'   => $this->merchantId,
-            'merchant_key'  => $this->merchantKey,
-            'return_url'    => $returnUrl,
-            'cancel_url'    => $cancelUrl,
-            'notify_url'    => $notifyUrl,
-            'name_first'    => $invoice->customer->contact_name ?? $invoice->customer->company_name,
-            'name_last'     => '',
-            'email_address' => $invoice->customer->email,
-            'm_payment_id'  => $invoice->id,
-            'amount'        => number_format($amount, 2, '.', ''),
-            'item_name'     => 'Invoice ' . $invoice->reference,
-            'item_description' => 'Payment for invoice ' . $invoice->reference,
-            'custom_str1'   => $invoice->id,
-            'custom_str2'   => $invoice->reference,
-        ];
+        // Build payload in PayFast's required field order.
+        // Empty fields must be excluded — they break signature validation.
+        $nameFirst = $invoice->customer->contact_name ?? $invoice->customer->company_name;
 
-        if ($this->passphrase) {
+        $data = array_filter([
+            'merchant_id'      => $this->merchantId,
+            'merchant_key'     => $this->merchantKey,
+            'return_url'       => $returnUrl,
+            'cancel_url'       => $cancelUrl,
+            'notify_url'       => $notifyUrl,
+            'name_first'       => $nameFirst,
+            // name_last intentionally omitted — we don't split names, including it
+            // as empty string breaks the signature
+            'email_address'    => $invoice->customer->email,
+            'm_payment_id'     => $invoice->id,
+            'amount'           => number_format($amount, 2, '.', ''),
+            'item_name'        => 'Invoice ' . $invoice->reference,
+            'item_description' => 'Payment for invoice ' . $invoice->reference,
+            'custom_str1'      => $invoice->id,
+            'custom_str2'      => $invoice->reference,
+        ], fn($v) => $v !== '' && $v !== null);
+
+        // Append passphrase for signature only — removed from URL afterwards
+        if ($this->passphrase !== '') {
             $data['passphrase'] = $this->passphrase;
         }
 
-        // Generate signature
-        $data['signature'] = $this->generateSignature($data);
+        // In initiatePayment() — exclude empties outbound
+        $data['signature'] = $this->generateSignature($data, excludeEmpty: true);
 
-        // Remove passphrase from POST data
         unset($data['passphrase']);
 
-        // Build redirect URL with form POST (PayFast requires POST)
-        // We return the base URL + encoded data — the payment page renders a self-submitting form
         return $this->baseUrl . '?' . http_build_query($data);
     }
 
     public function verifyPayment(string $paymentId, float $expectedAmount): bool
     {
-        // PayFast verifies via ITN webhook — this is handled in handleWebhook
-        // For manual verification, we'd query the PayFast API (they don't have a simple status API)
+        // PayFast verifies via ITN webhook — no simple status API available
         return true;
     }
 
     public function handleWebhook(array $payload, string $rawBody, string $signature): ?array
     {
-        // Validate the ITN (Instant Transfer Notification)
         if (! $this->validateItn($payload)) {
             Log::warning('PayFast ITN validation failed', $payload);
             return null;
@@ -93,37 +94,36 @@ class PayfastGateway implements PaymentGatewayInterface
         }
 
         return [
-            'invoice_id'  => $payload['custom_str1']   ?? null,
-            'reference'   => $payload['custom_str2']   ?? null,
-            'amount'      => (float) ($payload['amount_gross'] ?? 0),
-            'payment_id'  => $payload['pf_payment_id'] ?? null,
+            'invoice_id' => $payload['custom_str1']   ?? null,
+            'reference'  => $payload['custom_str2']   ?? null,
+            'amount'     => (float) ($payload['amount_gross'] ?? 0),
+            'payment_id' => $payload['pf_payment_id'] ?? null,
         ];
     }
 
     private function validateItn(array $payload): bool
     {
-        // Step 1: Verify source IP (PayFast IPs)
-        $validHosts = $this->testMode
-            ? ['sandbox.payfast.co.za']
-            : ['www.payfast.co.za', 'w1w.payfast.co.za', 'w2w.payfast.co.za'];
-
-        // Step 2: Validate signature
         $postedSignature = $payload['signature'] ?? '';
         $testPayload     = $payload;
         unset($testPayload['signature']);
 
-        if ($this->passphrase) {
+        // For ITN validation: DO NOT strip null/empty fields.
+        // PayFast includes all fields in their signature, with nulls as empty strings.
+        // Convert nulls to empty strings to match what PayFast hashed.
+        $testPayload = array_map(
+            fn($v) => $v === null ? '' : $v,
+            $testPayload
+        );
+
+        if ($this->passphrase !== '') {
             $testPayload['passphrase'] = $this->passphrase;
         }
 
-        $generatedSignature = $this->generateSignature($testPayload);
-
-        if ($generatedSignature !== $postedSignature) {
+        if ($this->generateSignature($testPayload) !== $postedSignature) {
             Log::warning('PayFast ITN signature mismatch');
             return false;
         }
 
-        // Step 3: Verify with PayFast server
         $validateUrl = $this->testMode
             ? 'https://sandbox.payfast.co.za/eng/query/validate'
             : 'https://www.payfast.co.za/eng/query/validate';
@@ -137,11 +137,15 @@ class PayfastGateway implements PaymentGatewayInterface
         }
     }
 
-    private function generateSignature(array $data): string
+    private function generateSignature(array $data, bool $excludeEmpty = false): string
     {
-        ksort($data);
-        $queryString = http_build_query($data);
-        $queryString = urldecode($queryString);
-        return md5($queryString);
+        $parts = [];
+        foreach ($data as $key => $value) {
+            if ($excludeEmpty && ($value === '' || $value === null)) {
+                continue;
+            }
+            $parts[] = $key . '=' . urlencode((string) $value);
+        }
+        return md5(implode('&', $parts));
     }
 }

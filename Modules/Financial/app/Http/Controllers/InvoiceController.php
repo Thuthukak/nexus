@@ -12,6 +12,7 @@ use Modules\Financial\app\Models\Invoice;
 use Modules\Financial\app\Models\TaxRate;
 use Modules\Financial\app\Services\InvoiceService;
 use App\Jobs\SendReceiptJob;
+use Illuminate\Support\Facades\Log;
 class InvoiceController extends Controller
 {
     public function __construct(private InvoiceService $service) {}
@@ -59,6 +60,7 @@ class InvoiceController extends Controller
             'customers' => Customer::active()->orderBy('company_name')->get(['id', 'company_name', 'email', 'vat_number']),
             'taxRates'  => TaxRate::active()->orderBy('name')->get(['id', 'name', 'rate', 'is_default']),
             'products'  => \Modules\Financial\app\Models\Product::active()->orderBy('name')->get(['id', 'name', 'default_price', 'default_tax_rate', 'unit']),
+            'netTerms'  => \Modules\Financial\app\Models\Invoice::NET_TERMS,
             'defaults'  => [
                 'currency'   => config('financial.currency', 'ZAR'),
                 'due_days'   => 30,
@@ -69,13 +71,17 @@ class InvoiceController extends Controller
 
     public function store(Request $request)
     {
+        Log::info('Creating invoice with data: ' . json_encode($request->all()));
         $validated = $request->validate([
             'customer_id'         => 'required|uuid|exists:fin_customers,id',
             'issue_date'          => 'required|date',
             'due_date'            => 'required|date',
             'notes'               => 'nullable|string',
+            'net_terms'          => 'nullable|string',
             'deposit_required'   => 'boolean',
+            'deposit_type'       => 'nullable|in:percentage,fixed',
             'deposit_percentage' => 'nullable|numeric|min:1|max:99',
+            'deposit_amount'     => 'nullable|numeric|min:0',
             'lines'               => 'required|array|min:1',
             'lines.*.description' => 'required|string',
             'lines.*.qty'         => 'required|numeric|min:0.01',
@@ -83,14 +89,29 @@ class InvoiceController extends Controller
             'lines.*.tax_rate'    => 'nullable|numeric|min:0|max:100',
         ]);
 
-         // Compute deposit amount from percentage after invoice total is known
+        // Handle net terms — compute due_date from issue_date if not custom
+        if (! empty($validated['net_terms']) && $validated['net_terms'] !== 'custom') {
+            $terms = \Modules\Financial\app\Models\Invoice::NET_TERMS[$validated['net_terms']] ?? null;
+            if ($terms && $terms['days'] !== null) {
+                $validated['due_date'] = \Carbon\Carbon::parse($validated['issue_date'])
+                    ->addDays($terms['days'])
+                    ->format('Y-m-d');
+            }
+        }
+
+        // If fixed deposit amount provided, clear percentage; if percentage, clear fixed amount
         if (! empty($validated['deposit_required'])) {
-            $validated['deposit_amount'] = 0; // will be computed after lines are saved
+            if (($validated['deposit_type'] ?? 'percentage') === 'fixed') {
+                $validated['deposit_percentage'] = 0;
+                // deposit_amount already set from form
+            } else {
+                $validated['deposit_amount'] = 0; // computed after total known
+            }
         }
 
         $invoice = $this->service->create($validated, $request->user()->id);
 
-        // Update deposit_amount now that we have the total
+        // Compute final deposit amount now that we have the total
         if ($invoice->deposit_required) {
             $invoice->update([
                 'deposit_amount' => $invoice->computeDepositAmount(),
@@ -141,7 +162,9 @@ class InvoiceController extends Controller
             ],
             'customers' => Customer::active()->orderBy('company_name')->get(['id', 'company_name']),
             'taxRates'  => TaxRate::active()->get(['id', 'name', 'rate', 'is_default']),
-            'products'  => \Modules\Financial\app\Models\Product::active()->orderBy('name')->get(['id', 'name', 'default_price', 'default_tax_rate', 'unit']),
+            'netTerms'  => \Modules\Financial\app\Models\Invoice::NET_TERMS,
+            'products'  => \Modules\Financial\app\Models\Product::active()->orderBy('name')
+                ->get(['id', 'name', 'default_price', 'default_tax_rate', 'unit']),
         ]);
     }
 
@@ -158,8 +181,11 @@ class InvoiceController extends Controller
             'issue_date'          => 'required|date',
             'due_date'            => 'required|date',
             'notes'               => 'nullable|string',
+            'net_terms'          => 'nullable|string',
             'deposit_required'   => 'boolean',
+            'deposit_type'       => 'nullable|in:percentage,fixed',
             'deposit_percentage' => 'nullable|numeric|min:1|max:99',
+            'deposit_amount'     => 'nullable|numeric|min:0',
             'lines'               => 'required|array|min:1',
             'lines.*.description' => 'required|string',
             'lines.*.qty'         => 'required|numeric|min:0.01',
@@ -277,10 +303,14 @@ class InvoiceController extends Controller
             'receipt_sent_at'    => $invoice->receipt_sent_at?->format('d M Y H:i'),
             'last_sent_at'       => $invoice->last_sent_at?->format('d M Y H:i'),
             'payment_url'        => $invoice->payment_url,
+            'net_terms'          => $invoice->net_terms,
             'deposit_required'   => $invoice->deposit_required,
+            'deposit_type'       => $invoice->deposit_type,
             'deposit_percentage' => $invoice->deposit_percentage,
             'deposit_amount'     => $invoice->deposit_amount,
             'deposit_paid_at'    => $invoice->deposit_paid_at?->format('d M Y H:i'),
+            'amount_due_now'     => $invoice->amountDueNow(),
+            'payment_stage'      => $invoice->paymentStageLabel(),
         ];
     }
 

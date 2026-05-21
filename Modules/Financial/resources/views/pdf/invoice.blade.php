@@ -256,37 +256,15 @@
     line-height: 1.6;
   }
 
-  /* PAID stamp */
-  .paid-stamp {
+  /* Status stamp */
+  .status-stamp {
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%) rotate(-35deg);
-    font-size: 80px;
     font-weight: 900;
-    color: rgba(5, 150, 105, 0.15);
-    border: 12px solid rgba(5, 150, 105, 0.15);
     border-radius: 16px;
-    padding: 10px 30px;
-    letter-spacing: 8px;
-    text-transform: uppercase;
-    pointer-events: none;
-    z-index: 1000;
-    white-space: nowrap;
-  }
-
-  .part-paid-stamp {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) rotate(-35deg);
-    font-size: 55px;
-    font-weight: 900;
-    color: rgba(217, 119, 6, 0.15);
-    border: 10px solid rgba(217, 119, 6, 0.15);
-    border-radius: 16px;
-    padding: 10px 24px;
-    letter-spacing: 4px;
+    letter-spacing: 6px;
     text-transform: uppercase;
     pointer-events: none;
     z-index: 1000;
@@ -430,12 +408,13 @@
   </div>
   @endif
 
-  @if($showPaidStamp ?? false)
-    @if($invoice->status === 'paid')
-      <div class="paid-stamp">PAID</div>
-    @elseif($invoice->status === 'part_paid')
-      <div class="part-paid-stamp">PART PAID</div>
-    @endif
+  @if(isset($stamp) && $stamp)
+    <div class="status-stamp" style="
+      color: {{ $stamp['color'] }};
+      border: 10px solid {{ $stamp['color'] }};
+      padding: {{ strlen($stamp['text']) > 8 ? '8px 16px' : '10px 28px' }};
+      font-size: {{ strlen($stamp['text']) > 8 ? '52px' : '72px' }};
+    ">{{ $stamp['text'] }}</div>
   @endif
 
   <!-- Footer -->

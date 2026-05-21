@@ -38,13 +38,26 @@ class SendInvoiceJob implements ShouldQueue
             return;
         }
 
+        Log::info("SendInvoiceJob invoice {$invoice->reference}", [
+        'total'       => $invoice->total,
+        'paid_total'  => $invoice->paid_total,
+        'balance_due' => $invoice->balance_due,
+        'payment_token'       => $invoice->payment_token,
+    ]);
+
         // Generate/refresh payment token
         if ($invoice->balance_due > 0) {
-            $invoice->generatePaymentToken();
+            try {
+                $invoice->generatePaymentToken();
+            } catch (\Throwable $e) {
+                Log::error("generatePaymentToken failed for {$invoice->reference}: " . $e->getMessage());
+                // Don't rethrow — still send the invoice without a payment link
+            }
         }
+        
 
         // Generate PDF and save temporarily
-        $pdf      = $pdfService->generate($invoice);
+        $pdf      = $pdfService->generate($invoice, withStamp: true);
         $filename = $pdfService->filename($invoice);
         $tempPath = 'temp/invoices/' . $filename;
 

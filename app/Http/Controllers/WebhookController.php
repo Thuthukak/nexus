@@ -22,25 +22,32 @@ class WebhookController extends Controller
     {
         $gateway = $this->gatewayManager->active();
 
-        if (! $gateway || $gateway->getName() === 'none') {
-            return response('Gateway not configured', 400);
+        if (! $gateway) {
+            Log::warning('PayFast ITN received but no gateway is configured');
+            // Still return 200 — returning 400 causes PayFast to retry indefinitely
+            return response('OK', 200);
         }
 
-        $payload  = $request->all();
-        $rawBody  = $request->getContent();
+        $payload   = $request->all();
+        $rawBody   = $request->getContent();
         $signature = $payload['signature'] ?? '';
 
         $result = $gateway->handleWebhook($payload, $rawBody, $signature);
 
         if (! $result) {
-            Log::warning('PayFast webhook: invalid ITN received', $payload);
-            return response('Invalid ITN', 400);
+            Log::warning('PayFast webhook: invalid or incomplete ITN', [
+                'payment_status' => $payload['payment_status'] ?? 'unknown',
+                'm_payment_id'   => $payload['m_payment_id']   ?? 'unknown',
+            ]);
+            // Return 200 for non-COMPLETE statuses (FAILED, CANCELLED) — these are
+            // valid ITNs, just not ones we act on. 400 triggers retries.
+            return response('OK', 200);
         }
 
         $this->processSuccessfulPayment(
             invoiceId:  $result['invoice_id'],
             amount:     $result['amount'],
-            paymentRef: $result['payment_id'] ?? 'PayFast-' . time(),
+            paymentRef: $result['payment_id'] ?? 'payfast-' . time(),
             method:     'payfast',
         );
 
@@ -49,7 +56,13 @@ class WebhookController extends Controller
 
     public function paystack(Request $request)
     {
-        $gateway   = $this->gatewayManager->active();
+        $gateway = $this->gatewayManager->active();
+
+        if (! $gateway) {
+            Log::warning('Paystack webhook received but no gateway is configured');
+            return response('OK', 200);
+        }
+
         $signature = $request->header('x-paystack-signature', '');
         $rawBody   = $request->getContent();
         $payload   = $request->all();
@@ -57,13 +70,14 @@ class WebhookController extends Controller
         $result = $gateway->handleWebhook($payload, $rawBody, $signature);
 
         if (! $result) {
-            return response('Invalid webhook', 400);
+            // Non-charge.success events (subscription, refund, etc.) return null — that's fine
+            return response('OK', 200);
         }
 
         $this->processSuccessfulPayment(
             invoiceId:  $result['invoice_id'],
             amount:     $result['amount'],
-            paymentRef: $result['payment_id'] ?? 'Paystack-' . time(),
+            paymentRef: $result['payment_id'] ?? 'paystack-' . time(),
             method:     'paystack',
         );
 
@@ -88,12 +102,23 @@ class WebhookController extends Controller
             return;
         }
 
+        // Guard against duplicate ITNs — PayFast can send the same ITN multiple times
         if ($invoice->status === 'paid') {
-            Log::info("Webhook: invoice {$invoiceId} already paid, skipping");
+            Log::info("Webhook: invoice {$invoice->reference} already paid, skipping duplicate ITN");
             return;
         }
 
-        // Record the payment
+        // Guard against amount mismatch — never trust the gateway amount blindly
+        $expected = $invoice->amountDueNow();
+        if (abs($amount - $expected) > 0.05) {
+            Log::error("Webhook: amount mismatch for {$invoice->reference}", [
+                'expected' => $expected,
+                'received' => $amount,
+                'method'   => $method,
+            ]);
+            return;
+        }
+
         $this->invoiceService->recordPayment($invoice, [
             'amount'    => $amount,
             'method'    => $method,
@@ -102,9 +127,13 @@ class WebhookController extends Controller
             'paid_at'   => now()->format('Y-m-d H:i:s'),
         ]);
 
-        // Send receipt automatically
-        SendReceiptJob::dispatch($invoice->id);
+        // Only send receipt once the invoice is fully paid
+        $invoice->refresh();
+        if ($invoice->status === 'paid') {
+            SendReceiptJob::dispatch($invoice->id);
+            Log::info("Webhook: receipt queued for {$invoice->reference}");
+        }
 
-        Log::info("Webhook: payment of {$amount} recorded for invoice {$invoice->reference}");
+        Log::info("Webhook: R{$amount} recorded for invoice {$invoice->reference} via {$method}");
     }
 }

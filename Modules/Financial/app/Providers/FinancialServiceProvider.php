@@ -18,6 +18,7 @@ class FinancialServiceProvider extends ServiceProvider
         $this->loadMigrationsFrom(module_path($this->moduleName, 'database/migrations'));
         $this->commands([
             \Modules\Financial\app\Console\Commands\ProcessRecurringInvoicesCommand::class,
+            \Modules\Financial\app\Console\Commands\MarkOverdueAndSendRemindersCommand::class,
         ]);
     }
 
