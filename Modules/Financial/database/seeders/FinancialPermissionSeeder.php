@@ -42,7 +42,7 @@ class FinancialPermissionSeeder extends Seeder
             ]);
         }
 
-        $admin = Role::findByName('Admin', 'web');
+        $admin = Role::findByName('Super Admin', 'web');
         $admin->givePermissionTo(array_filter(
             $permissions,
             fn ($p) => ! str_contains($p, '.portal.')

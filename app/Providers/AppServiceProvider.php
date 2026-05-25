@@ -11,6 +11,7 @@ use App\Services\LicenceService;
 use App\Settings\SettingsService;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Foundation\AliasLoader;
+use App\Services\ModuleRegistryService;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -27,6 +28,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(GatewayManager::class);
         $this->app->bind(PayfastGateway::class);
         $this->app->bind(PaystackGateway::class);
+
+        $this->app->singleton(ModuleRegistryService::class);
     }
 
     public function boot(): void
@@ -39,5 +42,7 @@ class AppServiceProvider extends ServiceProvider
             $loader = \Illuminate\Foundation\AliasLoader::getInstance();
             $loader->alias('Settings', \App\Facades\Settings::class);
         });
+
+        $this->commands([\App\Console\Commands\SetupModulesCommand::class,]);
     }
 }

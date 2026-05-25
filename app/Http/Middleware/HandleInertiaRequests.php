@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Middleware;
 
 use App\Facades\Settings;
+use App\Services\ModuleRegistryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
 use Inertia\Middleware;
@@ -37,7 +38,18 @@ class HandleInertiaRequests extends Middleware
                 'logo_url' => $this->logoUrl(),
             ],
             'theme' => $this->theme(),
+            
+            'activeModules' => $this->activeModules(),
         ]);
+    }
+
+    private function activeModules(): array
+    {
+        try {
+            return app(ModuleRegistryService::class)->getEnabledModules();
+        } catch (\Throwable) {
+            return ['Core'];
+        }
     }
 
     private function theme(): array

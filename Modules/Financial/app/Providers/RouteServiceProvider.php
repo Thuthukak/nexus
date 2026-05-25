@@ -18,7 +18,7 @@ class RouteServiceProvider extends ServiceProvider
 
     public function map(): void
     {
-        Route::middleware(['web', 'auth'])
+        Route::middleware(['web', 'auth', 'module:Financial'])
             ->prefix('financial')
             ->name('financial.')
             ->group(module_path($this->moduleName, 'routes/web.php'));

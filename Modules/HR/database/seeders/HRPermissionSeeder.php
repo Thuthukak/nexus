@@ -37,7 +37,7 @@ class HRPermissionSeeder extends Seeder
         }
 
         // Assign to default roles
-        $admin = Role::findByName('Admin', 'web');
+        $admin = Role::findByName('Super Admin', 'web');
         $admin->givePermissionTo($permissions);
 
         $manager = Role::findByName('Manager', 'web');

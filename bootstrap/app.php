@@ -11,6 +11,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->prepend(\App\Http\Middleware\WizardMiddleware::class);
+        $middleware->alias([
+            'module' => \App\Http\Middleware\ModuleAccessMiddleware::class,
+        ]);
         $middleware->validateCsrfTokens(except: [
             'webhooks/*',
         ]);

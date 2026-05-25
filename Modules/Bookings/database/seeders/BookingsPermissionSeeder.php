@@ -33,7 +33,7 @@ class BookingsPermissionSeeder extends Seeder
             ]);
         }
 
-        $admin = Role::findByName('Admin', 'web');
+        $admin = Role::findByName('Super Admin', 'web');
         $admin->givePermissionTo($permissions);
 
         $manager = Role::findByName('Manager', 'web');
