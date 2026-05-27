@@ -2,6 +2,15 @@
 
 use Illuminate\Support\Facades\Route;
 
+// Installation wizard
+Route::prefix('install')->name('install.')->group(function () {
+    Route::get('/',          [\App\Http\Controllers\Wizard\WizardController::class, 'index'])->name('index');
+    Route::get('/step/{step}', [\App\Http\Controllers\Wizard\WizardController::class, 'show'])->name('step');
+    Route::post('/step/{step}', [\App\Http\Controllers\Wizard\WizardController::class, 'process'])->name('process');
+    Route::get('/check-db',   [\App\Http\Controllers\Wizard\WizardController::class, 'checkDb'])->name('check-db');
+    Route::get('/progress',   [\App\Http\Controllers\Wizard\WizardController::class, 'migrationProgress'])->name('progress');
+});
+
 // Public payment routes — no authentication required
 Route::prefix('pay')->name('pay.')->group(function () {
     Route::get('/{token}',           [\App\Http\Controllers\PaymentController::class, 'show'])->name('show');

@@ -25,6 +25,14 @@ Route::prefix('settings')->name('settings.')->group(function () {
     Route::patch('/appearance',    [SettingsController::class, 'updateAppearance'])->name('appearance.update');
 });
 
+// Module Manager
+Route::prefix('admin/modules')->name('modules.')->group(function () {
+    Route::get('/',                    [\Modules\Core\app\Http\Controllers\ModuleManagerController::class, 'index'])->name('index');
+    Route::patch('/{module}/enable',   [\Modules\Core\app\Http\Controllers\ModuleManagerController::class, 'enable'])->name('enable');
+    Route::patch('/{module}/disable',  [\Modules\Core\app\Http\Controllers\ModuleManagerController::class, 'disable'])->name('disable');
+    Route::post('/licence',            [\Modules\Core\app\Http\Controllers\ModuleManagerController::class, 'updateLicence'])->name('licence.update');
+});
+
 // Logo
 Route::post('/settings/logo',   [\Modules\Core\app\Http\Controllers\LogoController::class, 'upload'])->name('settings.logo.upload');
 Route::delete('/settings/logo', [\Modules\Core\app\Http\Controllers\LogoController::class, 'destroy'])->name('settings.logo.destroy');

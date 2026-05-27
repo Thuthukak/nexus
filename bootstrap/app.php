@@ -4,6 +4,16 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 
+// Ensure .env exists before Laravel tries to load it
+if (! file_exists(dirname(__DIR__) . '/.env') && file_exists(dirname(__DIR__) . '/.env.example')) {
+    copy(dirname(__DIR__) . '/.env.example', dirname(__DIR__) . '/.env');
+}
+
+// Ensure .env exists before Laravel tries to load it
+if (! file_exists(dirname(__DIR__) . '/.env') && file_exists(dirname(__DIR__) . '/.env.example')) {
+    copy(dirname(__DIR__) . '/.env.example', dirname(__DIR__) . '/.env');
+}
+
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
