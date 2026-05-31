@@ -22,6 +22,9 @@ class User extends Authenticatable implements MustVerifyEmail
         'guard',
         'portal_access',
         'notification_preferences',
+        'is_active',      
+        'last_login_at',    
+        'notification_preferences',
     ];
 
     protected $hidden = [
@@ -37,6 +40,8 @@ class User extends Authenticatable implements MustVerifyEmail
             'email_verified_at'          => 'datetime',
             'password'                   => 'hashed',
             'portal_access'              => 'boolean',
+            'is_active'                  => 'boolean',            
+            'last_login_at'              => 'datetime',            
             'notification_preferences'   => 'array',
         ];
     }

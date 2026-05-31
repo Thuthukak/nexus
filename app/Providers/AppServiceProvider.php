@@ -12,6 +12,7 @@ use App\Settings\SettingsService;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Foundation\AliasLoader;
 use App\Services\ModuleRegistryService;
+use Illuminate\Support\Facades\Event;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -44,5 +45,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->commands([\App\Console\Commands\SetupModulesCommand::class,]);
+        $this->commands([\App\Console\Commands\SetupModulesCommand::class,]);
+        Event::listen(Login::class, UpdateLastLogin::class);
     }
 }

@@ -25,6 +25,28 @@ Route::prefix('settings')->name('settings.')->group(function () {
     Route::patch('/appearance',    [SettingsController::class, 'updateAppearance'])->name('appearance.update');
 });
 
+// User Management
+Route::prefix('users')->name('users.')->group(function () {
+    Route::get('/',                    [\Modules\Core\app\Http\Controllers\UserController::class, 'index'])->name('index');
+    Route::get('/create',              [\Modules\Core\app\Http\Controllers\UserController::class, 'create'])->name('create');
+    Route::post('/',                   [\Modules\Core\app\Http\Controllers\UserController::class, 'store'])->name('store');
+    Route::get('/{user}',              [\Modules\Core\app\Http\Controllers\UserController::class, 'show'])->name('show');
+    Route::get('/{user}/edit',         [\Modules\Core\app\Http\Controllers\UserController::class, 'edit'])->name('edit');
+    Route::patch('/{user}',            [\Modules\Core\app\Http\Controllers\UserController::class, 'update'])->name('update');
+    Route::patch('/{user}/deactivate', [\Modules\Core\app\Http\Controllers\UserController::class, 'deactivate'])->name('deactivate');
+    Route::patch('/{user}/activate',   [\Modules\Core\app\Http\Controllers\UserController::class, 'activate'])->name('activate');
+    Route::post('/{user}/reset-password', [\Modules\Core\app\Http\Controllers\UserController::class, 'resetPassword'])->name('reset-password');
+    Route::delete('/{user}',           [\Modules\Core\app\Http\Controllers\UserController::class, 'destroy'])->name('destroy');
+});
+
+// Roles
+Route::prefix('roles')->name('roles.')->group(function () {
+    Route::get('/',              [\Modules\Core\app\Http\Controllers\RoleController::class, 'index'])->name('index');
+    Route::post('/',             [\Modules\Core\app\Http\Controllers\RoleController::class, 'store'])->name('store');
+    Route::patch('/{role}',      [\Modules\Core\app\Http\Controllers\RoleController::class, 'update'])->name('update');
+    Route::delete('/{role}',     [\Modules\Core\app\Http\Controllers\RoleController::class, 'destroy'])->name('destroy');
+});
+
 // Module Manager
 Route::prefix('admin/modules')->name('modules.')->group(function () {
     Route::get('/',                    [\Modules\Core\app\Http\Controllers\ModuleManagerController::class, 'index'])->name('index');
