@@ -6,6 +6,9 @@ namespace Modules\Financial\app\Services;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Modules\Financial\app\Events\InvoiceApproved;
+use Modules\Financial\app\Events\InvoicePaid;
+use Modules\Financial\app\Events\InvoiceOverdue;
 use Modules\Financial\app\Models\Invoice;
 use Modules\Financial\app\Models\InvoiceLine;
 use Modules\Financial\app\Models\Payment;
@@ -63,6 +66,7 @@ class InvoiceService
         );
 
         $invoice->update(['status' => 'approved']);
+        event(new InvoiceApproved($invoice->fresh()));
         return $invoice->fresh();
     }
 
@@ -110,6 +114,10 @@ class InvoiceService
             }
 
             $invoice->update($updates);
+
+            if ($status === 'paid') {
+                event(new InvoicePaid($invoice->fresh()));
+            }
 
             return $payment;
         });

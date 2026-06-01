@@ -10,6 +10,8 @@ use Inertia\Inertia;
 use Modules\Bookings\app\Models\Booking;
 use Modules\Bookings\app\Models\Resource;
 use Modules\Bookings\app\Models\Service;
+use Modules\Bookings\app\Events\BookingCancelled;
+use Modules\Bookings\app\Events\BookingConfirmed;
 use Modules\Bookings\app\Services\BookingService;
 
 class BookingController extends Controller
@@ -94,12 +96,18 @@ class BookingController extends Controller
     public function confirm(Booking $booking)
     {
         $booking->update(['status' => 'confirmed']);
+
+        event(new BookingConfirmed($booking->fresh(['service', 'resource'])));
+
         return back()->with('toast', ['type' => 'success', 'title' => 'Booking confirmed']);
     }
 
     public function cancel(Booking $booking)
     {
         $booking->update(['status' => 'cancelled']);
+
+        event(new BookingCancelled($booking->fresh(['service', 'resource'])));
+        
         return back()->with('toast', ['type' => 'success', 'title' => 'Booking cancelled']);
     }
 

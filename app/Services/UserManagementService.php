@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
+use App\Notifications\NewUserCreatedNotification;
 
 class UserManagementService
 {
@@ -27,7 +28,11 @@ class UserManagementService
             $user->assignRole($data['role']);
         }
 
-        return $user;
+        // Notify super admins
+        User::role('Super Admin')
+            ->each(fn ($admin) => $admin->notify(new NewUserCreatedNotification($user)));
+
+        return $user;;
     }
 
     public function update(User $user, array $data): User

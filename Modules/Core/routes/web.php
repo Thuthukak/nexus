@@ -14,7 +14,9 @@ Route::get('/dashboard', function () {
 Route::prefix('profile')->name('profile.')->group(function () {
     Route::get('/',                [ProfileController::class, 'show'])->name('show');
     Route::patch('/',              [ProfileController::class, 'update'])->name('update');
-    Route::patch('/password',      [ProfileController::class, 'updatePassword'])->name('password');
+    Route::patch('/password',                 [ProfileController::class, 'updatePassword'])->name('password');
+    Route::get('/notifications',              [ProfileController::class, 'notificationPreferences'])->name('notifications');
+    Route::patch('/notification-preferences', [ProfileController::class, 'updateNotificationPreferences'])->name('notification-preferences');
 });
 
 // Settings
@@ -23,6 +25,14 @@ Route::prefix('settings')->name('settings.')->group(function () {
     Route::patch('/general',       [SettingsController::class, 'updateGeneral'])->name('general.update');
     Route::get('/appearance',      [SettingsController::class, 'appearance'])->name('appearance');
     Route::patch('/appearance',    [SettingsController::class, 'updateAppearance'])->name('appearance.update');
+});
+
+// Notifications (JSON — called by polling store)
+Route::prefix('notifications')->name('notifications.')->group(function () {
+    Route::get('/',              [\Modules\Core\app\Http\Controllers\NotificationController::class, 'index'])->name('index');
+    Route::patch('/{id}/read',   [\Modules\Core\app\Http\Controllers\NotificationController::class, 'markRead'])->name('read');
+    Route::patch('/read-all',    [\Modules\Core\app\Http\Controllers\NotificationController::class, 'markAllRead'])->name('read-all');
+    Route::delete('/{id}',       [\Modules\Core\app\Http\Controllers\NotificationController::class, 'destroy'])->name('destroy');
 });
 
 // User Management

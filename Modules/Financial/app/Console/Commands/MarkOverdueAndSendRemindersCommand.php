@@ -10,7 +10,9 @@ use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Modules\Financial\app\Events\InvoiceOverdue;
 use Modules\Financial\app\Models\Invoice;
+
 
 class MarkOverdueAndSendRemindersCommand extends Command
 {
@@ -28,7 +30,13 @@ class MarkOverdueAndSendRemindersCommand extends Command
         // Step 1 — Mark sent invoices as overdue if past due date
         $markedOverdue = Invoice::whereIn('status', ['sent', 'approved', 'deposit_paid', 'part_paid'])
             ->where('due_date', '<', today())
-            ->update(['status' => 'overdue']);
+            ->get();     
+            $markedOverdue = 0;     
+            foreach ($invoicesToOverdue as $inv) {
+                $inv->update(['status' => 'overdue']);
+                    event(new InvoiceOverdue($inv));
+                        $markedOverdue++; 
+                }
 
         $this->info("Marked {$markedOverdue} invoice(s) as overdue.");
 

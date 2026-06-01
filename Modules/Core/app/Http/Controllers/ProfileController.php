@@ -40,6 +40,32 @@ class ProfileController extends Controller
             ]);
     }
 
+    public function notificationPreferences(Request $request)
+    {
+        return Inertia::render('Core/Pages/Profile/Notifications', [
+            'preferences' => $request->user()->notification_preferences ?? [],
+        ]);
+    }
+
+    public function updateNotificationPreferences(Request $request)
+    {
+        $validated = $request->validate([
+            'preferences'        => 'array',
+            'preferences.*'      => 'array',
+            'preferences.*.email'  => 'boolean',
+            'preferences.*.in_app' => 'boolean',
+        ]);
+
+        $request->user()->update([
+            'notification_preferences' => $validated['preferences'],
+        ]);
+
+        return back()->with('toast', [
+            'type'  => 'success',
+            'title' => 'Preferences saved',
+        ]);
+    }
+
     public function updatePassword(Request $request)
     {
         $validated = $request->validate([

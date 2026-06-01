@@ -9,6 +9,9 @@ use Illuminate\Routing\Controller;
 use Inertia\Inertia;
 use Modules\HR\app\Models\Employee;
 use Modules\HR\app\Models\LeaveApplication;
+use Modules\HR\app\Events\LeaveApplicationApproved;
+use Modules\HR\app\Events\LeaveApplicationRejected;
+use Modules\HR\app\Events\LeaveApplicationSubmitted;
 use Modules\HR\app\Models\LeaveType;
 
 class LeaveController extends Controller
@@ -64,9 +67,12 @@ class LeaveController extends Controller
             'status'         => 'pending',
         ]);
 
-        return redirect()
-            ->route('hr.leave.index')
-            ->with('toast', [
+        $application = LeaveApplication::latest()->first();
+        event(new LeaveApplicationSubmitted($application));
+
+        return redirect()   
+        ->route('hr.leave.index')      
+        ->with('toast', [
                 'type'    => 'success',
                 'title'   => 'Leave application submitted',
                 'message' => "Application submitted for {$days} day(s).",
@@ -76,15 +82,17 @@ class LeaveController extends Controller
     public function approve(LeaveApplication $leave)
     {
         $leave->update([
-            'status'      => 'approved',
+            'status' => 'approved',
             'reviewed_by' => auth()->id(),
             'reviewed_at' => now(),
-        ]);
+            ]);
 
-        return back()->with('toast', [
-            'type'  => 'success',
-            'title' => 'Leave approved',
-        ]);
+            event(new LeaveApplicationApproved($leave->fresh(['employee.user', 'leaveType'])));
+
+            return back()->with('toast', [
+                    'type'  => 'success',
+                    'title' => 'Leave approved',
+                ]);
     }
 
     public function reject(Request $request, LeaveApplication $leave)
@@ -95,6 +103,8 @@ class LeaveController extends Controller
             'reviewed_by'      => auth()->id(),
             'reviewed_at'      => now(),
         ]);
+
+        event(new LeaveApplicationRejected($leave->fresh(['employee.user', 'leaveType'])));
 
         return back()->with('toast', [
             'type'  => 'success',

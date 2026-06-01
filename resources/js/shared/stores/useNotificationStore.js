@@ -1,11 +1,13 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
-import axios from 'axios'
+import { ref }         from 'vue'
+import axios           from 'axios'
+import { router }      from '@inertiajs/vue3'
 
 export const useNotificationStore = defineStore('notifications', () => {
     const notifications = ref([])
     const unreadCount   = ref(0)
     const isOpen        = ref(false)
+    const loading       = ref(false)
     let   pollInterval  = null
 
     async function fetch() {
@@ -29,18 +31,31 @@ export const useNotificationStore = defineStore('notifications', () => {
         unreadCount.value = 0
     }
 
+    async function dismiss(id) {
+        await axios.delete(`/notifications/${id}`)
+        notifications.value = notifications.value.filter(n => n.id !== id)
+    }
+
+    function navigateTo(notification) {
+        markRead(notification.id)
+        isOpen.value = false
+        if (notification.action?.url) {
+            router.visit(notification.action.url)
+        }
+    }
+
     function startPolling(ms = 30000) {
         fetch()
         pollInterval = setInterval(fetch, ms)
     }
 
     function stopPolling() {
-        clearInterval(pollInterval)
+        if (pollInterval) clearInterval(pollInterval)
     }
 
     return {
-        notifications, unreadCount, isOpen,
-        fetch, markRead, markAllRead,
+        notifications, unreadCount, isOpen, loading,
+        fetch, markRead, markAllRead, dismiss, navigateTo,
         startPolling, stopPolling,
     }
 })
