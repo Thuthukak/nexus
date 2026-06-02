@@ -28,6 +28,7 @@ use App\Listeners\Financial\NotifyInvoiceOverdue;
 use App\Listeners\HR\NotifyLeaveSubmitted;
 use App\Listeners\HR\NotifyLeaveDecision;
 use App\Listeners\Bookings\NotifyBookingStatusChange;
+use App\Listeners\Auth\UpdateLastLogin;
 
 class AppServiceProvider extends ServiceProvider
 {

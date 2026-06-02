@@ -11,6 +11,13 @@ Route::prefix('install')->name('install.')->group(function () {
     Route::get('/progress',   [\App\Http\Controllers\Wizard\WizardController::class, 'migrationProgress'])->name('progress');
 });
 
+// Public quotation routes — no auth required
+Route::prefix('quote')->name('quote.')->group(function () {
+    Route::get('/{token}',         [\Modules\Financial\app\Http\Controllers\QuotationController::class, 'publicShow'])->name('show');
+    Route::post('/{token}/accept', [\Modules\Financial\app\Http\Controllers\QuotationController::class, 'publicAccept'])->name('accept');
+    Route::post('/{token}/decline',[\Modules\Financial\app\Http\Controllers\QuotationController::class, 'publicDecline'])->name('decline');
+});
+
 // Public payment routes — no authentication required
 Route::prefix('pay')->name('pay.')->group(function () {
     Route::get('/{token}',           [\App\Http\Controllers\PaymentController::class, 'show'])->name('show');

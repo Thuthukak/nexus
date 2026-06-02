@@ -34,6 +34,16 @@ Route::prefix('recurring')->name('recurring.')->group(function () {
     Route::delete('/{recurringInvoice}',                   [RecurringInvoiceController::class, 'destroy'])->name('destroy');
 });
 
+// Quotations
+Route::resource('quotations', \Modules\Financial\app\Http\Controllers\QuotationController::class);
+Route::prefix('quotations/{quotation}')->name('quotations.')->group(function () {
+    Route::post('/send',         [\Modules\Financial\app\Http\Controllers\QuotationController::class, 'send'])->name('send');
+    Route::patch('/accept',      [\Modules\Financial\app\Http\Controllers\QuotationController::class, 'accept'])->name('accept');
+    Route::patch('/decline',     [\Modules\Financial\app\Http\Controllers\QuotationController::class, 'decline'])->name('decline');
+    Route::post('/convert',      [\Modules\Financial\app\Http\Controllers\QuotationController::class, 'convert'])->name('convert');
+    Route::get('/download-pdf',  [\Modules\Financial\app\Http\Controllers\QuotationController::class, 'downloadPdf'])->name('download-pdf');
+});
+
 // Customers
 Route::resource('customers', CustomerController::class);
 

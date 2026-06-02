@@ -16,7 +16,7 @@ Schedule::command('queue:work --stop-when-empty --timeout=55 --tries=3 --max-job
 
 /*
 |--------------------------------------------------------------------------
-| Recurring Invoices — daily at 06:00
+| Financial tasks
 |--------------------------------------------------------------------------
 */
 Schedule::command('financial:process-recurring')
@@ -26,6 +26,12 @@ Schedule::command('financial:process-recurring')
 Schedule::command('financial:process-overdue')
     ->dailyAt('06:05')
     ->withoutOverlapping();
+
+// Mark expired quotations daily
+Schedule::call(function () {
+    app(\Modules\Financial\App\Services\QuotationService::class)->markExpired();
+})->dailyAt('06:10');
+
 
 /*
 |--------------------------------------------------------------------------
