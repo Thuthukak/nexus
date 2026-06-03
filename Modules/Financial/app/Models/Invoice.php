@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\Financial\app\Models;
 
+use App\Traits\LogsModelActivity;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -12,7 +13,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Invoice extends Model
 {
-    use HasUuids, SoftDeletes;
+    use HasUuids, SoftDeletes, LogsModelActivity;
+
+    protected $activityLabel = 'Invoice';
 
     protected $table    = 'fin_invoices';
 

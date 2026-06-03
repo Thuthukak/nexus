@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\Financial\app\Models;
 
+use App\Traits\LogsModelActivity;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -12,7 +13,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Quotation extends Model
 {
-    use HasUuids, SoftDeletes;
+    use HasUuids, SoftDeletes, LogsModelActivity;
+
+    protected $activityLabel = 'Quotation';
 
     protected $table    = 'fin_quotations';
     protected $fillable = [

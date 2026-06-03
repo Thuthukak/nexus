@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\Bookings\app\Models;
 
+use App\Traits\LogsModelActivity;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
@@ -12,7 +13,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Booking extends Model
 {
-    use HasUuids, SoftDeletes;
+    use HasUuids, SoftDeletes, LogsModelActivity;
+
+    protected $activityLabel = 'Booking';
 
     protected $table    = 'bk_bookings';
     protected $fillable = [
@@ -34,7 +37,7 @@ class Booking extends Model
     public function scopeUpcoming(Builder $query): Builder
     {
         return $query->where('start_at', '>=', now())
-                     ->whereIn('status', ['pending', 'confirmed']);
+                    ->whereIn('status', ['pending', 'confirmed']);
     }
 
     public function scopeToday(Builder $query): Builder

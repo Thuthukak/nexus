@@ -27,6 +27,12 @@ Route::prefix('settings')->name('settings.')->group(function () {
     Route::patch('/appearance',    [SettingsController::class, 'updateAppearance'])->name('appearance.update');
 });
 
+// Activity Log
+Route::prefix('activity')->name('activity.')->group(function () {
+    Route::get('/',                    [\Modules\Core\app\Http\Controllers\ActivityLogController::class, 'index'])->name('index');
+    Route::get('/{type}/{id}',         [\Modules\Core\app\Http\Controllers\ActivityLogController::class, 'forSubject'])->name('subject');
+});
+
 // Notifications (JSON — called by polling store)
 Route::prefix('notifications')->name('notifications.')->group(function () {
     Route::get('/',              [\Modules\Core\app\Http\Controllers\NotificationController::class, 'index'])->name('index');

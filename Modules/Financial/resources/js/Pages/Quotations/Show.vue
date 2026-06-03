@@ -5,6 +5,7 @@ import AppLayout         from '@shared/layouts/AppLayout.vue'
 import Badge             from '@shared/components/display/Badge.vue'
 import Button            from '@shared/components/buttons/Button.vue'
 import ConfirmDialog     from '@shared/components/feedback/ConfirmDialog.vue'
+import ActivityTimeline  from '@shared/components/display/ActivityTimeline.vue'
 
 defineOptions({ layout: AppLayout })
 
@@ -300,6 +301,11 @@ function handleDelete() {
             </tbody>
           </table>
         </div>
+      </div>
+
+      <!-- Activity -->
+      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6">
+        <ActivityTimeline type="quotation" :id="quotation.id" />
       </div>
 
       <!-- Notes + Terms -->

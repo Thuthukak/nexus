@@ -11,6 +11,7 @@ use App\Services\LicenceService;
 use App\Settings\SettingsService;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Foundation\AliasLoader;
+use App\Services\ActivityLogService;
 use App\Services\ModuleRegistryService;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Auth\Events\Login;
@@ -28,7 +29,7 @@ use App\Listeners\Financial\NotifyInvoiceOverdue;
 use App\Listeners\HR\NotifyLeaveSubmitted;
 use App\Listeners\HR\NotifyLeaveDecision;
 use App\Listeners\Bookings\NotifyBookingStatusChange;
-use App\Listeners\Auth\UpdateLastLogin;
+use App\Listeners\UpdateLastLogin;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -46,6 +47,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(PayfastGateway::class);
         $this->app->bind(PaystackGateway::class);
 
+        $this->app->singleton(ActivityLogService::class);
+        
         $this->app->singleton(ModuleRegistryService::class);
     }
 

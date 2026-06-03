@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Modules\Financial\app\Services;
 
 use Carbon\Carbon;
+use App\Services\ActivityLogService;
 use Illuminate\Support\Facades\DB;
 use Modules\Financial\app\Models\Invoice;
 use Modules\Financial\app\Models\InvoiceLine;
@@ -75,6 +76,8 @@ class QuotationService
             'sent_at' => now(),
         ]);
 
+        app(ActivityLogService::class)->logStatusChange($quotation, 'draft', 'sent', 'Quotation sent to customer');
+
         \App\Jobs\SendQuotationJob::dispatch($quotation->id);
 
         return $quotation->fresh();
@@ -91,7 +94,7 @@ class QuotationService
             'status'      => 'accepted',
             'accepted_at' => now(),
         ]);
-
+        app(ActivityLogService::class)->logStatusChange($quotation, 'sent', 'accepted', 'Quotation accepted by customer');
         return $quotation->fresh();
     }
 
@@ -106,7 +109,7 @@ class QuotationService
             'status'      => 'declined',
             'declined_at' => now(),
         ]);
-
+        app(ActivityLogService::class)->logStatusChange($quotation, 'sent', 'declined', 'Quotation declined by customer');
         return $quotation->fresh();
     }
 
@@ -141,6 +144,8 @@ class QuotationService
                 'status'               => 'converted',
                 'converted_invoice_id' => $invoice->id,
             ]);
+
+            app(ActivityLogService::class)->log($quotation, 'Quotation converted to invoice ' . $invoice->reference, ['invoice_id' => $invoice->id]);
 
             return $invoice;
         });

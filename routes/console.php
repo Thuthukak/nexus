@@ -38,4 +38,5 @@ Schedule::call(function () {
 | Daily maintenance
 |--------------------------------------------------------------------------
 */
-Schedule::command('queue:prune-failed --hours=168')->daily(); // keep 7 days
+Schedule::command('queue:prune-failed --hours=168')->daily();
+Schedule::command('activitylog:clean')->weekly(); // keep 7 days

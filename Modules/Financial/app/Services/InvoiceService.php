@@ -7,6 +7,7 @@ namespace Modules\Financial\app\Services;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Modules\Financial\app\Events\InvoiceApproved;
+use App\Services\ActivityLogService;
 use Modules\Financial\app\Events\InvoicePaid;
 use Modules\Financial\app\Events\InvoiceOverdue;
 use Modules\Financial\app\Models\Invoice;
@@ -52,7 +53,7 @@ class InvoiceService
 
             $this->syncLines($invoice, $data['lines'] ?? []);
             $invoice->recalculate();
-
+            app(ActivityLogService::class)->log($invoice, 'Invoice updated', [], 'invoice');
             return $invoice->fresh(['lines', 'customer']);
         });
     }
@@ -66,6 +67,7 @@ class InvoiceService
         );
 
         $invoice->update(['status' => 'approved']);
+        app(ActivityLogService::class)->logStatusChange($invoice, 'draft', 'approved', 'Invoice approved');
         event(new InvoiceApproved($invoice->fresh()));
         return $invoice->fresh();
     }
@@ -77,10 +79,11 @@ class InvoiceService
             422,
             'Invoice cannot be marked as sent.'
         );
-
-        $invoice->update(['status' => 'sent']);
-        return $invoice->fresh();
-    }
+    
+            app(ActivityLogService::class)->logStatusChange($invoice, 'draft', 'sent', 'Invoice marked as sent');
+            $invoice->update(['status' => 'sent']);
+            return $invoice->fresh();
+        }
 
     public function recordPayment(Invoice $invoice, array $data): Payment
     {
@@ -131,6 +134,7 @@ class InvoiceService
             'This invoice cannot be cancelled.'
         );
 
+        app(ActivityLogService::class)->logStatusChange($invoice, $invoice->status, 'cancelled', 'Invoice cancelled');
         $invoice->update(['status' => 'cancelled']);
         return $invoice->fresh();
     }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\Financial\app\Models;
 
+use App\Traits\LogsModelActivity;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
@@ -12,7 +13,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Customer extends Model
 {
-    use HasUuids, SoftDeletes;
+    use HasUuids, SoftDeletes, LogsModelActivity;
+
+    protected $activityLabel = 'Customer';
 
     protected $table    = 'fin_customers';
     protected $fillable = [

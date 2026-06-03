@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Modules\HR\app\Models;
 
 use App\Models\User;
+use App\Traits\LogsModelActivity;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
@@ -14,7 +15,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Employee extends Model
 {
-    use HasUuids, SoftDeletes;
+    use HasUuids, SoftDeletes, LogsModelActivity;
+
+    protected $activityLabel = 'Employee';
 
     protected $table    = 'hr_employees';
     protected $fillable = [

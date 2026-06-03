@@ -127,6 +127,7 @@ class ModuleRegistryService
         );
 
         $this->clearCache();
+        activity('module')->causedBy(auth()->user())->log("Module {$moduleName} enabled");
         return true;
     }
 
@@ -142,6 +143,7 @@ class ModuleRegistryService
             ->update(['is_enabled' => false, 'updated_at' => now()]);
 
         $this->clearCache();
+        activity('module')->causedBy(auth()->user())->log("Module {$moduleName} disabled");
         return true;
     }
 

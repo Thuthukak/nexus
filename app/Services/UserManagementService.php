@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
 use App\Notifications\NewUserCreatedNotification;
+use App\Services\ActivityLogService;
 
 class UserManagementService
 {
@@ -29,6 +30,7 @@ class UserManagementService
         }
 
         // Notify super admins
+        app(ActivityLogService::class)->log($user, 'User account created', ['role' => $data['role'] ?? null], 'user');
         User::role('Super Admin')
             ->each(fn ($admin) => $admin->notify(new NewUserCreatedNotification($user)));
 
@@ -56,11 +58,14 @@ class UserManagementService
         abort_if($user->hasRole('Super Admin'), 422, 'The Super Admin account cannot be deactivated.');
 
         $user->update(['is_active' => false]);
+
+        app(ActivityLogService::class)->log($user, 'User account deactivated', [], 'user');
     }
 
     public function activate(User $user): void
     {
         $user->update(['is_active' => true]);
+        app(ActivityLogService::class)->log($user, 'User account activated', [], 'user');
     }
 
     public function resetPassword(User $user): string
@@ -75,6 +80,7 @@ class UserManagementService
         abort_if($user->id === $actor->id, 422, 'You cannot delete your own account.');
         abort_if($user->hasRole('Super Admin'), 422, 'The Super Admin account cannot be deleted.');
 
+        app(ActivityLogService::class)->log($user, 'User account deleted', [], 'user');
         $user->delete();
     }
 }
