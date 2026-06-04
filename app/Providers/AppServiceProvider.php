@@ -54,9 +54,9 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        if (app()->environment('local')) {
-            \Illuminate\Support\Facades\URL::forceScheme('https');
-        }
+        // if (app()->environment('local')) {
+        //     \Illuminate\Support\Facades\URL::forceScheme('https');
+        // }
         
         $this->app->booting(function () {
             $loader = \Illuminate\Foundation\AliasLoader::getInstance();

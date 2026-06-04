@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Inertia\Inertia;
 use Modules\Financial\app\Models\Customer;
+use App\Services\CustomerPortalService;
 
 class CustomerController extends Controller
 {
@@ -72,6 +73,7 @@ class CustomerController extends Controller
     public function show(Customer $customer)
     {
         $customer->load('invoices');
+        $customer->load('portalUser');
 
         return Inertia::render('Financial/Pages/Customers/Show', [
             'customer' => [
@@ -83,6 +85,7 @@ class CustomerController extends Controller
                 'vat_number'   => $customer->vat_number,
                 'address'      => $customer->address,
                 'is_active'    => $customer->is_active,
+                'portal_enabled'   => $customer->portal_enabled,
                 'invoices'     => $customer->invoices->map(fn ($inv) => [
                     'id'        => $inv->id,
                     'reference' => $inv->reference,
@@ -132,6 +135,27 @@ class CustomerController extends Controller
                 'type'  => 'success',
                 'title' => 'Customer updated',
             ]);
+    }
+
+    public function inviteToPortal(Customer $customer, CustomerPortalService $service)
+    {
+        $service->invite($customer);
+
+        return back()->with('toast', [
+            'type'    => 'success',
+            'title'   => 'Invite sent',
+            'message' => "Portal invitation sent to {$customer->email}",
+        ]);
+    }
+
+    public function revokePortal(Customer $customer, CustomerPortalService $service)
+    {
+        $service->revoke($customer);
+
+        return back()->with('toast', [
+            'type'  => 'success',
+            'title' => 'Portal access revoked',
+        ]);
     }
 
     public function destroy(Customer $customer)

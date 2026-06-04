@@ -21,14 +21,22 @@ class Customer extends Model
     protected $fillable = [
         'user_id', 'company_name', 'contact_name',
         'email', 'phone', 'vat_number', 'address', 'is_active',
+        'portal_enabled', 'portal_invited_at',
     ];
 
     protected function casts(): array
     {
         return [
-            'address'   => 'array',
-            'is_active' => 'boolean',
+            'portal_enabled'    => 'boolean',
+            'portal_invited_at' => 'datetime',
+            'is_active'         => 'boolean',
+            'address'           => 'array',
         ];
+    }
+
+    public function portalUser(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(\App\Models\User::class, 'user_id');
     }
 
     public function scopeActive(Builder $query): Builder

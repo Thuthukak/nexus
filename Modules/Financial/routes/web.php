@@ -46,6 +46,8 @@ Route::prefix('quotations/{quotation}')->name('quotations.')->group(function () 
 
 // Customers
 Route::resource('customers', CustomerController::class);
+Route::post('/customers/{customer}/invite-portal', [CustomerController::class, 'inviteToPortal'])->name('customers.invite-portal');
+Route::patch('/customers/{customer}/revoke-portal', [CustomerController::class, 'revokePortal'])->name('customers.revoke-portal');
 
 // Tax Rates
 Route::get('/tax-rates',              [TaxRateController::class, 'index'])->name('tax-rates.index');

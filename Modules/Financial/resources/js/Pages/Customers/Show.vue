@@ -1,10 +1,11 @@
 <script setup>
+import { router } from '@inertiajs/vue3'
 import AppLayout from '@shared/layouts/AppLayout.vue'
 import Badge     from '@shared/components/display/Badge.vue'
 import DataTable from '@shared/components/data/DataTable.vue'
 
 defineOptions({ layout: AppLayout })
-defineProps({ customer: { type: Object, required: true } })
+const props = defineProps({ customer: { type: Object, required: true } })
 
 const statusType = {
   paid: 'success', draft: 'neutral', overdue: 'danger',
@@ -17,6 +18,14 @@ const invoiceColumns = [
   { key: 'due_date',  label: 'Due Date',  sortable: true },
   { key: 'status',    label: 'Status',    sortable: true },
 ]
+
+function inviteToPortal() {
+  router.post(`/financial/customers/${props.customer.id}/invite-portal`)
+}
+
+function revokePortal() {
+  router.patch(`/financial/customers/${props.customer.id}/revoke-portal`)
+}
 
 function currency(val) {
   return 'R ' + Number(val ?? 0).toLocaleString('en-ZA', { minimumFractionDigits: 2 })
@@ -42,11 +51,11 @@ function currency(val) {
         </div>
         <div class="flex items-center gap-2">
           <a :href="`/financial/customers/${customer.id}/edit`"
-             class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 text-sm text-app-text/70 hover:text-app-text transition-colors">
+              class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 text-sm text-app-text/70 hover:text-app-text transition-colors">
             Edit Customer
           </a>
           <a :href="`/financial/invoices/create?customer_id=${customer.id}`"
-             class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-text text-sm font-medium hover:opacity-90">
+              class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-text text-sm font-medium hover:opacity-90">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
             </svg>
@@ -59,7 +68,7 @@ function currency(val) {
     <!-- Contact details row -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
       <div v-if="customer.contact_name || customer.email || customer.phone"
-           class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-5">
+            class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-5">
         <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider mb-3">Contact</h2>
         <p v-if="customer.contact_name" class="text-sm font-medium text-app-text">{{ customer.contact_name }}</p>
         <p v-if="customer.email" class="text-sm text-app-text/60 mt-1">{{ customer.email }}</p>
@@ -67,7 +76,7 @@ function currency(val) {
       </div>
 
       <div v-if="customer.address?.city || customer.address?.line1"
-           class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-5">
+            class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-5">
         <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider mb-3">Address</h2>
         <div class="text-sm text-app-text/70 space-y-0.5">
           <p v-if="customer.address?.line1">{{ customer.address.line1 }}</p>
@@ -96,6 +105,38 @@ function currency(val) {
       </div>
     </div>
 
+    <!-- Portal access card -->
+      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-5 mb-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider mb-1">Client Portal</h2>
+            <p v-if="customer.has_portal_user && customer.portal_enabled"
+                class="text-sm text-green-600 font-medium">
+              Portal access active
+              <span v-if="customer.portal_invited_at"
+                    class="text-xs text-app-text/40 font-normal ml-1">
+                (invited {{ customer.portal_invited_at }})
+              </span>
+            </p>
+            <p v-else-if="customer.has_portal_user && !customer.portal_enabled"
+                class="text-sm text-app-text/50">Portal access suspended</p>
+            <p v-else class="text-sm text-app-text/50">Not invited yet</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button @click="inviteToPortal"
+                    class="px-3 py-1.5 text-xs font-medium rounded-lg text-white"
+                    style="background-color: var(--color-primary);">
+              {{ customer.has_portal_user ? 'Re-send Invite' : 'Invite to Portal' }}
+            </button>
+            <button v-if="customer.portal_enabled"
+                    @click="revokePortal"
+                    class="px-3 py-1.5 text-xs font-medium rounded-lg border border-red-200 text-red-500 hover:bg-red-50 transition-colors">
+              Revoke Access
+            </button>
+          </div>
+        </div>
+      </div>
+
     <!-- Invoices — full width -->
     <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
       <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
@@ -103,7 +144,7 @@ function currency(val) {
         <span class="text-xs text-app-text/40">{{ customer.invoices?.length ?? 0 }} total</span>
       </div>
       <DataTable :columns="invoiceColumns" :rows="customer.invoices ?? []"
-                 empty-message="No invoices for this customer yet.">
+                  empty-message="No invoices for this customer yet.">
         <template #cell-reference="{ row, value }">
           <a :href="`/financial/invoices/${row.id}`" class="font-medium text-primary hover:underline">
             {{ value }}

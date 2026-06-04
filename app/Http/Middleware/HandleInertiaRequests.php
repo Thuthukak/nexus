@@ -21,11 +21,22 @@ class HandleInertiaRequests extends Middleware
 
     public function share(Request $request): array
     {
+        // Resolve user — check web guard first, then customer guard for portal
+        $user = $request->user();
+
+        if (! $user) {
+            try {
+                $user = \Illuminate\Support\Facades\Auth::guard('customer')->user();
+            } catch (\Throwable) {
+                $user = null;
+            }
+        }
+
         return array_merge(parent::share($request), [
             'auth' => [
-                'user'        => $request->user(),
-                'permissions' => $request->user()
-                    ? $request->user()->getAllPermissions()->pluck('name')
+                'user'        => $user,
+                'permissions' => $user && method_exists($user, 'getAllPermissions')
+                    ? $user->getAllPermissions()->pluck('name')
                     : [],
             ],
             'flash' => [
