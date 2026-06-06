@@ -87,30 +87,56 @@ class EmployeeController extends Controller
 
     public function show(Employee $employee)
     {
-        $employee->load(['user', 'department', 'jobTitle', 'leaveApplications.leaveType']);
+        $employee->load('department', 'jobTitle', 'user');
+        $documents = \Modules\HR\app\Models\HrDocument::where('employee_id', $employee->id)
+            ->with('uploadedBy')
+            ->orderByDesc('created_at')
+            ->get()
+            ->map(fn ($d) => [
+                'id'            => $d->id,
+                'name'          => $d->name,
+                'type'          => $d->type,
+                'type_label'    => \Modules\HR\app\Models\HrDocument::TYPES[$d->type] ?? $d->type,
+                'file_name'     => $d->file_name,
+                'file_size'     => $d->file_size_formatted,
+                'visibility'    => $d->visibility,
+                'expiry_date'   => $d->expiry_date?->format('d M Y'),
+                'expiry_raw'    => $d->expiry_date?->format('Y-m-d'),
+                'is_expired'    => $d->is_expired,
+                'is_expiring'   => $d->isExpiringSoon(),
+                'notes'         => $d->notes,
+                'customer_id'   => $d->customer_id,
+                'uploaded_by'   => $d->uploadedBy?->name,
+                'created_at'    => $d->created_at->format('d M Y'),
+            ]);
 
-        return Inertia::render('HR/Pages/Employees/Show', [
-            'employee' => [
-                'id'              => $employee->id,
-                'name'            => $employee->user?->name,
-                'email'           => $employee->user?->email,
-                'employee_number' => $employee->employee_number,
-                'department'      => $employee->department?->name,
-                'job_title'       => $employee->jobTitle?->name,
-                'employment_type' => $employee->employment_type,
-                'status'          => $employee->status,
-                'start_date'      => $employee->start_date?->format('d M Y'),
-                'phone'           => $employee->phone,
-                'leave'           => $employee->leaveApplications->map(fn ($l) => [
-                    'id'         => $l->id,
-                    'type'       => $l->leaveType?->name,
-                    'start_date' => $l->start_date?->format('d M Y'),
-                    'end_date'   => $l->end_date?->format('d M Y'),
-                    'days'       => $l->days_requested,
-                    'status'     => $l->status,
-                ]),
-            ],
-        ]);
+        $payslips = \Modules\HR\app\Models\Payslip::where('employee_id', $employee->id)
+            ->orderByDesc('period_year')
+            ->orderByDesc('period_month')
+            ->get()
+            ->map(fn ($p) => [
+                'id'           => $p->id,
+                'period_label' => $p->period_label,
+                'period_year'  => $p->period_year,
+                'period_month' => $p->period_month,
+                'gross_amount' => $p->gross_amount,
+                'net_amount'   => $p->net_amount,
+                'file_name'    => $p->file_name,
+                'notes'        => $p->notes,
+                'created_at'   => $p->created_at->format('d M Y'),
+            ]);
+
+            $customers = \Modules\Financial\app\Models\Customer::active()
+            ->orderBy('company_name')
+            ->get(['id', 'company_name']);
+
+            return Inertia::render('HR/Pages/Employees/Show', [
+                'documents' => $documents,
+                'payslips'  => $payslips,
+                'customers' => $customers,
+                'docTypes'  => \Modules\HR\app\Models\HrDocument::TYPES,
+                'employee' => $employee,
+            ]);
     }
 
     private function nextEmployeeNumber(): string

@@ -8,5 +8,7 @@ export default {
         { label: 'Employees',   href: '/hr/employees',    permission: 'hr.employees.view' },
         { label: 'Leave',       href: '/hr/leave',        permission: 'hr.leave.view' },
         { label: 'Departments', href: '/hr/departments',  permission: 'hr.employees.manage' },
+        { label: 'Settings',    href: '/hr/settings',    permission: 'core.settings.manage' },
+        
     ],
 }

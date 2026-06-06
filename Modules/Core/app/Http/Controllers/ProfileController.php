@@ -40,6 +40,34 @@ class ProfileController extends Controller
             ]);
     }
 
+    public function myPayslips(\Illuminate\Http\Request $request)
+    {
+        $employee = \Modules\HR\app\Models\Employee::where('user_id', $request->user()->id)
+            ->first();
+
+        if (! $employee) {
+            return \Inertia\Inertia::render('Core/Pages/Profile/Payslips', [
+                'payslips' => [],
+            ]);
+        }
+
+        $payslips = \Modules\HR\app\Models\Payslip::where('employee_id', $employee->id)
+            ->orderByDesc('period_year')
+            ->orderByDesc('period_month')
+            ->get()
+            ->map(fn ($p) => [
+                'id'           => $p->id,
+                'period_label' => $p->period_label,
+                'gross_amount' => $p->gross_amount,
+                'net_amount'   => $p->net_amount,
+                'created_at'   => $p->created_at->format('d M Y'),
+            ]);
+
+        return \Inertia\Inertia::render('Core/Pages/Profile/Payslips', [
+            'payslips' => $payslips,
+        ]);
+    }
+
     public function notificationPreferences(Request $request)
     {
         return Inertia::render('Core/Pages/Profile/Notifications', [

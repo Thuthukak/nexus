@@ -16,6 +16,7 @@ Route::prefix('profile')->name('profile.')->group(function () {
     Route::patch('/',              [ProfileController::class, 'update'])->name('update');
     Route::patch('/password',                 [ProfileController::class, 'updatePassword'])->name('password');
     Route::get('/notifications',              [ProfileController::class, 'notificationPreferences'])->name('notifications');
+    Route::get('/payslips',                  [ProfileController::class, 'myPayslips'])->name('payslips');
     Route::patch('/notification-preferences', [ProfileController::class, 'updateNotificationPreferences'])->name('notification-preferences');
 });
 

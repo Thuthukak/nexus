@@ -16,6 +16,9 @@ class HRServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->moduleName, 'database/migrations'));
+        $this->commands([
+            \Modules\HR\app\Console\Commands\ProcessDocumentExpiryCommand::class,
+        ]);
     }
 
     public function register(): void

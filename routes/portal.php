@@ -54,6 +54,12 @@ Route::prefix('portal')->name('portal.')->middleware(['web', 'customer.portal'])
     // Bookings
     Route::get('/bookings', [PortalBookingController::class, 'index'])->name('bookings');
 
+    // Documents
+    Route::prefix('documents')->name('documents.')->group(function () {
+        Route::get('/',              [\App\Http\Controllers\Portal\PortalDocumentController::class, 'index'])->name('index');
+        Route::get('/{document}/download', [\App\Http\Controllers\Portal\PortalDocumentController::class, 'download'])->name('download');
+    });
+
     // Profile
     Route::prefix('profile')->name('profile.')->group(function () {
         Route::get('/',         [PortalProfileController::class, 'show'])->name('show');

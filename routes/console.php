@@ -27,6 +27,11 @@ Schedule::command('financial:process-overdue')
     ->dailyAt('06:05')
     ->withoutOverlapping();
 
+// HR document expiry checks — daily at 07:00
+Schedule::command('hr:process-document-expiry')
+    ->dailyAt('07:00')
+    ->withoutOverlapping();
+
 // Mark expired quotations daily
 Schedule::call(function () {
     app(\Modules\Financial\App\Services\QuotationService::class)->markExpired();
