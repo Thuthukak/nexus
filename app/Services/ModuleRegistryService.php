@@ -47,6 +47,14 @@ class ModuleRegistryService
             'requires'    => ['Core'],
             'order'       => 30,
         ],
+        'Events' => [
+            'alias'       => 'events',
+            'version'     => '1.0.0',
+            'is_core'     => false,
+            'description' => 'Event ticketing — create events, sell tickets, PayFast payments',
+            'requires'    => ['Core', 'Financial'],
+            'order'       => 50,
+        ],
     ];
 
     /**

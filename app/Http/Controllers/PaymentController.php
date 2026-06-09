@@ -162,6 +162,8 @@ class PaymentController extends Controller
             'due_date'           => $invoice->due_date?->format('d M Y'),
             'currency'           => $invoice->currency,
             'token'              => $invoice->payment_token,
+            'amount_due_now'     => $invoice->amountDueNow(),
+            'payment_stage'      => $invoice->paymentStageLabel(),
         ];
     }
 }

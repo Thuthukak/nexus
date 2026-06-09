@@ -10,14 +10,11 @@ defineProps({
     <div class="pf-card">
       <!-- Animated checkmark -->
       <div class="icon-wrap icon-success">
-        <svg class="check-ring" viewBox="0 0 50 50">
-          <circle cx="25" cy="25" r="22" fill="none" stroke="#22c55e" stroke-width="2"
-                  stroke-dasharray="138" stroke-dashoffset="138"
-                  style="animation: drawRing 0.6s 0.1s ease forwards;"/>
-        </svg>
-        <svg class="icon-inner" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-             style="animation: popIn 0.3s 0.65s ease both; opacity: 0;">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M5 13l4 4L19 7"/>
+        <svg viewBox="0 0 52 52" class="checkmark-svg">
+          <circle class="checkmark-circle" cx="26" cy="26" r="23" fill="none" stroke="#22c55e" stroke-width="2"/>
+          <path class="checkmark-check" fill="none" stroke="#22c55e" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round"
+                d="M14 27l8 8 16-16"/>
         </svg>
       </div>
 
@@ -101,6 +98,31 @@ defineProps({
   inset: 0;
   width: 100%;
   height: 100%;
+}
+
+.checkmark-svg {
+  width: 80px;
+  height: 80px;
+}
+
+.checkmark-circle {
+  stroke-dasharray: 145;
+  stroke-dashoffset: 145;
+  animation: drawCircle 0.6s ease forwards;
+}
+
+.checkmark-check {
+  stroke-dasharray: 36;
+  stroke-dashoffset: 36;
+  animation: drawCheck 0.4s ease 0.55s forwards;
+}
+
+@keyframes drawCircle {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes drawCheck {
+  to { stroke-dashoffset: 0; }
 }
 
 @keyframes drawRing {
