@@ -8,6 +8,7 @@ import financialNav from '../../../../../Modules/Financial/resources/js/nav.js'
 import hrNav        from '../../../../../Modules/HR/resources/js/nav.js'
 import bookingsNav  from '../../../../../Modules/Bookings/resources/js/nav.js'
 import eventsNav    from '../../../../../Modules/Events/resources/js/nav.js'
+import lmsNav       from '../../../../../Modules/LMS/resources/js/nav.js'
 
 const page         = usePage()
 const { can }      = usePermission()
@@ -20,7 +21,7 @@ function toggle() {
 }
 
 // All module nav configs ordered
-const allModuleNavs = [financialNav, hrNav, bookingsNav, eventsNav]
+const allModuleNavs = [financialNav, hrNav, bookingsNav, eventsNav, lmsNav]
     .sort((a, b) => a.order - b.order)
 
 // Filter to only active modules, then filter items by permission

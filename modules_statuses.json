@@ -3,5 +3,6 @@
     "Financial": true,
     "HR": true,
     "Bookings": true,
-    "Events": true
+    "Events": true,
+    "LMS": true
 }

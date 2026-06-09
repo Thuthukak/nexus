@@ -29,6 +29,7 @@ class DatabaseSeeder extends Seeder
         $this->callIfExists(\Modules\Bookings\database\seeders\BookingsPermissionSeeder::class);
         $this->callIfExists(\Database\Seeders\LmsPermissionsSeeder::class);
         $this->callIfExists(\Database\Seeders\EventsPermissionsSeeder::class);
+        $this->callIfExists(\Modules\LMS\database\seeders\LMSDatabaseSeeder::class);
 
         // Phase 4: Re-run RoleSeeder to sync permissions now that
         // all permissions exist (firstOrCreate — no duplicates)

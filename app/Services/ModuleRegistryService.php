@@ -39,6 +39,14 @@ class ModuleRegistryService
             'requires'    => ['Core'],
             'order'       => 20,
         ],
+        'LMS' => [
+            'alias'       => 'lms',
+            'version'     => '1.0.0',
+            'is_core'     => false,
+            'description' => 'Learning Management System — courses, cohorts, quizzes and certificates',
+            'requires'    => ['Core'],
+            'order'       => 40,
+        ],
         'Bookings' => [
             'alias'       => 'bookings',
             'version'     => '1.0.0',
