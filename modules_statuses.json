@@ -2,5 +2,6 @@
     "Core": true,
     "Financial": true,
     "HR": true,
-    "Bookings": true
+    "Bookings": true,
+    "Events": true
 }

@@ -30,6 +30,7 @@ use App\Listeners\HR\NotifyLeaveSubmitted;
 use App\Listeners\HR\NotifyLeaveDecision;
 use App\Listeners\Bookings\NotifyBookingStatusChange;
 use App\Listeners\UpdateLastLogin;
+use App\Listeners\Events\HandleEventOrderPaid;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -72,6 +73,7 @@ class AppServiceProvider extends ServiceProvider
         Event::listen(InvoiceApproved::class, NotifyInvoiceApproved::class);
         Event::listen(InvoicePaid::class,     NotifyInvoicePaid::class);
         Event::listen(InvoiceOverdue::class,  NotifyInvoiceOverdue::class);
+        Event::listen(InvoicePaid::class,     HandleEventOrderPaid::class);
 
         // HR notifications
         Event::listen(LeaveApplicationSubmitted::class, NotifyLeaveSubmitted::class);

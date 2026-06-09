@@ -11,6 +11,14 @@ Route::prefix('install')->name('install.')->group(function () {
     Route::get('/progress',   [\App\Http\Controllers\Wizard\WizardController::class, 'migrationProgress'])->name('progress');
 });
 
+// Public event routes — no auth required
+Route::prefix('events')->name('events.public.')->group(function () {
+    Route::get('/',            [\Modules\Events\app\Http\Controllers\PublicEventController::class, 'index'])->name('index');
+    Route::get('/order/{reference}/confirmation', [\Modules\Events\app\Http\Controllers\PublicEventController::class, 'confirmation'])->name('confirmation');
+    Route::get('/{slug}',      [\Modules\Events\app\Http\Controllers\PublicEventController::class, 'show'])->name('show');
+    Route::post('/{slug}/checkout', [\Modules\Events\app\Http\Controllers\PublicEventController::class, 'checkout'])->name('checkout');
+});
+
 // Public quotation routes — no auth required
 Route::prefix('quote')->name('quote.')->group(function () {
     Route::get('/{token}',         [\Modules\Financial\app\Http\Controllers\QuotationController::class, 'publicShow'])->name('show');

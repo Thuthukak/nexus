@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             \Modules\Financial\database\seeders\FinancialPermissionSeeder::class,
             \Modules\HR\database\seeders\HRPermissionSeeder::class,
             \Modules\Bookings\database\seeders\BookingsPermissionSeeder::class,
+            \Modules\Events\database\seeders\EventsPermissionsSeeder::class,
         ]);
 
         // Development-only Seeders (Gated)
