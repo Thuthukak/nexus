@@ -136,7 +136,7 @@ class EventController extends Controller
         ]);
     }
 
-    public function downloadTickets(Order $order, TicketPdfService $pdfService)
+    public function downloadTickets(Event $event, Order $order, TicketPdfService $pdfService)
     {
         $pdf      = $pdfService->generate($order);
         $filename = $pdfService->filename($order);

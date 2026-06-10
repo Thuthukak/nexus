@@ -68,7 +68,7 @@ class Event extends Model
 
     public function getTotalRevenueAttribute(): float
     {
-        return $this->orders()
+        return (float) $this->orders()
             ->where('status', 'paid')
             ->sum('total');
     }

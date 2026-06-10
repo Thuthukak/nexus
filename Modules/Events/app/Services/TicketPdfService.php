@@ -6,6 +6,7 @@ namespace Modules\Events\app\Services;
 
 use App\Facades\Settings;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Modules\Events\app\Services\QrCodeService;
 use Modules\Events\app\Models\Order;
 
 class TicketPdfService
@@ -17,6 +18,13 @@ class TicketPdfService
         $appName     = Settings::group('general')->get('app_name', config('app.name'));
         $primaryColor= Settings::group('theme')->get('primary', '#1E3A5F');
         $logoPath    = $this->resolveLogoPath();
+        $qrService   = app(QrCodeService::class);
+
+        $qrCodes = [];
+
+        foreach ($order->tickets as $ticket) {
+            $qrCodes[$ticket->id] = $qrService->generateBase64($ticket->qr_data);
+        }
 
         return Pdf::loadView('events::pdf.tickets', [
             'order'        => $order,
@@ -24,6 +32,7 @@ class TicketPdfService
             'primaryColor' => $primaryColor,
             'logoPath'     => $logoPath,
             'currency'     => config('financial.currency', 'ZAR'),
+            'qrCodes'      => $qrCodes,
         ])->setPaper('A4', 'portrait');
     }
 

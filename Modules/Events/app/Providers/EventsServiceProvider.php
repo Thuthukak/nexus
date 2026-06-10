@@ -44,6 +44,9 @@ class EventsServiceProvider extends ServiceProvider
     {
         $this->app->register(EventServiceProvider::class);
         $this->app->register(RouteServiceProvider::class);
+        $this->app->singleton(\Modules\Events\app\Services\QrCodeService::class);
+        $this->app->singleton(\Modules\Events\app\Services\TicketPdfService::class);
+        $this->app->singleton(\Modules\Events\app\Services\OrderService::class);
     }
 
     /**
