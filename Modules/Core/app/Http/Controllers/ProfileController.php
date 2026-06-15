@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
+use App\Services\ModuleRegistryService;
 
 class ProfileController extends Controller
 {
@@ -69,10 +70,47 @@ class ProfileController extends Controller
         ]);
     }
 
-    public function notificationPreferences(Request $request)
+    public function notificationPreferences(Request $request, ModuleRegistryService $registry)
     {
+        $activeModules = $registry->getEnabledModules();
+
+        $allTypes = [
+            'Core' => [
+                ['key' => 'user.created', 'label' => 'New User Created'],
+            ],
+            'Financial' => [
+                ['key' => 'invoice.approved', 'label' => 'Invoice Approved'],
+                ['key' => 'invoice.paid',     'label' => 'Invoice Paid'],
+                ['key' => 'invoice.overdue',  'label' => 'Invoice Overdue'],
+            ],
+            'HR' => [
+                ['key' => 'leave.submitted', 'label' => 'Leave Application'],
+                ['key' => 'leave.approved',  'label' => 'Leave Approved'],
+                ['key' => 'leave.rejected',  'label' => 'Leave Rejected'],
+            ],
+            'Bookings' => [
+                ['key' => 'booking.confirmed', 'label' => 'Booking Confirmed'],
+                ['key' => 'booking.cancelled', 'label' => 'Booking Cancelled'],
+            ],
+            'Events' => [
+                ['key' => 'event.created', 'label' => 'New Event Created'],
+                ['key' => 'event.updated', 'label' => 'Event Updated'     ],
+                ['key' => 'event.cancelled', 'label' => 'Event Cancelled' ],
+            ],
+            'LMS' => [
+                ['key' => 'course.assigned', 'label' => 'Course Assigned' ],
+                ['key' => 'course.completed', 'label' => 'Course Completed' ],
+            ],
+        ];
+
+        $notificationTypes = collect($allTypes)
+            ->filter(fn ($_, $module) => $module === 'Core' || in_array($module, $activeModules))
+            ->map(fn ($types, $module) => ['module' => $module, 'types' => $types])
+            ->values();
+
         return Inertia::render('Core/Pages/Profile/Notifications', [
-            'preferences' => $request->user()->notification_preferences ?? [],
+            'preferences'       => $request->user()->notification_preferences ?? (object)[],
+            'notificationTypes' => $notificationTypes,
         ]);
     }
 

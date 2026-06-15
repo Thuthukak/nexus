@@ -1,45 +1,30 @@
 <script setup>
-import { useForm } from '@inertiajs/vue3'
-import AppLayout   from '@shared/layouts/AppLayout.vue'
-import Button      from '@shared/components/buttons/Button.vue'
+import { useForm }  from '@inertiajs/vue3'
+import AppLayout    from '@shared/layouts/AppLayout.vue'
+import Button       from '@shared/components/buttons/Button.vue'
+import Checkbox     from '@shared/components/buttons/Checkbox.vue'
 
 defineOptions({ layout: AppLayout })
 
 const props = defineProps({
-  preferences: { type: Object, required: true },
+  preferences:       { type: Object, required: true },
+  notificationTypes: { type: Array,  required: true },
 })
 
-const notificationTypes = [
-  { key: 'invoice.approved', label: 'Invoice Approved',       module: 'Financial' },
-  { key: 'invoice.paid',     label: 'Invoice Paid',           module: 'Financial' },
-  { key: 'invoice.overdue',  label: 'Invoice Overdue',        module: 'Financial' },
-  { key: 'leave.submitted',  label: 'Leave Application',      module: 'HR' },
-  { key: 'leave.approved',   label: 'Leave Approved',         module: 'HR' },
-  { key: 'leave.rejected',   label: 'Leave Rejected',         module: 'HR' },
-  { key: 'booking.confirmed',label: 'Booking Confirmed',      module: 'Bookings' },
-  { key: 'booking.cancelled',label: 'Booking Cancelled',      module: 'Bookings' },
-  { key: 'user.created',     label: 'New User Created',       module: 'Core' },
-]
-
-const moduleGroups = ['Financial', 'HR', 'Bookings', 'Core']
-
-// Build form with defaults
 const defaultPrefs = {}
-notificationTypes.forEach(({ key }) => {
-  defaultPrefs[key] = {
-    in_app: props.preferences?.[key]?.in_app ?? true,
-    email:  props.preferences?.[key]?.email  ?? true,
-  }
+props.notificationTypes.forEach(({ types }) => {
+  types.forEach(({ key }) => {
+    defaultPrefs[key] = {
+      in_app: props.preferences?.[key]?.in_app ?? true,
+      email:  props.preferences?.[key]?.email  ?? true,
+    }
+  })
 })
 
 const form = useForm({ preferences: defaultPrefs })
 
 function submit() {
   form.patch('/profile/notification-preferences')
-}
-
-function typesForModule(module) {
-  return notificationTypes.filter(t => t.module === module)
 }
 </script>
 
@@ -54,8 +39,8 @@ function typesForModule(module) {
     </div>
 
     <form @submit.prevent="submit" class="space-y-6">
-      <div v-for="module in moduleGroups" :key="module"
-           class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
+      <div v-for="{ module, types } in notificationTypes" :key="module"
+          class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
         <div class="px-6 py-3 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50">
           <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider">
             {{ module }}
@@ -71,29 +56,24 @@ function typesForModule(module) {
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-50 dark:divide-gray-800">
-            <tr v-for="type in typesForModule(module)" :key="type.key">
+            <tr v-for="type in types" :key="type.key">
               <td class="px-6 py-3 text-app-text">{{ type.label }}</td>
+
+              <!-- In-app: always on, disabled -->
               <td class="px-6 py-3 text-center">
-                <!-- In-app always on — disabled toggle -->
-                <div class="inline-flex items-center justify-center">
-                  <div class="w-8 h-5 rounded-full bg-primary/30 relative cursor-not-allowed">
-                    <div class="absolute right-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm" />
-                  </div>
+                <div class="flex justify-center opacity-40 cursor-not-allowed">
+                  <Checkbox :model-value="true" @update:model-value="() => {}" />
                 </div>
               </td>
+
+              <!-- Email: user-controlled -->
               <td class="px-6 py-3 text-center">
-                <label class="relative inline-flex items-center cursor-pointer">
-                  <input
-                    v-model="form.preferences[type.key].email"
-                    type="checkbox"
-                    class="sr-only peer"
+                <div class="flex justify-center">
+                  <Checkbox
+                    :model-value="form.preferences[type.key].email"
+                    @update:model-value="val => form.preferences[type.key].email = val"
                   />
-                  <div class="w-8 h-5 bg-gray-200 dark:bg-gray-700 rounded-full peer
-                              peer-checked:bg-primary transition-colors
-                              peer-focus:ring-2 peer-focus:ring-primary/50" />
-                  <span class="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full
-                               shadow-sm transition-transform peer-checked:translate-x-3" />
-                </label>
+                </div>
               </td>
             </tr>
           </tbody>

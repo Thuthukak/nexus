@@ -4,13 +4,19 @@ declare(strict_types=1);
 
 namespace Modules\Core\app\Http\Controllers;
 
+use App\Services\ModuleRegistryService;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 
 class NotificationController extends Controller
 {
+    public function __construct(
+        private ModuleRegistryService $registry,
+    ) {}
     public function index(Request $request)
     {
+        $activeModules = $this->registry->getEnabledModules();
+
         $notifications = $request->user()
             ->notifications()
             ->latest()
@@ -26,7 +32,9 @@ class NotificationController extends Controller
                 'action'     => $n->data['action'] ?? null,
                 'read_at'    => $n->read_at?->toISOString(),
                 'created_at' => $n->created_at->diffForHumans(),
-            ]);
+            ])
+            ->filter(fn ($n) => in_array($n['module'], $activeModules))
+            ->values();
 
         return response()->json([
             'notifications' => $notifications,
