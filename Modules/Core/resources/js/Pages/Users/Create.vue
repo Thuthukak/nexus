@@ -5,7 +5,7 @@ import Input       from '@shared/components/form/Input.vue'
 import Button      from '@shared/components/buttons/Button.vue'
 
 defineOptions({ layout: AppLayout })
-defineProps({ roles: { type: Array, default: () => [] } })
+const props = defineProps({ roles: { type: Array, default: () => [] } })
 
 const form = useForm({
   name:     '',
@@ -48,7 +48,9 @@ function submit() {
 
         <Input v-model="form.password" label="Password"
                type="password" hint="Leave blank to auto-generate a secure password"
-               :error="form.errors.password" />
+               :error="form.errors.password" 
+               class="hidden"
+        />
       </div>
 
       <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 rounded-xl p-4">

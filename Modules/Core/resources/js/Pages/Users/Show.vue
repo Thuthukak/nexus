@@ -1,14 +1,13 @@
 <script setup>
-import { router }    from '@inertiajs/vue3'
+import { router, usePage }    from '@inertiajs/vue3'
 import AppLayout     from '@shared/layouts/AppLayout.vue'
 import Badge         from '@shared/components/display/Badge.vue'
 import Button        from '@shared/components/buttons/Button.vue'
 import ConfirmDialog from '@shared/components/feedback/ConfirmDialog.vue'
-import { ref }       from 'vue'
-import { usePage }   from '@inertiajs/vue3'
+import { ref, computed } from 'vue'
 
 defineOptions({ layout: AppLayout })
-defineProps({ user: { type: Object, required: true } })
+const props = defineProps({ user: { type: Object, required: true } })
 
 const page        = usePage()
 const currentUser = page.props.auth?.user
@@ -17,8 +16,6 @@ const confirmDeactivate = ref(false)
 const confirmDelete     = ref(false)
 
 const isSelf = computed(() => currentUser?.id === props.user.id)
-
-import { computed } from 'vue'
 
 function deactivate() {
   router.patch(`/users/${props.user.id}/deactivate`, {}, {

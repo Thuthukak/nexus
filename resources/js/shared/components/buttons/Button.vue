@@ -28,7 +28,7 @@ defineProps({
       'px-5 py-2.5 text-base gap-2': size === 'lg',
       // Variants
       'bg-primary text-primary-text hover:opacity-90 focus:ring-primary/50':                       variant === 'primary',
-      'bg-secondary/10 text-secondary hover:bg-secondary/20 focus:ring-secondary/50':              variant === 'secondary',
+      'border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 focus:ring-gray-300': variant === 'secondary',
       'bg-red-500 text-white hover:bg-red-600 focus:ring-red-500/50':                              variant === 'danger',
       'bg-transparent text-app-text hover:bg-gray-100 dark:hover:bg-gray-800 focus:ring-gray-300': variant === 'ghost',
     }"

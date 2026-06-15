@@ -22,6 +22,7 @@ class FinancialPermissionSeeder extends Seeder
             'financial.invoices.delete',
             'financial.invoices.approve',
             'financial.invoices.export',
+            'financial.invoices.manage',
             'financial.quotations.view',
             'financial.quotations.create',
             'financial.quotations.edit',
@@ -42,11 +43,25 @@ class FinancialPermissionSeeder extends Seeder
             ]);
         }
 
-        $admin = Role::findByName('Super Admin', 'web');
-        $admin->givePermissionTo(array_filter(
+        $superAdmin = Role::findByName('Super Admin', 'web');
+        $superAdmin->givePermissionTo(array_filter(
             $permissions,
             fn ($p) => ! str_contains($p, '.portal.')
         ));
+
+        $admin = Role::findByName('Admin', 'web');
+        $admin->givePermissionTo([
+            'financial.invoices.view',
+            'financial.invoices.create',
+            'financial.invoices.edit',
+            'financial.invoices.delete',
+            'financial.invoices.approve',
+            'financial.invoices.export',
+            'financial.invoices.manage',
+            'financial.quotations.view',
+            'financial.quotations.create',
+            'financial.reports.view',
+        ]);
 
         $manager = Role::findByName('Manager', 'web');
         $manager->givePermissionTo([

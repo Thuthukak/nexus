@@ -8,6 +8,7 @@ defineOptions({ layout: AppLayout })
 
 const props = defineProps({
   theme: { type: Object, required: true },
+  app:   { type: Object, required: true },
 })
 
 const form = useForm({ ...props.theme })
@@ -107,7 +108,7 @@ function applyPreset(preset) {
     <div class="mb-6">
       <h1 class="text-2xl font-bold text-app-text">Appearance</h1>
       <p class="text-sm text-app-text/60 mt-1">
-        Customise the colour palette for your Nexus platform
+        Customise the colour palette for your {{ props.app.name }} platform
       </p>
     </div>
 

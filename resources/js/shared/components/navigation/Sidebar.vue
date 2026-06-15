@@ -69,20 +69,32 @@ function groupIsActive(nav) {
     <!-- Zone 1: Logo -->
     <div class="h-14 flex items-center px-4 flex-shrink-0 border-b border-white/10">
       <template v-if="!collapsed">
+        <!-- Full logo: use logo_url if available, else app name -->
         <img v-if="page.props.app?.logo_url"
-             :src="page.props.app.logo_url"
-             :alt="page.props.app?.name ?? 'Nexus'"
-             class="h-8 w-auto object-contain max-w-[140px]" />
+            :src="page.props.app.logo_url"
+            :alt="page.props.app?.name ?? 'Nexus'"
+            class="h-16 w-auto object-contain max-w-[140px]" />
         <span v-else class="text-white font-bold text-lg tracking-tight truncate">
           {{ page.props.app?.name ?? 'Nexus' }}
         </span>
       </template>
-      <div v-else class="mx-auto">
-        <img v-if="page.props.app?.logo_url"
-             :src="page.props.app.logo_url"
-             class="h-7 w-7 object-contain rounded" />
-        <span v-else class="text-white font-bold text-lg">N</span>
-      </div>
+
+      <template v-else>
+        <!-- Collapsed: prefer logo_icon_url → fallback logo_url → fallback first letter -->
+        <div class="mx-auto">
+          <img v-if="page.props.app?.logo_icon_url"
+              :src="page.props.app.logo_icon_url"
+              :alt="page.props.app?.name ?? 'Nexus'"
+              class="h-7 w-7 object-contain rounded" />
+          <img v-else-if="page.props.app?.logo_url"
+              :src="page.props.app.logo_url"
+              :alt="page.props.app?.name ?? 'Nexus'"
+              class="h-7 w-7 object-contain rounded" />
+          <span v-else class="text-white font-bold text-lg">
+            {{ page.props.app?.name?.charAt(0)?.toUpperCase() ?? 'N' }}
+          </span>
+        </div>
+      </template>
     </div>
 
     <!-- Zone 2: Navigation -->
@@ -90,14 +102,14 @@ function groupIsActive(nav) {
 
       <!-- Dashboard — always visible (Core) -->
       <a href="/dashboard"
-         :title="collapsed ? 'Dashboard' : undefined"
-         class="flex items-center rounded-lg transition-colors duration-150"
-         :class="[
-           collapsed ? 'px-2 py-2 justify-center' : 'px-3 py-2 gap-3',
-           isActive('/dashboard')
-             ? 'bg-white/15 text-white border-l-2 border-white'
-             : 'text-white/60 hover:bg-white/10 hover:text-white'
-         ]">
+        :title="collapsed ? 'Dashboard' : undefined"
+        class="flex items-center rounded-lg transition-colors duration-150"
+        :class="[
+          collapsed ? 'px-2 py-2 justify-center' : 'px-3 py-2 gap-3',
+          isActive('/dashboard')
+            ? 'bg-white/15 text-white border-l-2 border-white'
+            : 'text-white/60 hover:bg-white/10 hover:text-white'
+        ]">
         <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round"
             d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
@@ -125,9 +137,9 @@ function groupIsActive(nav) {
             {{ nav.label }}
           </span>
           <svg v-if="!collapsed"
-               class="w-3.5 h-3.5 flex-shrink-0 transition-transform duration-200"
-               :class="expanded[nav.module] ? 'rotate-180' : ''"
-               fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              class="w-3.5 h-3.5 flex-shrink-0 transition-transform duration-200"
+              :class="expanded[nav.module] ? 'rotate-180' : ''"
+              fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
           </svg>
         </button>
@@ -135,11 +147,11 @@ function groupIsActive(nav) {
         <!-- Sub-items — expanded -->
         <template v-if="!collapsed && expanded[nav.module]">
           <a v-for="item in nav.items" :key="item.href"
-             :href="item.href"
-             class="flex items-center pl-8 pr-3 py-1.5 rounded-lg text-sm transition-colors duration-150"
-             :class="isActive(item.href)
-               ? 'bg-white/15 text-white font-medium'
-               : 'text-white/50 hover:bg-white/10 hover:text-white'">
+            :href="item.href"
+            class="flex items-center pl-8 pr-3 py-1.5 rounded-lg text-sm transition-colors duration-150"
+            :class="isActive(item.href)
+              ? 'bg-white/15 text-white font-medium'
+              : 'text-white/50 hover:bg-white/10 hover:text-white'">
             {{ item.label }}
           </a>
         </template>
@@ -147,12 +159,12 @@ function groupIsActive(nav) {
         <!-- Sub-items — collapsed (dot indicators) -->
         <template v-if="collapsed">
           <a v-for="item in nav.items" :key="item.href"
-             :href="item.href"
-             :title="item.label"
-             class="flex items-center justify-center px-2 py-1.5 rounded-lg transition-colors"
-             :class="isActive(item.href)
-               ? 'bg-white/15 text-white'
-               : 'text-white/30 hover:bg-white/10 hover:text-white/70'">
+            :href="item.href"
+            :title="item.label"
+            class="flex items-center justify-center px-2 py-1.5 rounded-lg transition-colors"
+            :class="isActive(item.href)
+              ? 'bg-white/15 text-white'
+              : 'text-white/30 hover:bg-white/10 hover:text-white/70'">
             <span class="w-1.5 h-1.5 rounded-full bg-current" />
           </a>
         </template>
@@ -162,6 +174,19 @@ function groupIsActive(nav) {
       <!-- Settings — always visible for admins -->
       <div class="mt-4 pt-4 border-t border-white/10 space-y-1">
         <a v-if="!collapsed"
+            class="flex items-center px-3 py-2 gap-3 rounded-lg transition-colors text-white/40">
+          <span class="text-xs font-medium">Settings</span>
+        </a>
+        <a v-if="!collapsed"
+            href="/settings/general"
+            class="flex items-center px-3 py-2 gap-3 rounded-lg transition-colors text-white/40 hover:text-white hover:bg-white/10">
+            <svg class="w-4 h-4 text-app-text/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+          </svg>
+          <span class="text-xs font-medium">General Settings</span>
+        </a>
+        <a v-if="!collapsed"
             href="/settings/appearance"
             class="flex items-center px-3 py-2 gap-3 rounded-lg transition-colors text-white/40 hover:text-white hover:bg-white/10">
           <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -169,7 +194,7 @@ function groupIsActive(nav) {
               d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
           </svg>
-          <span class="text-xs font-medium">Settings</span>
+          <span class="text-xs font-medium">Appearance</span>
         </a>
         <a v-if="!collapsed"
             href="/users"

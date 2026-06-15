@@ -15,6 +15,11 @@ class SettingsController extends Controller
     {
         return Inertia::render('Core/Pages/Settings/Appearance', [
             'theme' => Settings::group('theme')->all(),
+            'app'       => [
+                'name'     => \App\Facades\Settings::group('general')->get('app_name', config('app.name')),
+                'logo_url' => \App\Facades\Settings::group('general')->get('logo_url'),
+                'logo_icon_url' => \App\Facades\Settings::group('general')->get('logo_icon_url'),
+            ],
         ]);
     }
 
