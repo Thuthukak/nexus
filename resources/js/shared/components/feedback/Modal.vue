@@ -36,13 +36,10 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
     >
       <div
         v-if="show"
-        class="fixed inset-0 z-50 flex items-center justify-center p-4"
+        class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto p-4"
       >
         <!-- Backdrop -->
-        <div
-          class="absolute inset-0 bg-black/50 backdrop-blur-sm"
-          @click="close"
-        />
+        <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" @click="close" />
 
         <!-- Panel -->
         <Transition
@@ -55,7 +52,7 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
         >
           <div
             v-if="show"
-            class="relative bg-surface rounded-2xl shadow-xl w-full z-10"
+            class="relative bg-surface rounded-2xl shadow-xl w-full z-10 flex flex-col my-auto max-h-[calc(100vh-2rem)]"
             :class="{
               'max-w-sm':  size === 'sm',
               'max-w-md':  size === 'md',
@@ -66,7 +63,7 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
             <!-- Header -->
             <div
               v-if="title || $slots.header"
-              class="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800"
+              class="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex-shrink-0"
             >
               <slot name="header">
                 <h2 class="text-base font-semibold" :class="danger ? 'text-red-600' : 'text-app-text'">
@@ -85,14 +82,14 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
             </div>
 
             <!-- Body -->
-            <div class="px-6 py-4">
+            <div class="px-6 py-4 overflow-y-auto flex-1">
               <slot />
             </div>
 
             <!-- Footer -->
             <div
               v-if="$slots.footer"
-              class="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-100 dark:border-gray-800"
+              class="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-100 dark:border-gray-800 flex-shrink-0"
             >
               <slot name="footer" />
             </div>

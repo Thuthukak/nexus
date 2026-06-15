@@ -16,6 +16,7 @@ Route::prefix('profile')->name('profile.')->group(function () {
     Route::patch('/',              [ProfileController::class, 'update'])->name('update');
     Route::patch('/password',                 [ProfileController::class, 'updatePassword'])->name('password');
     Route::get('/notifications',              [ProfileController::class, 'notificationPreferences'])->name('notifications');
+    Route::post('/users/{user}/resend-invite', [\App\Http\Controllers\Auth\AuthController::class, 'resendInvite'])->name('users.resend-invite');
     Route::get('/payslips',                  [ProfileController::class, 'myPayslips'])->name('payslips');
     Route::patch('/notification-preferences', [ProfileController::class, 'updateNotificationPreferences'])->name('notification-preferences');
 });
@@ -75,3 +76,5 @@ Route::prefix('admin/modules')->name('modules.')->group(function () {
 // Logo
 Route::post('/settings/logo',   [\Modules\Core\app\Http\Controllers\LogoController::class, 'upload'])->name('settings.logo.upload');
 Route::delete('/settings/logo', [\Modules\Core\app\Http\Controllers\LogoController::class, 'destroy'])->name('settings.logo.destroy');
+Route::post('/settings/logo/icon', [\Modules\Core\app\Http\Controllers\LogoController::class, 'uploadIcon'])->name('settings.logo.icon.upload');
+Route::delete('/settings/logo/icon', [\Modules\Core\app\Http\Controllers\LogoController::class, 'destroyIcon'])->name('settings.logo.icon.destroy');

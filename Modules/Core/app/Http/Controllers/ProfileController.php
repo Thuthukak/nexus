@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\Core\app\Http\Controllers;
 
+use App\Rules\StrongPassword;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Hash;

@@ -17,30 +17,50 @@ class CorePermissionSeeder extends Seeder
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
         $permissions = [
-            // User management
             'core.users.view',
             'core.users.create',
             'core.users.edit',
             'core.users.delete',
-
-            // Role management
             'core.roles.manage',
-
-            // Settings
             'core.settings.manage',
-
-            // Module manager
             'core.modules.manage',
-
-            // Activity log
             'core.activity.view',
         ];
 
         foreach ($permissions as $permission) {
-            Permission::firstOrCreate(
-                ['name' => $permission, 'guard_name' => 'web']
-            );
+            Permission::firstOrCreate([
+                'name' => $permission, 
+                'guard_name' => 'web'
+            ]);
         }
+
+        $superAdmin = Role::findByName('Super Admin', 'web');
+        $superAdmin->givePermissionTo($permissions);
+
+        $admin = Role::findByName('Admin', 'web');
+        $admin->givePermissionTo([
+            'core.users.view',
+            'core.roles.manage',
+            'core.settings.manage',
+            'core.modules.manage',
+            'core.activity.view',
+        ]);
+
+        $manager = Role::findByName('Manager', 'web');
+        $manager->givePermissionTo([
+            'core.users.view',
+            'core.roles.manage',
+            'core.settings.manage',
+            'core.activity.view',
+        ]);
+
+        $staff = Role::findByName('Staff', 'web');
+        $staff->givePermissionTo([
+            'core.users.view',
+            'core.activity.view',
+        ]);
+
+        $this->command->info('Core permissions seeded.');
 
         $this->command->info('Core permissions seeded.');
     }

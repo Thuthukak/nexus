@@ -47,6 +47,7 @@ class HandleInertiaRequests extends Middleware
             'app' => [
                 'name'     => $this->appName(),
                 'logo_url' => $this->logoUrl(),
+                'logo_icon_url' => $this->logoIconUrl(),
             ],
             'theme' => $this->theme(),
             
@@ -101,6 +102,16 @@ class HandleInertiaRequests extends Middleware
         try {
             if (! Schema::hasTable('settings')) return null;
             return Settings::group('general')->get('logo_url');
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    private function logoIconUrl(): ?string
+    {
+        try {
+            if (! Schema::hasTable('settings')) return null;
+            return Settings::group('general')->get('logo_icon_url');
         } catch (\Throwable) {
             return null;
         }

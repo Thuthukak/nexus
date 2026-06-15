@@ -26,7 +26,7 @@ class UserController extends Controller
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
                 $q->where('name',  'like', '%' . $request->search . '%')
-                  ->orWhere('email', 'like', '%' . $request->search . '%');
+                ->orWhere('email', 'like', '%' . $request->search . '%');
             });
         }
 
@@ -168,6 +168,8 @@ class UserController extends Controller
             'email'         => $user->email,
             'guard'         => $user->guard,
             'is_active'     => $user->is_active,
+            'email_verified_at' => $user->email_verified_at?->format('d M Y'),
+            'invite_pending' => is_null($user->email_verified_at),
             'portal_access' => $user->portal_access,
             'roles'         => $user->roles->pluck('name'),
             'last_login_at' => $user->last_login_at?->diffForHumans(),

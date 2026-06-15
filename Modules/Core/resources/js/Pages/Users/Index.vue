@@ -160,6 +160,14 @@ function resetPassword(user) {
     <!-- Table -->
     <DataTable :columns="columns" :rows="users" empty-message="No users found.">
       <template #cell-name="{ row, value }">
+          <div class="flex items-center gap-2">
+            <span>{{ value }}</span>
+            <span v-if="row.invite_pending"
+                  class="text-xs bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30
+                         dark:text-yellow-400 px-1.5 py-0.5 rounded-full font-medium">
+              Invite pending
+            </span>
+          </div>
         <a :href="`/users/${row.id}`" class="font-medium text-primary hover:underline">
           {{ value }}
         </a>

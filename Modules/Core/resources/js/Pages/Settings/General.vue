@@ -19,6 +19,7 @@ function submit() {
   form.patch('/settings/general')
 }
 
+// --- Full logo ---
 const logoForm    = useForm({ logo: null })
 const logoPreview = ref(page.props.app?.logo_url ?? null)
 const logoInput   = ref(null)
@@ -30,15 +31,35 @@ function onLogoChange(e) {
   logoForm.logo = file
   logoForm.post('/settings/logo', {
     forceFormData: true,
-    onSuccess: () => {
-      logoPreview.value = page.props.app?.logo_url ?? null
-    },
+    onSuccess: () => { logoPreview.value = page.props.app?.logo_url ?? null },
   })
 }
 
 function removeLogo() {
   router.delete('/settings/logo', {
     onSuccess: () => { logoPreview.value = null },
+  })
+}
+
+// --- Icon (collapsed sidebar) ---
+const iconForm    = useForm({ logo_icon: null })
+const iconPreview = ref(page.props.app?.logo_icon_url ?? null)
+const iconInput   = ref(null)
+
+function onIconChange(e) {
+  const file = e.target.files[0]
+  if (!file) return
+  iconPreview.value = URL.createObjectURL(file)
+  iconForm.logo_icon = file
+  iconForm.post('/settings/logo/icon', {
+    forceFormData: true,
+    onSuccess: () => { iconPreview.value = page.props.app?.logo_icon_url ?? null },
+  })
+}
+
+function removeIcon() {
+  router.delete('/settings/logo/icon', {
+    onSuccess: () => { iconPreview.value = null },
   })
 }
 
@@ -59,32 +80,72 @@ const timezones = [
     </div>
 
     <div class="space-y-6">
-      <!-- Logo -->
+
+      <!-- Logos -->
       <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6">
         <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider mb-4">
           Application Logo
         </h2>
-        <div class="flex items-center gap-6">
-          <div class="w-24 h-16 rounded-lg border-2 border-dashed border-gray-200 dark:border-gray-700 flex items-center justify-center overflow-hidden bg-gray-50 dark:bg-gray-900/50 flex-shrink-0">
-            <img v-if="logoPreview" :src="logoPreview" class="h-full w-full object-contain p-1" />
-            <svg v-else class="w-8 h-8 text-app-text/20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
+
+        <div class="space-y-6">
+
+          <!-- Full logo -->
+          <div>
+            <p class="text-sm font-medium text-app-text mb-3">Full Logo</p>
+            <div class="flex items-center gap-6">
+              <div class="w-24 h-16 rounded-lg border-2 border-dashed border-gray-200 dark:border-gray-700 flex items-center justify-center overflow-hidden bg-gray-50 dark:bg-gray-900/50 flex-shrink-0">
+                <img v-if="logoPreview" :src="logoPreview" class="h-full w-full object-contain p-1" />
+                <svg v-else class="w-8 h-8 text-app-text/20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <div class="space-y-2">
+                <input ref="logoInput" type="file" accept="image/*" class="hidden" @change="onLogoChange" />
+                <button @click="logoInput.click()"
+                        class="px-4 py-2 text-sm font-medium border border-gray-200 dark:border-gray-700 rounded-lg text-app-text/70 hover:text-app-text hover:border-gray-300 transition-colors">
+                  {{ logoPreview ? 'Change Logo' : 'Upload Logo' }}
+                </button>
+                <button v-if="logoPreview" @click="removeLogo"
+                        class="block text-xs text-red-400 hover:text-red-600 transition-colors">
+                  Remove logo
+                </button>
+                <p class="text-xs text-app-text/40">PNG, JPG or SVG. Max 2MB. Recommended: 200×60px</p>
+              </div>
+            </div>
           </div>
-          <div class="space-y-2">
-            <input ref="logoInput" type="file" accept="image/*"
-                   class="hidden" @change="onLogoChange" />
-            <button @click="logoInput.click()"
-                    class="px-4 py-2 text-sm font-medium border border-gray-200 dark:border-gray-700 rounded-lg text-app-text/70 hover:text-app-text hover:border-gray-300 transition-colors">
-              {{ logoPreview ? 'Change Logo' : 'Upload Logo' }}
-            </button>
-            <button v-if="logoPreview" @click="removeLogo"
-                    class="block text-xs text-red-400 hover:text-red-600 transition-colors">
-              Remove logo
-            </button>
-            <p class="text-xs text-app-text/40">PNG, JPG or SVG. Max 2MB. Recommended: 200×60px</p>
+
+          <div class="border-t border-gray-100 dark:border-gray-800" />
+
+          <!-- Icon (collapsed sidebar) -->
+          <div>
+            <p class="text-sm font-medium text-app-text mb-1">Sidebar Icon</p>
+            <p class="text-xs text-app-text/40 mb-3">
+              Shown when the sidebar is collapsed. If not set, the full logo is used instead.
+            </p>
+            <div class="flex items-center gap-6">
+              <div class="w-12 h-12 rounded-lg border-2 border-dashed border-gray-200 dark:border-gray-700 flex items-center justify-center overflow-hidden bg-gray-50 dark:bg-gray-900/50 flex-shrink-0">
+                <img v-if="iconPreview" :src="iconPreview" class="h-full w-full object-contain p-1" />
+                <svg v-else class="w-6 h-6 text-app-text/20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <div class="space-y-2">
+                <input ref="iconInput" type="file" accept="image/*" class="hidden" @change="onIconChange" />
+                <button @click="iconInput.click()"
+                        class="px-4 py-2 text-sm font-medium border border-gray-200 dark:border-gray-700 rounded-lg text-app-text/70 hover:text-app-text hover:border-gray-300 transition-colors">
+                  {{ iconPreview ? 'Change Icon' : 'Upload Icon' }}
+                </button>
+                <button v-if="iconPreview" @click="removeIcon"
+                        class="block text-xs text-red-400 hover:text-red-600 transition-colors">
+                  Remove icon
+                </button>
+                <p class="text-xs text-app-text/40">PNG, JPG or SVG. Max 512KB. Recommended: 64×64px square</p>
+              </div>
+            </div>
           </div>
+
         </div>
       </div>
 
@@ -92,9 +153,12 @@ const timezones = [
       <form @submit.prevent="submit">
         <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6 space-y-4">
           <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider">Application</h2>
-          <Input v-model="form.app_name" label="Application Name"
-                 hint="Displayed in the browser tab and sidebar header"
-                 :error="form.errors.app_name" />
+          <Input 
+            v-model="form.app_name"
+            label="Application Name"
+            hint="Displayed in the browser tab and sidebar header"
+            :error="form.errors.app_name"
+          />
           <div class="flex flex-col gap-1">
             <label class="text-sm font-medium text-app-text">Timezone</label>
             <select v-model="form.timezone"
@@ -107,6 +171,7 @@ const timezones = [
           <Button type="submit" :loading="form.processing">Save Settings</Button>
         </div>
       </form>
+
     </div>
   </div>
 </template>

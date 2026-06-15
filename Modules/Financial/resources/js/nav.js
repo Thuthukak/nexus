@@ -7,9 +7,9 @@ export default {
         { label: 'Overview',    href: '/financial/dashboard',         permission: null },
         { label: 'Quotations', href: '/financial/quotations',         permission: 'financial.quotations.view' },
         { label: 'Invoices',  href: '/financial/invoices',           permission: 'financial.invoices.view' },
+        { label: 'Recurring', href: '/financial/recurring',          permission: 'financial.invoices.manage' },
         { label: 'Customers', href: '/financial/customers',          permission: 'financial.customers.manage' },
         { label: 'Tax Rates', href: '/financial/tax-rates',          permission: 'financial.invoices.manage' },
-        { label: 'Recurring', href: '/financial/recurring',          permission: 'financial.invoices.manage' },
         { label: 'Payments',  href: '/financial/settings/payments',  permission: 'core.settings.manage' },
     ],
 }

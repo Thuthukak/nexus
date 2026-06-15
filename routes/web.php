@@ -11,6 +11,31 @@ Route::prefix('install')->name('install.')->group(function () {
     Route::get('/progress',   [\App\Http\Controllers\Wizard\WizardController::class, 'migrationProgress'])->name('progress');
 });
 
+// ── Internal Auth ─────────────────────────────────────────────
+Route::middleware('guest')->group(function () {
+    Route::get('/login',          [\App\Http\Controllers\Auth\AuthController::class, 'showLogin'])->name('login');
+    Route::post('/login',         [\App\Http\Controllers\Auth\AuthController::class, 'login'])->name('login.post');
+
+    // Forgot password
+    Route::get('/forgot-password',  [\App\Http\Controllers\Auth\AuthController::class, 'showForgotPassword'])->name('password.request');
+    Route::post('/forgot-password', [\App\Http\Controllers\Auth\AuthController::class, 'sendResetLink'])->name('password.email');
+
+    // Reset password
+    Route::get('/reset-password/{token}',  [\App\Http\Controllers\Auth\AuthController::class, 'showResetPassword'])->name('password.reset');
+    Route::post('/reset-password',         [\App\Http\Controllers\Auth\AuthController::class, 'resetPassword'])->name('password.update');
+
+    // Accept invite (signed URL — no guest middleware needed but fine here)
+    Route::get('/accept-invite/{user}',   [\App\Http\Controllers\Auth\AuthController::class, 'showAcceptInvite'])->name('auth.accept-invite');
+    Route::post('/accept-invite/{user}',  [\App\Http\Controllers\Auth\AuthController::class, 'acceptInvite'])->name('auth.accept-invite.post');
+});
+
+Route::post('/logout', [\App\Http\Controllers\Auth\AuthController::class, 'logout'])->name('logout');
+
+// Resend invite — admin only
+Route::post('/users/{user}/resend-invite',
+    [\App\Http\Controllers\Auth\AuthController::class, 'resendInvite']
+)->middleware(['web', 'auth'])->name('users.resend-invite');
+
 // Public event routes — no auth required
 Route::prefix('events')->name('events.public.')->group(function () {
     Route::get('/',            [\Modules\Events\app\Http\Controllers\PublicEventController::class, 'index'])->name('index');
