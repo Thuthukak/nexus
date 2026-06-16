@@ -86,7 +86,7 @@ class OrderService
                 'description' => "{$event->title} — {$li['ticket_type']->name}",
                 'qty'         => $li['quantity'],
                 'unit_price'  => $li['unit_price'],
-                'tax_rate'    => 0, // events typically zero-rated
+                'tax_rate'    => 0,
             ], $lineItems);
 
             // Create invoice via existing InvoiceService

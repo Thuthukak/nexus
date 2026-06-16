@@ -8,8 +8,9 @@ use App\Models\User;
 use App\Notifications\InvoicePaidNotification;
 use Modules\Financial\app\Events\InvoicePaid;
 use Spatie\Permission\Models\Role;
+use Illuminate\Contracts\Queue\ShouldQueue;
 
-class NotifyInvoicePaid
+class NotifyInvoicePaid implements ShouldQueue
 {
     public function handle(InvoicePaid $event): void
     {
