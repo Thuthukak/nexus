@@ -26,7 +26,7 @@ function currency(val) {
     <div class="bg-white border-b border-gray-200 px-6 py-4">
       <div class="max-w-2xl mx-auto flex items-center justify-between">
         <div class="flex items-center gap-3">
-          <img v-if="app.logo_url" :src="app.logo_url" class="h-8 w-auto object-contain" />
+          <img v-if="app.logo_url" :src="app.logo_url" class="h-16 w-auto object-contain" />
           <span v-else class="text-lg font-bold text-gray-800">{{ app.name }}</span>
         </div>
         <span v-if="gateway.test_mode"
