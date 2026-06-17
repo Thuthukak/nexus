@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->enum('guard', ['internal', 'customer'])->default('internal')->after('email');
+            $table->enum('guard', ['web', 'customer'])->default('web')->after('email');
             $table->boolean('portal_access')->default(false)->after('guard');
             $table->json('notification_preferences')->nullable()->after('portal_access');
         });

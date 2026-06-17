@@ -6,14 +6,22 @@ defineOptions({ layout: WizardLayout })
 defineProps({
   currentStep:   { type: Number, default: 7 },
   adminEmail:    { type: String, required: true },
-  activeModules: { type: Array,  default: () => [] },
+  activeModules: { default: () => [] },
 })
+
+const moduleList = computed(() => {
+  if (Array.isArray(props.activeModules)) return props.activeModules
+  if (typeof props.activeModules === 'string' && props.activeModules.trim())
+    return props.activeModules.split(',').map(s => s.trim())
+  return []
+})
+
 </script>
 
 <template>
   <div class="text-center">
     <div class="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"
-         style="background-color: var(--color-primary, #1E3A5F);">
+          style="background-color: var(--color-primary, #1E3A5F);">
       <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
       </svg>
@@ -39,7 +47,7 @@ defineProps({
         <div class="flex justify-between text-sm">
           <dt class="text-gray-500">Active Modules</dt>
           <dd class="font-medium text-gray-900 dark:text-white">
-            {{ activeModules.join(', ') }}
+            {{ moduleList.join(', ') || '—' }}
           </dd>
         </div>
         <div class="flex justify-between text-sm">

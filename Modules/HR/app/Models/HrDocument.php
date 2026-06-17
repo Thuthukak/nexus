@@ -43,7 +43,7 @@ class HrDocument extends Model
     ];
 
     public const VISIBILITY = [
-        'internal' => 'Internal Only',
+        'web' => 'Internal Only',
         'customer' => 'Customer Visible',
     ];
 

@@ -13,53 +13,62 @@ class RoleSeeder extends Seeder
 {
     public function run(): void
     {
+        // Clear permission cache before seeding
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
-        // Super Admin — wildcard, handled by Spatie's super-admin gate
-        $superAdmin = Role::firstOrCreate(
-            ['name' => 'Super Admin', 'guard_name' => 'web']
+        $guard = 'web'; // all internal staff use 'web' guard
+
+        // ── Super Admin ────────────────────────────────────────
+        // Spatie handles wildcard via gate — no permissions to sync
+        Role::firstOrCreate(['name' => 'Super Admin', 'guard_name' => $guard]);
+
+        // ── Admin ──────────────────────────────────────────────
+        $admin = Role::firstOrCreate(['name' => 'Admin', 'guard_name' => $guard]);
+        $admin->syncPermissions(
+            Permission::where('guard_name', $guard)->get()
         );
 
-        // Admin — all core permissions
-        $admin = Role::firstOrCreate(
-            ['name' => 'Admin', 'guard_name' => 'web']
-        );
-        $admin->syncPermissions(Permission::where('guard_name', 'web')->get());
-
-        // Manager — view + limited core
-        $manager = Role::firstOrCreate(
-            ['name' => 'Manager', 'guard_name' => 'web']
-        );
+        // ── Manager ────────────────────────────────────────────
+        $manager = Role::firstOrCreate(['name' => 'Manager', 'guard_name' => $guard]);
         $manager->syncPermissions(
-            Permission::where('guard_name', 'web')
-                ->where('name', 'like', '%.view')
-                ->orWhere('name', 'like', '%.create')
+            Permission::where('guard_name', $guard)
+                ->where(function ($q) {
+                    $q->where('name', 'like', '%.view')
+                      ->orWhere('name', 'like', '%.create');
+                })
                 ->get()
         );
 
-        // Staff — view only on core
-        $staff = Role::firstOrCreate(
-            ['name' => 'Staff', 'guard_name' => 'web']
-        );
+        // ── Staff ──────────────────────────────────────────────
+        $staff = Role::firstOrCreate(['name' => 'Staff', 'guard_name' => $guard]);
         $staff->syncPermissions(
-            Permission::where('guard_name', 'web')
+            Permission::where('guard_name', $guard)
                 ->where('name', 'like', '%.view')
                 ->get()
         );
 
-        // Read Only
-        Role::firstOrCreate(
-            ['name' => 'Read Only', 'guard_name' => 'web']
+        // ── Teacher (LMS) ──────────────────────────────────────
+        $teacher = Role::firstOrCreate(['name' => 'Teacher', 'guard_name' => $guard]);
+        $teacher->syncPermissions(
+            Permission::where('guard_name', $guard)
+                ->where('name', 'like', 'lms.%')
+                ->get()
         );
 
-        // Customer roles (portal guard)
-        Role::firstOrCreate(
-            ['name' => 'Customer Admin', 'guard_name' => 'web']
-        );
-        Role::firstOrCreate(
-            ['name' => 'Customer User', 'guard_name' => 'web']
+        // ── Read Only ──────────────────────────────────────────
+        $readOnly = Role::firstOrCreate(['name' => 'Read Only', 'guard_name' => $guard]);
+        $readOnly->syncPermissions(
+            Permission::where('guard_name', $guard)
+                ->where('name', 'like', '%.view')
+                ->get()
         );
 
-        $this->command->info('Roles seeded.');
+        // ── Customer roles ─────────────────────────────────────
+        // These use 'web' guard_name too — customers are in the same
+        // users table, just differentiated by guard column value
+        Role::firstOrCreate(['name' => 'Customer Admin', 'guard_name' => $guard]);
+        Role::firstOrCreate(['name' => 'Customer User',  'guard_name' => $guard]);
+
+        $this->command?->info('Roles seeded successfully.');
     }
 }

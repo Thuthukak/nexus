@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('file_name');      // original filename
             $table->string('mime_type')->nullable();
             $table->unsignedBigInteger('file_size')->nullable(); // bytes
-            $table->enum('visibility', ['internal', 'customer'])->default('internal');
+            $table->enum('visibility', ['web', 'customer'])->default('web');
             $table->date('expiry_date')->nullable();
             $table->boolean('is_expired')->default(false);
             $table->boolean('expiry_notified')->default(false);

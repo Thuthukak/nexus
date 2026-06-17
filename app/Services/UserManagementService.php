@@ -26,7 +26,7 @@ class UserManagementService
             'name'              => $data['name'],
             'email'             => $data['email'],
             'password'          => Hash::make(Str::random(64)), // unusable placeholder
-            'guard'             => 'internal',
+            'guard'             => 'web',
             'is_active'         => true,
             'email_verified_at' => null, // not verified until they accept invite
         ]);

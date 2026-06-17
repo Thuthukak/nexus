@@ -43,13 +43,13 @@ class FinancialPermissionSeeder extends Seeder
             ]);
         }
 
-        $superAdmin = Role::findByName('Super Admin', 'web');
+        $superAdmin = Role::where('name', 'Super Admin')->where('guard_name', 'web')->first();
         $superAdmin->givePermissionTo(array_filter(
             $permissions,
             fn ($p) => ! str_contains($p, '.portal.')
         ));
 
-        $admin = Role::findByName('Admin', 'web');
+        $admin = Role::where('name', 'Admin')->where('guard_name', 'web')->first();
         $admin->givePermissionTo([
             'financial.invoices.view',
             'financial.invoices.create',
@@ -63,7 +63,7 @@ class FinancialPermissionSeeder extends Seeder
             'financial.reports.view',
         ]);
 
-        $manager = Role::findByName('Manager', 'web');
+        $manager = Role::where('name', 'Manager')->where('guard_name', 'web')->first();
         $manager->givePermissionTo([
             'financial.invoices.view',
             'financial.invoices.create',
@@ -72,7 +72,7 @@ class FinancialPermissionSeeder extends Seeder
             'financial.reports.view',
         ]);
 
-        $staff = Role::findByName('Staff', 'web');
+        $staff = Role::where('name', 'Staff')->where('guard_name', 'web')->first();
         $staff->givePermissionTo([
             'financial.invoices.view',
             'financial.invoices.create',
@@ -80,6 +80,6 @@ class FinancialPermissionSeeder extends Seeder
             'financial.quotations.create',
         ]);
 
-        $this->command->info('Financial permissions seeded.');
+        $this->command?->info('Financial permissions seeded.');
     }
 }

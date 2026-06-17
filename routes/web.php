@@ -7,6 +7,8 @@ Route::prefix('install')->name('install.')->group(function () {
     Route::get('/',          [\App\Http\Controllers\Wizard\WizardController::class, 'index'])->name('index');
     Route::get('/step/{step}', [\App\Http\Controllers\Wizard\WizardController::class, 'show'])->name('step');
     Route::post('/step/{step}', [\App\Http\Controllers\Wizard\WizardController::class, 'process'])->name('process');
+    Route::get('/debug-state',   [\App\Http\Controllers\Wizard\WizardController::class, 'debugState'])->name('debug');
+    Route::get('/migration-progress', [\App\Http\Controllers\Wizard\WizardController::class, 'migrationProgress'])->name('migration.progress');
     Route::get('/check-db',   [\App\Http\Controllers\Wizard\WizardController::class, 'checkDb'])->name('check-db');
     Route::get('/progress',   [\App\Http\Controllers\Wizard\WizardController::class, 'migrationProgress'])->name('progress');
 });

@@ -33,10 +33,10 @@ class BookingsPermissionSeeder extends Seeder
             ]);
         }
 
-        $admin = Role::findByName('Super Admin', 'web');
+        $admin = Role::where('name', 'Super Admin')->where('guard_name', 'web')->first();
         $admin->givePermissionTo($permissions);
 
-        $manager = Role::findByName('Manager', 'web');
+        $manager = Role::where('name', 'Manager')->where('guard_name', 'web')->first();
         $manager->givePermissionTo([
             'bookings.bookings.view',
             'bookings.bookings.create',
@@ -44,12 +44,12 @@ class BookingsPermissionSeeder extends Seeder
             'bookings.reports.view',
         ]);
 
-        $staff = Role::findByName('Staff', 'web');
+        $staff = Role::where('name', 'Staff')->where('guard_name', 'web')->first();
         $staff->givePermissionTo([
             'bookings.bookings.view',
             'bookings.bookings.create',
         ]);
 
-        $this->command->info('Bookings permissions seeded.');
+        $this->command?->info('Bookings permissions seeded.');
     }
 }

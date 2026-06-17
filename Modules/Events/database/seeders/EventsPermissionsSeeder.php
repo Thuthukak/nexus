@@ -26,12 +26,12 @@ class EventsPermissionsSeeder extends Seeder
             ]);
         }
 
-        $admin = Role::findByName('Super Admin', 'web');
+        $admin = Role::where('name', 'Super Admin')->where('guard_name', 'web')->first();
         $admin->givePermissionTo($permissions);
 
         Role::firstOrCreate(['name' => 'Manager', 'guard_name' => 'web'])
             ->givePermissionTo(['events.view', 'events.orders']);
 
-        $this->command->info('Events permissions seeded.');
+        $this->command?->info('Events permissions seeded.');
     }
 }
