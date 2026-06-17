@@ -1,9 +1,14 @@
 <script setup>
-import { useForm }  from '@inertiajs/vue3'
-import WizardLayout from '@shared/layouts/WizardLayout.vue'
+import { ref, computed } from 'vue'
+import { useForm }        from '@inertiajs/vue3'
+import WizardLayout       from '@shared/layouts/WizardLayout.vue'
+import PasswordInput      from '@shared/components/form/PasswordInput.vue'
 
 defineOptions({ layout: WizardLayout })
-defineProps({ currentStep: { type: Number, default: 6 } })
+
+defineProps({
+  currentStep: { type: Number, default: 6 },
+})
 
 const form = useForm({
   name:                  '',
@@ -12,65 +17,91 @@ const form = useForm({
   password_confirmation: '',
 })
 
+const confirmTouched = ref(false)
+
+const confirmError = computed(() => {
+  if (! confirmTouched.value || ! form.password_confirmation) return null
+  if (form.password !== form.password_confirmation) return 'Passwords do not match.'
+  return form.errors.password_confirmation ?? null
+})
+
 function submit() {
+  confirmTouched.value = true
+  if (form.password !== form.password_confirmation) return
   form.post('/install/step/6')
 }
 </script>
 
 <template>
   <div>
-    <div class="mb-8">
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Create Admin Account</h1>
-      <p class="text-gray-500 mt-1">
-        This will be the Super Admin account for your Nexus installation.
+    <div class="mb-6">
+      <h2 class="text-xl font-bold text-app-text">Create Admin Account</h2>
+      <p class="text-sm text-app-text/60 mt-1">
+        This will be your Super Admin account. Keep these credentials safe.
       </p>
     </div>
 
-    <form @submit.prevent="submit"
-          class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-6 space-y-4 mb-6">
+    <form @submit.prevent="submit" class="space-y-5" novalidate>
+
+      <!-- Name -->
       <div class="flex flex-col gap-1">
-        <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Full Name</label>
-        <input v-model="form.name" type="text" required
-               class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:border-transparent" />
+        <label class="text-sm font-medium text-app-text">Full Name</label>
+        <input v-model="form.name" type="text" required autofocus
+               class="w-full px-3 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600
+                      bg-background text-app-text text-sm focus:outline-none
+                      focus:ring-2 focus:ring-primary/50"
+               :class="form.errors.name ? 'border-red-400' : ''" />
         <p v-if="form.errors.name" class="text-xs text-red-500">{{ form.errors.name }}</p>
       </div>
 
+      <!-- Email -->
       <div class="flex flex-col gap-1">
-        <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Email Address</label>
+        <label class="text-sm font-medium text-app-text">Email Address</label>
         <input v-model="form.email" type="email" required
-               class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:border-transparent" />
+               class="w-full px-3 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600
+                      bg-background text-app-text text-sm focus:outline-none
+                      focus:ring-2 focus:ring-primary/50"
+               :class="form.errors.email ? 'border-red-400' : ''" />
         <p v-if="form.errors.email" class="text-xs text-red-500">{{ form.errors.email }}</p>
       </div>
 
-      <div class="grid grid-cols-2 gap-4">
-        <div class="flex flex-col gap-1">
-          <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
-          <input v-model="form.password" type="password" required
-                 class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:border-transparent" />
-          <p v-if="form.errors.password" class="text-xs text-red-500">{{ form.errors.password }}</p>
-        </div>
-        <div class="flex flex-col gap-1">
-          <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Confirm Password</label>
-          <input v-model="form.password_confirmation" type="password" required
-                 class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:border-transparent" />
-        </div>
+      <!-- Password with strength meter -->
+      <PasswordInput
+        v-model="form.password"
+        label="Password"
+        autocomplete="new-password"
+        :show-strength="true"
+        :error="form.errors.password"
+      />
+
+      <!-- Confirm password -->
+      <div class="flex flex-col gap-1">
+        <PasswordInput
+          v-model="form.password_confirmation"
+          label="Confirm Password"
+          autocomplete="new-password"
+          :show-strength="false"
+          :error="confirmError"
+          @blur="confirmTouched = true"
+        />
       </div>
 
-      <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg px-4 py-3 text-xs text-blue-700 dark:text-blue-400">
-        Use a strong password. This account has full access to all platform settings.
+      <!-- Security note -->
+      <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800
+                  rounded-xl px-4 py-3">
+        <p class="text-xs text-blue-700 dark:text-blue-400 leading-relaxed">
+          🔒 <strong>Super Admin</strong> has full access to all modules and settings.
+          Store these credentials in a secure password manager.
+        </p>
       </div>
-    </form>
 
-    <div class="flex justify-between">
-      <a href="/install/step/5"
-         class="px-5 py-2.5 rounded-xl text-sm font-semibold border border-gray-300 text-gray-600 hover:bg-gray-50 transition-colors">
-        ← Back
-      </a>
-      <button @click="submit" :disabled="form.processing"
-              class="px-6 py-2.5 rounded-xl text-sm font-semibold text-white disabled:opacity-40"
+      <button type="submit"
+              :disabled="form.processing"
+              class="w-full py-3 rounded-xl font-semibold text-sm text-primary-text
+                     disabled:opacity-60 transition-opacity"
               style="background-color: var(--color-primary, #1E3A5F);">
-        Create Account & Finish →
+        {{ form.processing ? 'Creating account…' : 'Create Admin Account →' }}
       </button>
-    </div>
+    </form>
   </div>
 </template>

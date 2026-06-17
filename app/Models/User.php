@@ -27,6 +27,7 @@ class User extends Authenticatable implements CanResetPasswordContract, MustVeri
         'is_active',      
         'last_login_at',    
         'notification_preferences',
+        'email_verified_at'
     ];
 
     protected $hidden = [
@@ -45,6 +46,7 @@ class User extends Authenticatable implements CanResetPasswordContract, MustVeri
             'is_active'                  => 'boolean',            
             'last_login_at'              => 'datetime',            
             'notification_preferences'   => 'array',
+            'email_verified_at'          => 'datetime',
         ];
     }
 

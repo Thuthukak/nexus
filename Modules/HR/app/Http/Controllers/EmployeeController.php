@@ -60,7 +60,7 @@ class EmployeeController extends Controller
             'name'              => $validated['name'],
             'email'             => $validated['email'],
             'password'          => Hash::make('Welcome@1'),
-            'guard'             => 'internal',
+            'guard'             => 'web',
             'email_verified_at' => now(),
         ]);
 

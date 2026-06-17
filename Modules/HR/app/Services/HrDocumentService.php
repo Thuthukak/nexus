@@ -32,7 +32,7 @@ class HrDocumentService
             'file_name'     => $file->getClientOriginalName(),
             'mime_type'     => $file->getMimeType(),
             'file_size'     => $file->getSize(),
-            'visibility'    => $data['visibility'] ?? 'internal',
+            'visibility'    => $data['visibility'] ?? 'web',
             'expiry_date'   => $data['expiry_date'] ?? null,
             'notes'         => $data['notes'] ?? null,
         ]);

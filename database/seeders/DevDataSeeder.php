@@ -98,6 +98,6 @@ class DevDataSeeder extends Seeder
             ]);
         }
 
-        $this->command->info('Dev data seeded successfully.');
+        $this->command?->info('Dev data seeded successfully.');
     }
 }

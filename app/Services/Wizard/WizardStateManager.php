@@ -57,6 +57,11 @@ class WizardStateManager
         return $this->isStepComplete($step - 1);
     }
 
+    public function debug(): array
+    {
+        return $this->load();
+    }
+
     public function clear(): void
     {
         if (file_exists($this->statePath)) {

@@ -13,7 +13,6 @@ class CorePermissionSeeder extends Seeder
 {
     public function run(): void
     {
-        // Reset cached roles and permissions
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
         $permissions = [
@@ -29,39 +28,46 @@ class CorePermissionSeeder extends Seeder
 
         foreach ($permissions as $permission) {
             Permission::firstOrCreate([
-                'name' => $permission, 
-                'guard_name' => 'web'
+                'name'       => $permission,
+                'guard_name' => 'web',
             ]);
         }
 
-        $superAdmin = Role::findByName('Super Admin', 'web');
-        $superAdmin->givePermissionTo($permissions);
+        // Use firstOrCreate — roles are guaranteed to exist (WizardSeeder
+        // Phase 1 creates them, RoleSeeder creates them for artisan db:seed)
+        $rolePermissions = [
+            'Super Admin' => $permissions,
+            'Admin'   => [
+                'core.users.view',
+                'core.users.create',
+                'core.users.edit',
+                'core.users.delete',
+                'core.roles.manage',
+                'core.settings.manage',
+                'core.modules.manage',
+                'core.activity.view',
+            ],
+            'Manager' => [
+                'core.users.view',
+                'core.activity.view',
+                'core.settings.manage',
+            ],
+            'Staff' => [
+                'core.users.view',
+                'core.activity.view',
+            ],
+        ];
 
-        $admin = Role::findByName('Admin', 'web');
-        $admin->givePermissionTo([
-            'core.users.view',
-            'core.roles.manage',
-            'core.settings.manage',
-            'core.modules.manage',
-            'core.activity.view',
-        ]);
+        foreach ($rolePermissions as $roleName => $perms) {
+            $role = Role::where('name', $roleName)
+                        ->where('guard_name', 'web')
+                        ->first();
 
-        $manager = Role::findByName('Manager', 'web');
-        $manager->givePermissionTo([
-            'core.users.view',
-            'core.roles.manage',
-            'core.settings.manage',
-            'core.activity.view',
-        ]);
+            if ($role) {
+                $role->givePermissionTo($perms);
+            }
+        }
 
-        $staff = Role::findByName('Staff', 'web');
-        $staff->givePermissionTo([
-            'core.users.view',
-            'core.activity.view',
-        ]);
-
-        $this->command->info('Core permissions seeded.');
-
-        $this->command->info('Core permissions seeded.');
+        $this->command?->info('Core permissions seeded.');
     }
 }

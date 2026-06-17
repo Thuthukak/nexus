@@ -20,7 +20,7 @@ class UserController extends Controller
     public function index(Request $request)
     {
         $query = User::with('roles')
-            ->where('guard', 'internal')
+            ->where('guard', 'web')
             ->orderBy('name');
 
         if ($request->filled('search')) {
@@ -47,9 +47,9 @@ class UserController extends Controller
             'roles'   => Role::where('guard_name', 'web')->pluck('name'),
             'filters' => $request->only(['search', 'role', 'status']),
             'stats'   => [
-                'total'    => User::where('guard', 'internal')->count(),
-                'active'   => User::where('guard', 'internal')->where('is_active', true)->count(),
-                'inactive' => User::where('guard', 'internal')->where('is_active', false)->count(),
+                'total'    => User::where('guard', 'web')->count(),
+                'active'   => User::where('guard', 'web')->where('is_active', true)->count(),
+                'inactive' => User::where('guard', 'web')->where('is_active', false)->count(),
             ],
         ]);
     }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Wizard;
 
 use App\Http\Controllers\Controller;
+use App\Rules\StrongPassword;
 use App\Services\LicenceService;
 use App\Services\ModuleRegistryService;
 use App\Services\Wizard\Steps\DatabaseSetupStep;
@@ -14,6 +15,8 @@ use App\Services\Wizard\WizardStateManager;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use Inertia\Inertia;
 
 class WizardController extends Controller
@@ -30,18 +33,19 @@ class WizardController extends Controller
     public function show(int $step)
     {
         if (! $this->state->canAccessStep($step)) {
-            $lastCompleted = max($this->state->completedSteps() ?: [0]);
+            $completed     = $this->state->completedSteps();
+            $lastCompleted = count($completed) > 0 ? max($completed) : 0;
             return redirect()->route('install.step', $lastCompleted + 1);
         }
 
-        return match($step) {
-            1 => $this->showStep1(),
-            2 => $this->showStep2(),
-            3 => $this->showStep3(),
-            4 => $this->showStep4(),
-            5 => $this->showStep5(),
-            6 => $this->showStep6(),
-            7 => $this->showStep7(),
+        return match ($step) {
+            1       => $this->showStep1(),
+            2       => $this->showStep2(),
+            3       => $this->showStep3(),
+            4       => $this->showStep4(),
+            5       => $this->showStep5(),
+            6       => $this->showStep6(),
+            7       => $this->showStep7(),
             default => redirect()->route('install.step', 1),
         };
     }
@@ -52,27 +56,28 @@ class WizardController extends Controller
             return redirect()->route('install.step', 1);
         }
 
-        return match($step) {
-            1 => $this->processStep1(),
-            2 => $this->processStep2($request),
-            3 => $this->processStep3(),
-            4 => $this->processStep4($request),
-            5 => $this->processStep5($request),
-            6 => $this->processStep6($request),
+        return match ($step) {
+            1       => $this->processStep1(),
+            2       => $this->processStep2($request),
+            3       => $this->processStep3(),
+            4       => $this->processStep4($request),
+            5       => $this->processStep5($request),
+            6       => $this->processStep6($request),
             default => redirect()->route('install.step', $step),
         };
     }
 
     // ── Step 1: Environment check ─────────────────────────────
+
     private function showStep1()
     {
         $checker = new EnvironmentCheckStep();
         $result  = $checker->check();
 
         return Inertia::render('Install/Step1Environment', [
-            'checks'     => $result['checks'],
-            'allPassed'  => $result['all_passed'],
-            'currentStep'=> 1,
+            'checks'      => $result['checks'],
+            'allPassed'   => $result['all_passed'],
+            'currentStep' => 1,
         ]);
     }
 
@@ -90,13 +95,14 @@ class WizardController extends Controller
     }
 
     // ── Step 2: Database ──────────────────────────────────────
+
     private function showStep2()
     {
         return Inertia::render('Install/Step2Database', [
             'currentStep' => 2,
-            'saved' => [
-                'host'     => $this->state->get('db_host', '127.0.0.1'),
-                'port'     => $this->state->get('db_port', '3306'),
+            'saved'       => [
+                'host'     => $this->state->get('db_host',     '127.0.0.1'),
+                'port'     => $this->state->get('db_port',     '3306'),
                 'database' => $this->state->get('db_database', 'nexus'),
                 'username' => $this->state->get('db_username', 'root'),
             ],
@@ -105,8 +111,6 @@ class WizardController extends Controller
 
     private function processStep2(Request $request)
     {
-        \Log::info('Testing DB connection with', $request->only('host', 'port', 'database', 'username'));
-        
         $validated = $request->validate([
             'host'     => 'required|string',
             'port'     => 'required|string',
@@ -115,6 +119,7 @@ class WizardController extends Controller
             'password' => 'nullable|string',
         ]);
 
+        // Test the connection first
         $step = new DatabaseSetupStep();
         $test = $step->test($validated);
 
@@ -122,7 +127,7 @@ class WizardController extends Controller
             return back()->withErrors(['connection' => $test['message']]);
         }
 
-        // Write to .env
+        // Write credentials to .env
         $step->writeToEnv($validated);
 
         // Save to wizard state
@@ -134,14 +139,16 @@ class WizardController extends Controller
         ]);
 
         $this->state->markStepComplete(2);
-        \Log::info('Step 2 completed successfully');
+
+        Log::info('Wizard step 2 complete — DB credentials saved.');
+
         return redirect()->route('install.step', 3);
     }
 
     // ── Step 3: Migrations ────────────────────────────────────
+
     private function showStep3()
     {
-        \Log::info('Showing Step 3: Migrations');
         return Inertia::render('Install/Step3Migrations', [
             'currentStep' => 3,
         ]);
@@ -150,22 +157,42 @@ class WizardController extends Controller
     private function processStep3()
     {
         try {
-            // Reload DB config from .env in case it was just written
+            // Re-read .env and reconnect with new credentials
             $this->refreshDatabaseConfig();
 
+            // ── Run migrations ────────────────────────────────
+            Log::info('Wizard step 3: running migrations');
             Artisan::call('migrate', ['--force' => true]);
-            Artisan::call('db:seed', ['--force' => true]);
+            Log::info('Migrations output: ' . Artisan::output());
+
+            // ── Seed in dependency order ──────────────────────
+            // Seed via WizardSeeder which handles the correct order:
+            // Phase 1: create empty roles
+            // Phase 2: theme defaults
+            // Phase 3: all permissions (core + all modules)
+            // Phase 4: sync permissions onto roles
+            // SuperAdmin is NOT created here — that happens in step 6.
+            $wizardSeeder = new \App\Services\Wizard\WizardSeeder();
+            $wizardSeeder->run();
 
             $this->state->markStepComplete(3);
-            return redirect('/install/step/4?migrated=1');
+
+            Log::info('Wizard step 3 complete — migrations and seeders done.');
+
+            return redirect()->route('install.step', 4);
+
         } catch (\Throwable $e) {
-            return back()->withErrors(['migration' => $e->getMessage()]);
+            Log::error('Wizard step 3 FAILED: ' . $e->getMessage() . "\n" . $e->getTraceAsString());
+            return back()->withErrors([
+                'migration' => $e->getMessage(),
+            ]);
         }
     }
 
+
+
     private function refreshDatabaseConfig(): void
     {
-        // Re-read .env and update the live DB config
         $envPath = base_path('.env');
         if (! file_exists($envPath)) return;
 
@@ -174,68 +201,77 @@ class WizardController extends Controller
             $line = trim($line);
             if (str_contains($line, '=') && ! str_starts_with($line, '#')) {
                 [$key, $value] = explode('=', $line, 2);
-                $env[trim($key)] = trim($value);
+                $env[trim($key)] = trim($value, " \t\n\r\0\x0B\"'");
             }
         }
 
         $connection = $env['DB_CONNECTION'] ?? 'mysql';
 
         config([
-            'database.default'                          => $connection,
-            "database.connections.{$connection}.host"   => $env['DB_HOST']     ?? '127.0.0.1',
-            "database.connections.{$connection}.port"   => $env['DB_PORT']     ?? '3306',
-            "database.connections.{$connection}.database"=> $env['DB_DATABASE'] ?? '',
-            "database.connections.{$connection}.username"=> $env['DB_USERNAME'] ?? '',
-            "database.connections.{$connection}.password"=> $env['DB_PASSWORD'] ?? '',
+            'database.default'                             => $connection,
+            "database.connections.{$connection}.host"      => $env['DB_HOST']     ?? '127.0.0.1',
+            "database.connections.{$connection}.port"      => $env['DB_PORT']     ?? '3306',
+            "database.connections.{$connection}.database"  => $env['DB_DATABASE'] ?? '',
+            "database.connections.{$connection}.username"  => $env['DB_USERNAME'] ?? '',
+            "database.connections.{$connection}.password"  => $env['DB_PASSWORD'] ?? '',
         ]);
 
-        // Force reconnect
         \Illuminate\Support\Facades\DB::purge($connection);
         \Illuminate\Support\Facades\DB::reconnect($connection);
     }
 
-    // Polling endpoint for migration progress
+    // AJAX — check if migrations have run (used by frontend polling)
     public function migrationProgress()
     {
-        // Simple check — if users table exists, migrations ran
-        $done = \Illuminate\Support\Facades\Schema::hasTable('users');
+        $done = Schema::hasTable('users');
         return response()->json(['done' => $done]);
     }
 
-    // Test DB connection (AJAX)
+    // AJAX — test DB connection from step 2 form
     public function checkDb(Request $request)
     {
         $step   = new DatabaseSetupStep();
         $result = $step->test([
-            'host'     => $request->host     ?? '127.0.0.1',
-            'port'     => $request->port     ?? '3306',
-            'database' => $request->database ?? '',
-            'username' => $request->username ?? '',
-            'password' => $request->password ?? '',
+            'host'     => $request->input('host',     '127.0.0.1'),
+            'port'     => $request->input('port',     '3306'),
+            'database' => $request->input('database', ''),
+            'username' => $request->input('username', ''),
+            'password' => $request->input('password', ''),
         ]);
         return response()->json($result);
     }
 
+    // Debug — inspect wizard state (remove before go-live)
+    public function debugState()
+    {
+        $path = storage_path('app/wizard/state.json');
+        return response()->json([
+            'state'            => $this->state->debug(),
+            'state_path'       => $path,
+            'file_exists'      => file_exists($path),
+            'dir_writable'     => is_writable(dirname($path)),
+        ]);
+    }
+
     // ── Step 4: Licence ───────────────────────────────────────
+
     private function showStep4()
     {
-        $savedLicence = $this->state->get('licence_data');
-
         return Inertia::render('Install/Step4Licence', [
-            'currentStep'  => 4,
-            'licenceData'  => $savedLicence,
-            'isDev'        => app()->environment('local'),
+            'currentStep' => 4,
+            'licenceData' => $this->state->get('licence_data'),
+            'isDev'       => app()->environment('local'),
         ]);
     }
 
     private function processStep4(Request $request)
     {
         // Dev bypass
-        if (app()->environment('local') && $request->input('skip_licence')) {
+        if (app()->environment('local') && $request->boolean('skip_licence')) {
             $this->state->set('licence_data', [
                 'valid'    => true,
                 'licensee' => 'Development',
-                'modules'  => ['Core', 'Financial', 'HR', 'Bookings'],
+                'modules'  => ['Core', 'Financial', 'HR', 'Bookings', 'LMS', 'Events'],
                 'dev'      => true,
             ]);
             $this->state->markStepComplete(4);
@@ -259,25 +295,30 @@ class WizardController extends Controller
     }
 
     // ── Step 5: Module selection ──────────────────────────────
+
     private function showStep5()
     {
-        $licenceData    = $this->state->get('licence_data', []);
+        $licenceData     = $this->state->get('licence_data', []);
         $licensedModules = $licenceData['modules'] ?? ['Core'];
 
-        $modules = collect([
-            'Core'      => ['description' => 'Authentication, users, roles and settings', 'required' => true],
+        $allModules = [
+            'Core'      => ['description' => 'Authentication, users, roles and settings',   'required' => true],
             'Financial' => ['description' => 'Invoicing, quotations, payments and reports', 'required' => false],
-            'HR'        => ['description' => 'Employee management and leave tracking', 'required' => false],
-            'Bookings'  => ['description' => 'Appointment and resource booking', 'required' => false],
-        ])
-        ->filter(fn ($m, $name) => in_array($name, $licensedModules, true))
-        ->map(fn ($m, $name) => [
-            'name'        => $name,
-            'description' => $m['description'],
-            'required'    => $m['required'],
-            'licensed'    => true,
-        ])
-        ->values();
+            'HR'        => ['description' => 'Employee management and leave tracking',       'required' => false],
+            'Bookings'  => ['description' => 'Appointment and resource booking',             'required' => false],
+            'LMS'       => ['description' => 'Learning management and online courses',       'required' => false],
+            'Events'    => ['description' => 'Event ticketing and public sales pages',       'required' => false],
+        ];
+
+        $modules = collect($allModules)
+            ->filter(fn ($m, $name) => in_array($name, $licensedModules, true))
+            ->map(fn ($m, $name) => [
+                'name'        => $name,
+                'description' => $m['description'],
+                'required'    => $m['required'],
+                'licensed'    => true,
+            ])
+            ->values();
 
         return Inertia::render('Install/Step5Modules', [
             'currentStep' => 5,
@@ -293,8 +334,7 @@ class WizardController extends Controller
             'modules.*' => 'string',
         ]);
 
-        // Core always included
-        $selected = array_unique(array_merge(['Core'], $validated['modules']));
+        $selected = array_values(array_unique(array_merge(['Core'], $validated['modules'])));
 
         $this->state->set('selected_modules', $selected);
         $this->state->markStepComplete(5);
@@ -302,6 +342,7 @@ class WizardController extends Controller
     }
 
     // ── Step 6: Admin account ─────────────────────────────────
+
     private function showStep6()
     {
         return Inertia::render('Install/Step6Admin', [
@@ -312,59 +353,70 @@ class WizardController extends Controller
     private function processStep6(Request $request)
     {
         $validated = $request->validate([
-            'name'                  => 'required|string|max:255',
-            'email'                 => 'required|email|unique:users,email',
-            'password'              => 'required|min:8|confirmed',
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|email|unique:users,email',
+            'password' => ['required', 'confirmed', new StrongPassword()],
+            'password_confirmation' => 'required',
         ]);
 
-        // Create super admin
+        // Create the Super Admin — guard must be 'web' for internal staff
         $user = \App\Models\User::create([
             'name'              => $validated['name'],
             'email'             => $validated['email'],
             'password'          => Hash::make($validated['password']),
-            'guard'             => 'internal',
+            'guard'             => 'web',    // ← always 'web' for internal staff
+            'is_active'         => true,
             'email_verified_at' => now(),
         ]);
 
         $user->assignRole('Super Admin');
 
-        // Enable selected modules
+        Log::info("Wizard step 6: Super Admin created — {$validated['email']}");
+
+        // Enable selected modules in the registry
         $registry        = app(ModuleRegistryService::class);
         $selectedModules = $this->state->get('selected_modules', ['Core']);
 
         foreach ($selectedModules as $module) {
-            $registry->enable($module);
+            try {
+                $registry->enable($module);
+            } catch (\Throwable $e) {
+                Log::warning("Could not enable module {$module}: " . $e->getMessage());
+            }
         }
 
         $this->state->set('admin_email', $validated['email']);
         $this->state->markStepComplete(6);
+
         return redirect()->route('install.step', 7);
     }
 
     // ── Step 7: Complete ──────────────────────────────────────
+
     private function showStep7()
     {
         $adminEmail      = $this->state->get('admin_email');
         $selectedModules = $this->state->get('selected_modules', ['Core']);
 
-        // Write APP_INSTALLED=true to .env
+        // Write APP_INSTALLED=true
         $this->writeInstalled();
 
-        // Cache config
+        // Cache config/routes for performance
         try {
-            Artisan::call('config:cache');
-            Artisan::call('route:cache');
+            Artisan::call('config:clear');
+            Artisan::call('route:clear');
+            Artisan::call('view:clear');
         } catch (\Throwable) {
-            // Non-fatal — app still works without cache
+            // Non-fatal
         }
 
         // Clear wizard state
         $this->state->clear();
 
         return Inertia::render('Install/Step7Complete', [
-            'currentStep'    => 7,
-            'adminEmail'     => $adminEmail,
-            'activeModules'  => $selectedModules,
+            'currentStep'   => 7,
+            'adminEmail'    => $adminEmail,
+            'activeModules' => $selectedModules,
         ]);
     }
 
@@ -376,7 +428,7 @@ class WizardController extends Controller
         if (preg_match('/^APP_INSTALLED=/m', $env)) {
             $env = preg_replace('/^APP_INSTALLED=.*/m', 'APP_INSTALLED=true', $env);
         } else {
-            $env .= "\nAPP_INSTALLED=true";
+            $env .= "\nAPP_INSTALLED=true\n";
         }
 
         file_put_contents($envPath, $env);

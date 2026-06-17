@@ -37,10 +37,10 @@ class HRPermissionSeeder extends Seeder
         }
 
         // Assign to default roles
-        $superAdmin = Role::findByName('Super Admin', 'web');
+        $superAdmin = Role::where('name', 'Super Admin')->where('guard_name', 'web')->first();
         $superAdmin->givePermissionTo($permissions);
 
-        $admin = Role::findByName('Admin', 'web');
+        $admin = Role::where('name', 'Admin')->where('guard_name', 'web')->first();
         $admin->givePermissionTo([
             'hr.employees.view',
             'hr.employees.manage',
@@ -51,7 +51,7 @@ class HRPermissionSeeder extends Seeder
             'hr.reports.view',
         ]);
 
-        $manager = Role::findByName('Manager', 'web');
+        $manager = Role::where('name', 'Manager')->where('guard_name', 'web')->first();
         $manager->givePermissionTo([
             'hr.employees.view',
             'hr.leave.view',
@@ -59,13 +59,13 @@ class HRPermissionSeeder extends Seeder
             'hr.reports.view',
         ]);
 
-        $staff = Role::findByName('Staff', 'web');
+        $staff = Role::where('name', 'Staff')->where('guard_name', 'web')->first();
         $staff->givePermissionTo([
             'hr.employees.view',
             'hr.leave.view',
             'hr.leave.create',
         ]);
 
-        $this->command->info('HR permissions seeded.');
+        $this->command?->info('HR permissions seeded.');
     }
 }

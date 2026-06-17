@@ -53,7 +53,7 @@ class ActivityLogController extends Controller
         $modules = Activity::distinct()->pluck('log_name')->sort()->values();
 
         // Users for filter dropdown
-        $users = User::where('guard', 'internal')
+        $users = User::where('guard', 'web')
             ->orderBy('name')
             ->get(['id', 'name', 'email']);
 
