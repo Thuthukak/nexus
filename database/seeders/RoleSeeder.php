@@ -66,8 +66,7 @@ class RoleSeeder extends Seeder
         // ── Customer roles ─────────────────────────────────────
         // These use 'web' guard_name too — customers are in the same
         // users table, just differentiated by guard column value
-        Role::firstOrCreate(['name' => 'Customer Admin', 'guard_name' => $guard]);
-        Role::firstOrCreate(['name' => 'Customer User',  'guard_name' => $guard]);
+        Role::firstOrCreate(['name' => 'Customer', 'guard_name' => $guard]);
 
         $this->command?->info('Roles seeded successfully.');
     }

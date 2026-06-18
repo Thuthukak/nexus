@@ -26,7 +26,7 @@ class RoleController extends Controller
                 'permissions'  => $r->permissions->pluck('name'),
                 'is_system'    => in_array($r->name, [
                     'Super Admin', 'Admin', 'Manager', 'Staff', 'Read Only',
-                    'Customer Admin', 'Customer User',
+                    'Customer',
                 ]),
             ]);
 

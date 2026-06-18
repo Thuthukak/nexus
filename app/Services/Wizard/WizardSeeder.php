@@ -34,8 +34,7 @@ class WizardSeeder
         'Teacher',
         'Staff',
         'Read Only',
-        'Customer Admin',
-        'Customer User',
+        'Customer',
     ];
 
     public function run(): void
@@ -142,7 +141,7 @@ class WizardSeeder
             );
         }
 
-        // Super Admin, Customer Admin, Customer User — no explicit permissions
+        // Super Admin — no explicit permissions
         // Super Admin is handled by Spatie gate wildcard
     }
 
