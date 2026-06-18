@@ -124,4 +124,10 @@ class UserManagementService
 
         app(ActivityLogService::class)->log($user, 'User accepted invite and set password', [], 'user');
     }
+
+    public function delete(User $user): void
+    {
+        $user->delete();
+        app(ActivityLogService::class)->log($user, 'User account deleted', [], 'user');
+    }
 }

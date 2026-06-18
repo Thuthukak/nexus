@@ -46,18 +46,17 @@ function submit() {
           <p v-if="form.errors.role" class="text-xs text-red-500">{{ form.errors.role }}</p>
         </div>
 
-        <Input v-model="form.password" label="Password"
-               type="password" hint="Leave blank to auto-generate a secure password"
-               :error="form.errors.password" 
-               class="hidden"
+        <Input v-model="form.password" 
+            label="Password"
+            type="password" hint="Leave blank to auto-generate a secure password"
+            :error="form.errors.password" 
+            class="hidden"
         />
       </div>
 
       <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 rounded-xl p-4">
         <p class="text-sm text-blue-700 dark:text-blue-400">
-          The user will be created with a verified email.
-          If no password is set, a random password will be generated —
-          use the Reset Password action to send them their credentials.
+          The new user will receive an email with instructions to set their password and log in.
         </p>
       </div>
 

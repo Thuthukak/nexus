@@ -85,6 +85,7 @@ function updatePassword() {
             type="email"
             required
             :error="profileForm.errors.email"
+            disabled
           />
           <div class="flex justify-end">
             <Button type="submit" :loading="profileForm.processing">

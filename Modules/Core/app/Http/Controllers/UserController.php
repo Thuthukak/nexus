@@ -79,7 +79,7 @@ class UserController extends Controller
             ->with('toast', [
                 'type'    => 'success',
                 'title'   => 'User created',
-                'message' => "{$validated['name']} has been added.",
+                'message' => "{$validated['name']} has been added. Email sent with instructions to set their password and log in.",
             ]);
     }
 
