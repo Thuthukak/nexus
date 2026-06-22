@@ -12,13 +12,14 @@ Route::get('/dashboard', function () {
 
 // Profile
 Route::prefix('profile')->name('profile.')->group(function () {
-    Route::get('/',                [ProfileController::class, 'show'])->name('show');
-    Route::patch('/',              [ProfileController::class, 'update'])->name('update');
+    Route::get('/',                           [ProfileController::class, 'show'])->name('show');
+    Route::patch('/',                         [ProfileController::class, 'update'])->name('update');
     Route::patch('/password',                 [ProfileController::class, 'updatePassword'])->name('password');
     Route::get('/notifications',              [ProfileController::class, 'notificationPreferences'])->name('notifications');
-    Route::post('/users/{user}/resend-invite', [\App\Http\Controllers\Auth\AuthController::class, 'resendInvite'])->name('users.resend-invite');
-    Route::get('/payslips',                  [ProfileController::class, 'myPayslips'])->name('payslips');
     Route::patch('/notification-preferences', [ProfileController::class, 'updateNotificationPreferences'])->name('notification-preferences');
+    Route::get('/payslips',                   [ProfileController::class, 'myPayslips'])->name('payslips');
+    Route::get('/payslips/{payslip}/download',[ProfileController::class, 'downloadPayslip'])->name('payslips.download');
+    Route::get('/documents/{document}/download',[ProfileController::class, 'downloadDocument'])->name('documents.download');
 });
 
 // Settings
