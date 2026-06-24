@@ -39,19 +39,19 @@ const sortedRows = computed(() => {
     <div class="overflow-x-auto">
       <table class="w-full text-sm">
         <!-- Head -->
-        <thead class="border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50">
+        <thead class="border-b border-gray-100 text-white dark:border-gray-800 bg-primary dark:bg-gray-900/50">
           <tr>
             <th
               v-for="col in columns"
               :key="col.key"
               class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-app-text/50 select-none"
-              :class="col.sortable ? 'cursor-pointer hover:text-app-text' : ''"
+              :class="col.sortable ? 'cursor-pointer hover:text-gray-200' : ''"
               @click="col.sortable ? setSort(col.key) : null"
             >
-              <span class="flex items-center gap-1">
+              <span class="flex items-center text-white gap-1">
                 {{ col.label }}
                 <template v-if="col.sortable">
-                  <svg class="w-3 h-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-3 h-3 opacity-100" fill="none" stroke="#ffffff" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       :d="sortKey === col.key && sortOrder === 'asc'
                         ? 'M5 15l7-7 7 7'

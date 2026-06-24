@@ -85,32 +85,37 @@
 
   /* ── Individual ticket page ───────────────────────── */
   /*
-   * Each ticket sits in a fixed-height wrapper that exactly fills one A4 page.
-   * A4 portrait = 210mm × 297mm. We use px at 96dpi: ~794px × 1122px.
-   * With 24px padding each side: inner area ~746px wide × ~1074px tall.
-   * We keep the card well within that to guarantee no overflow.
+   * A4 portrait at 96 dpi ≈ 794px wide.
+   * ticket-wrapper padding: 20px each side → inner card ≈ 754px wide.
+   * All sections use flexbox so nothing ever overflows horizontally.
    */
   .ticket-wrapper {
     width: 100%;
-    padding: 28px 32px;
+    max-width: 754px;
+    padding: 20px;
+    box-sizing: border-box;
   }
 
   .ticket-card {
-    border: 2px solid {{ $primaryColor }};
-    border-radius: 10px;
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid {{ $primaryColor }};
+    border-radius: 6px;
     overflow: hidden;
   }
 
-  /* Event banner — capped height so everything else fits */
+  /* Event banner */
   .ticket-banner {
     width: 100%;
-    height: 130px;
-    object-fit: cover;
+    height: 200px;
+    background-size: cover;
+    background-position: center;
     display: block;
   }
+
   .ticket-banner-placeholder {
     width: 100%;
-    height: 130px;
+    height: 100px;
     background: {{ $primaryColor }};
     display: block;
     position: relative;
@@ -122,39 +127,42 @@
     align-items: center;
     justify-content: center;
     color: #fff;
-    font-size: 20px;
+    font-size: 17px;
     font-weight: 700;
     text-align: center;
-    padding: 0 20px;
+    padding: 0 16px;
   }
 
   /* Header strip */
   .ticket-strip {
     background: {{ $primaryColor }};
-    padding: 10px 18px;
-    display: table;
+    padding: 8px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
     width: 100%;
   }
-  .ticket-strip-left  { display: table-cell; vertical-align: middle; }
-  .ticket-strip-right { display: table-cell; vertical-align: middle; text-align: right; }
-  .ticket-strip .org  { color: #fff; font-weight: 700; font-size: 13px; }
-  .ticket-strip .ref  { color: rgba(255,255,255,0.65); font-size: 10px; margin-top: 1px; }
+  .ticket-strip-left  { }
+  .ticket-strip-right { text-align: right; margin: 0px 30px 0px 0px; flex-shrink: 0; }
+  .ticket-strip .org  { color: #fff; font-weight: 700; font-size: 12px; }
+  .ticket-strip .ref  { color: rgba(255,255,255,0.65); font-size: 9px; margin-top: 1px; }
 
   /* Main body */
-  .ticket-body { padding: 16px 18px; }
+  .ticket-body { padding: 12px 14px; box-sizing: border-box; }
 
   .event-name {
-    font-size: 18px;
+    font-size: 15px;
     font-weight: 700;
     color: #111827;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
     line-height: 1.2;
   }
   .event-meta-row {
-    font-size: 11px;
+    font-size: 10px;
     color: #6b7280;
-    margin-bottom: 3px;
-    line-height: 1.5;
+    margin-bottom: 2px;
+    line-height: 1.4;
   }
   .event-meta-row strong { color: #374151; }
 
@@ -162,58 +170,63 @@
   .tear-line {
     border: none;
     border-top: 2px dashed #d1d5db;
-    margin: 14px 0;
-    position: relative;
+    margin: 10px 0;
   }
 
-  /* Holder + QR row */
+  /* Holder + QR row — flexbox keeps columns within card width */
   .holder-qr-row {
-    display: table;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
     width: 100%;
+    box-sizing: border-box;
   }
-  .holder-cell { display: table-cell; vertical-align: top; padding-right: 16px; }
-  .qr-cell     { display: table-cell; vertical-align: top; width: 110px; text-align: center; }
+  .holder-cell { flex: 1 1 auto; min-width: 0; }
+  .qr-cell     { flex: 0 0 90px; text-align: center; }
 
-  .holder-label { font-size: 9px; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 2px; }
-  .holder-name  { font-size: 16px; font-weight: 700; color: #111827; margin-bottom: 2px; }
-  .holder-email { font-size: 11px; color: #6b7280; margin-bottom: 10px; }
+  .holder-label { font-size: 8px; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 2px; }
+  .holder-name  { font-size: 14px; font-weight: 700; color: #111827; margin-bottom: 1px; word-break: break-word; }
+  .holder-email { font-size: 10px; color: #6b7280; margin-bottom: 8px; word-break: break-all; }
 
   .type-badge {
     display: inline-block;
-    padding: 5px 14px;
+    padding: 4px 10px;
     background: {{ $primaryColor }};
     color: #fff;
     border-radius: 20px;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 700;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
   }
 
-  .meta-row { font-size: 10px; color: #9ca3af; margin-bottom: 2px; }
-  .meta-row strong { color: #374151; font-size: 11px; }
+  .meta-row { font-size: 9px; color: #9ca3af; margin-bottom: 2px; }
+  .meta-row strong { color: #374151; font-size: 10px; }
 
-  .qr-image { width: 100px; height: 100px; display: block; margin: 0 auto 4px; }
-  .qr-label { font-size: 8px; color: #9ca3af; text-align: center; text-transform: uppercase; letter-spacing: 0.5px; }
+  .qr-image { width: 88px; height: 88px; display: block; margin: 0 auto 3px; }
+  .qr-label { font-size: 7px; color: #9ca3af; text-align: center; text-transform: uppercase; letter-spacing: 0.5px; }
 
   /* Ticket number bar */
   .ticket-number-bar {
     background: #f9fafb;
     border-top: 1px solid #e5e7eb;
-    padding: 8px 18px;
-    display: table;
+    padding: 7px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
     width: 100%;
   }
-  .tn-left  { display: table-cell; vertical-align: middle; }
-  .tn-right { display: table-cell; vertical-align: middle; text-align: right; }
-  .tn-label { font-size: 9px; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.5px; }
-  .tn-value { font-size: 14px; font-weight: 700; color: #111827; letter-spacing: 1px; }
+  .tn-left  { }
+  .tn-right { flex-shrink: 0; margin: 5px 0px 0px 0px; }
+  .tn-label { font-size: 8px; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.5px; }
+  .tn-value { font-size: 13px; font-weight: 700; color: #111827; letter-spacing: 1px; }
   .valid-badge {
     display: inline-block;
     background: #d1fae5;
     color: #065f46;
-    padding: 4px 12px;
+    padding: 3px 10px;
     border-radius: 20px;
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -223,8 +236,8 @@
   .ticket-footer {
     background: {{ $primaryColor }}10;
     border-top: 1px solid {{ $primaryColor }}20;
-    padding: 6px 18px;
-    font-size: 9px;
+    padding: 5px 14px;
+    font-size: 8px;
     color: #6b7280;
     text-align: center;
   }
@@ -294,9 +307,9 @@
   </table>
 
   <div class="summary-notice">
-    📎 <strong>{{ $order->tickets->count() }} ticket(s)</strong> follow on the next pages —
+    <strong>{{ $order->tickets->count() }} ticket(s)</strong> follow on the next pages —
     one ticket per page. Each ticket must be presented separately at the entrance.<br/>
-    🎫 Tickets are non-transferable and valid for one entry each.
+    Tickets are non-transferable and valid for one entry each.
   </div>
 
 </div>
@@ -318,7 +331,7 @@
         : null;
     @endphp
     @if($bannerAbs && file_exists($bannerAbs))
-      <img src="{{ $bannerAbs }}" class="ticket-banner" />
+    <div class="ticket-banner" style="background-image: url('{{ $bannerAbs }}');"></div>
     @else
       <div class="ticket-banner-placeholder">
         <div class="ticket-banner-title">{{ $order->event->title }}</div>
@@ -327,16 +340,24 @@
 
     {{-- Strip --}}
     <div class="ticket-strip">
-      <div class="ticket-strip-left">
-        <div class="org">{{ $appName }}</div>
-        <div class="ref">{{ $order->reference }}</div>
-      </div>
-      <div class="ticket-strip-right">
-        <div style="color:#fff;font-size:10px;opacity:0.6;">TICKET</div>
-        <div style="color:#fff;font-size:11px;font-weight:700;">
-          {{ $loop->iteration }} of {{ $order->tickets->count() }}
-        </div>
-      </div>
+      <table style="width:100%;border-collapse:collapse;">
+        <tr>
+          <td style="vertical-align:top;">
+            <div class="ticket-strip-left">
+              <div class="org">{{ $appName }}</div>
+              <div class="ref">{{ $order->reference }}</div>
+            </div>
+          </td>
+          <td style="vertical-align:top;">
+            <div class="ticket-strip-right">
+              <div style="color:#fff;font-size:9px;opacity:0.6;">TICKET</div>
+              <div style="color:#fff;font-size:10px;font-weight:700;">
+                {{ $loop->iteration }} of {{ $order->tickets->count() }}
+              </div>
+            </div>
+          </td>
+        </tr>
+      </table>
     </div>
 
     {{-- Body --}}
@@ -359,44 +380,48 @@
       <hr class="tear-line" />
 
       {{-- Holder info + QR --}}
-      <div class="holder-qr-row">
-        <div class="holder-cell">
-          <div class="holder-label">Ticket Holder</div>
-          <div class="holder-name">{{ $ticket->holder_name }}</div>
-          <div class="holder-email">{{ $ticket->holder_email }}</div>
+      <table style="width:100%;border-collapse:collapse;">
+        <tr>
+          <td style="vertical-align:top;">
+            <div class="holder-qr-row">
+              <div class="holder-cell">
+                <div class="holder-label">Ticket Holder</div>
+                <div class="holder-name">{{ $ticket->holder_name }}</div>
+                <div class="holder-email">{{ $ticket->holder_email }}</div>
 
-          <div class="type-badge">
-            {{ $ticket->orderItem->ticketType->name ?? $ticket->orderItem->ticket_type_name }}
-          </div>
+                <div class="type-badge">
+                  {{ $ticket->orderItem->ticketType->name ?? $ticket->orderItem->ticket_type_name }}
+                </div>
 
-          <div class="meta-row">
-            Price: <strong>{{ $currency }} {{ number_format($ticket->orderItem->unit_price, 2) }}</strong>
-          </div>
-          <div class="meta-row">
-            Order Ref: <strong>{{ $order->reference }}</strong>
-          </div>
-          <div class="meta-row">
-            Issued: <strong>{{ now()->format('d M Y') }}</strong>
-          </div>
-        </div>
-
-        <div class="qr-cell">
-          {{-- Actual QR code as inline SVG/base64 --}}
-          @if(isset($qrCodes[$ticket->id]))
-            <img src="{{ $qrCodes[$ticket->id] }}" class="qr-image" />
-          @else
-            {{-- Fallback if QR generation fails --}}
-            <div style="width:100px;height:100px;background:#f3f4f6;border:1px solid #e5e7eb;
-                        display:flex;align-items:center;justify-content:center;
-                        font-size:8px;color:#9ca3af;text-align:center;padding:4px;
-                        word-break:break-all;">
-              {{ $ticket->qr_data }}
+                <div class="meta-row">
+                  Price: <strong>{{ $currency }} {{ number_format($ticket->orderItem->unit_price, 2) }}</strong>
+                </div>
+                <div class="meta-row">
+                  Order Ref: <strong>{{ $order->reference }}</strong>
+                </div>
+                <div class="meta-row">
+                  Issued: <strong>{{ now()->format('d M Y') }}</strong>
+              </div>
             </div>
-          @endif
-          <div class="qr-label">Scan to verify</div>
-        </div>
-      </div>
+          </td>
 
+          <td style="vertical-align:top;text-align:right;width:100px;">
+            <div class="qr-cell">
+              @if(isset($qrCodes[$ticket->id]))
+                <img src="{{ $qrCodes[$ticket->id] }}" class="qr-image" />
+              @else
+                <div style="width:88px;height:88px;background:#f3f4f6;border:1px solid #e5e7eb;
+                            display:flex;align-items:center;justify-content:center;
+                            font-size:7px;color:#9ca3af;text-align:center;padding:4px;
+                            word-break:break-all;">
+                  {{ $ticket->qr_data }}
+                </div>
+              @endif
+                <div class="qr-label">Scan to verify</div>
+            </div>
+          </td>
+        </tr>
+      </table>
     </div>
 
     {{-- Ticket number bar --}}
@@ -419,7 +444,6 @@
   </div>
 </div>
 
-{{-- Page break after every ticket EXCEPT the last one --}}
 @if(! $loop->last)
   <div class="page-break"></div>
 @endif
