@@ -104,7 +104,7 @@ function onProductSelect(lineIndex, productId) {
 
 // ─── Form ─────────────────────────────────────────────────────
 const urlParams      = new URLSearchParams(window.location.search)
-const defaultTaxRate = computed(() => Number(props.taxRates.find(r => r.is_default)?.rate ?? 15))
+const defaultTaxRate = computed(() => Number(props.taxRates.find(r => r.is_default)?.rate ?? 0))
 
 const form = useForm({
   customer_id:        urlParams.get('customer_id') ?? '',
