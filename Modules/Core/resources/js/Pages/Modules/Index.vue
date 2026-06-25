@@ -50,7 +50,7 @@ const statusBadge = (mod) => {
     </div>
 
     <!-- Licence info -->
-    <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-5 mb-6">
+    <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-5 mb-6">
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
         <div>
           <p class="text-xs text-app-text/50 mb-0.5">Licensed To</p>
@@ -76,7 +76,7 @@ const statusBadge = (mod) => {
     <!-- Module cards -->
     <div class="space-y-3">
       <div v-for="mod in modules" :key="mod.name"
-           class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-5">
+           class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-5">
         <div class="flex items-start justify-between gap-4">
           <div class="flex-1 min-w-0">
             <div class="flex items-center gap-3 mb-1 flex-wrap">
@@ -93,7 +93,7 @@ const statusBadge = (mod) => {
           <div class="flex-shrink-0">
             <!-- Core — cannot toggle -->
             <span v-if="mod.is_core"
-                  class="text-xs text-app-text/30 px-3 py-1.5 rounded-lg border border-gray-100 dark:border-gray-700">
+                  class="text-xs text-app-text/30 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
               Always On
             </span>
 
@@ -114,7 +114,7 @@ const statusBadge = (mod) => {
 
             <!-- Not licensed -->
             <span v-else
-                  class="text-xs text-app-text/30 px-3 py-1.5 rounded-lg border border-gray-100 dark:border-gray-700">
+                  class="text-xs text-app-text/30 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
               Not Licensed
             </span>
           </div>

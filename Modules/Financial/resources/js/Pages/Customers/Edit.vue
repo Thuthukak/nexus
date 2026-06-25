@@ -36,7 +36,7 @@ function submit() {
     </div>
 
     <form @submit.prevent="submit" class="space-y-6">
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6 space-y-4">
+      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-6 space-y-4">
         <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider">Company Details</h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Input v-model="form.company_name" label="Company Name" required :error="form.errors.company_name" class="sm:col-span-2" />
@@ -53,7 +53,7 @@ function submit() {
         </div>
       </div>
 
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6 space-y-4">
+      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-6 space-y-4">
         <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider">Address</h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Input v-model="form.address.line1" label="Street Address" class="sm:col-span-2" />

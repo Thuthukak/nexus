@@ -36,7 +36,7 @@ const steps = [
     </div>
 
     <!-- Step indicator -->
-    <div class="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 px-6 py-3">
+    <div class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-6 py-3">
       <div class="max-w-3xl mx-auto">
         <div class="flex items-center gap-0">
           <template v-for="(step, i) in steps" :key="step.number">

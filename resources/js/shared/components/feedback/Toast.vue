@@ -39,7 +39,7 @@ const config = computed(() => ({
 </script>
 
 <template>
-  <div class="w-80 bg-surface rounded-xl shadow-lg border border-gray-100 dark:border-gray-800 overflow-hidden pointer-events-auto">
+  <div class="w-80 bg-surface rounded-xl shadow-lg border border-gray-200 dark:border-gray-800 overflow-hidden pointer-events-auto">
     <!-- Colour bar -->
     <div class="h-1 w-full" :class="config.bar" />
 

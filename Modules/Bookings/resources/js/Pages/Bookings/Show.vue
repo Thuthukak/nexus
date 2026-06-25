@@ -56,7 +56,7 @@ function cancel() {
     <!-- Details row -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
       <!-- Customer -->
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6">
+      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-6">
         <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider mb-3">Customer</h2>
         <p class="font-semibold text-app-text text-base">{{ booking.customer_name }}</p>
         <p class="text-sm text-app-text/60 mt-1">{{ booking.customer_email }}</p>
@@ -64,7 +64,7 @@ function cancel() {
       </div>
 
       <!-- Booking info -->
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6">
+      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-6">
         <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider mb-3">Booking Details</h2>
         <dl class="grid grid-cols-2 gap-x-4 gap-y-3">
           <div>
@@ -102,7 +102,7 @@ function cancel() {
 
     <!-- Notes -->
     <div v-if="booking.notes"
-         class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6">
+         class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-6">
       <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider mb-2">Notes</h2>
       <p class="text-sm text-app-text/70 leading-relaxed">{{ booking.notes }}</p>
     </div>

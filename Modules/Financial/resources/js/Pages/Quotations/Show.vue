@@ -151,7 +151,7 @@ function handleDelete() {
                         leave-active-class="transition-all duration-100 ease-in"
                         leave-from-class="opacity-100" leave-to-class="opacity-0 scale-95">
               <div v-if="kebabOpen"
-                   class="absolute right-0 top-full mt-1 w-52 bg-surface rounded-xl shadow-lg border border-gray-100 dark:border-gray-800 py-1 z-30">
+                   class="absolute right-0 top-full mt-1 w-52 bg-surface rounded-xl shadow-lg border border-gray-200 dark:border-gray-800 py-1 z-30">
 
                 <!-- Download PDF -->
                 <a :href="`/financial/quotations/${quotation.id}/download-pdf`"
@@ -186,7 +186,7 @@ function handleDelete() {
                   Copy Public Link
                 </button>
 
-                <div v-if="canDelete" class="my-1 border-t border-gray-100 dark:border-gray-800" />
+                <div v-if="canDelete" class="my-1 border-t border-gray-200 dark:border-gray-800" />
 
                 <!-- Delete -->
                 <button v-if="canDelete"
@@ -207,15 +207,15 @@ function handleDelete() {
 
     <!-- Summary bar -->
     <div class="grid grid-cols-3 gap-4 mb-6">
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 px-4 py-3">
+      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 px-4 py-3">
         <p class="text-xs text-app-text/50 mb-1">Subtotal</p>
         <p class="text-sm font-semibold text-app-text">{{ currency(quotation.subtotal) }}</p>
       </div>
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 px-4 py-3">
+      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 px-4 py-3">
         <p class="text-xs text-app-text/50 mb-1">Tax</p>
         <p class="text-sm font-semibold text-app-text">{{ currency(quotation.tax_total) }}</p>
       </div>
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 px-4 py-3">
+      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 px-4 py-3">
         <p class="text-xs text-app-text/50 mb-1">Total</p>
         <p class="text-sm font-bold text-app-text">{{ currency(quotation.total) }}</p>
       </div>
@@ -224,7 +224,7 @@ function handleDelete() {
     <div class="space-y-6">
       <!-- Customer + Details -->
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6">
+        <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-6">
           <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider mb-3">Prepared For</h2>
           <a :href="`/financial/customers/${quotation.customer_detail?.id}`"
              class="font-semibold text-primary hover:underline text-base">
@@ -238,7 +238,7 @@ function handleDelete() {
           </p>
         </div>
 
-        <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6">
+        <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-6">
           <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider mb-3">Details</h2>
           <dl class="grid grid-cols-2 gap-x-4 gap-y-3">
             <div>
@@ -274,8 +274,8 @@ function handleDelete() {
       </div>
 
       <!-- Line items -->
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-800">
+      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-800">
           <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider">Line Items</h2>
         </div>
         <div class="overflow-x-auto">
@@ -304,7 +304,7 @@ function handleDelete() {
       </div>
 
       <!-- Activity -->
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6">
+      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-6">
         <ActivityTimeline type="quotation" :id="quotation.id" />
       </div>
 
@@ -312,12 +312,12 @@ function handleDelete() {
       <div v-if="quotation.notes || quotation.terms"
            class="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <div v-if="quotation.notes"
-             class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6">
+             class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-6">
           <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider mb-2">Notes</h2>
           <p class="text-sm text-app-text/70 leading-relaxed whitespace-pre-line">{{ quotation.notes }}</p>
         </div>
         <div v-if="quotation.terms"
-             class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6">
+             class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-6">
           <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider mb-2">Terms & Conditions</h2>
           <p class="text-sm text-app-text/70 leading-relaxed whitespace-pre-line">{{ quotation.terms }}</p>
         </div>

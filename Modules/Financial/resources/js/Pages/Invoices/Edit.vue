@@ -62,7 +62,7 @@ function submit() {
 
     <form @submit.prevent="submit" class="space-y-6">
       <!-- Customer + dates -->
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6">
+      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-6">
         <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider mb-4">Invoice Details</h2>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div class="sm:col-span-1 flex flex-col gap-1">
@@ -79,8 +79,8 @@ function submit() {
       </div>
 
       <!-- Lines -->
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-800">
+      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-800">
           <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider">Line Items</h2>
         </div>
         <div class="p-6 space-y-3">
@@ -126,7 +126,7 @@ function submit() {
         </div>
 
         <!-- Totals -->
-        <div class="border-t border-gray-100 dark:border-gray-800 px-6 py-4 space-y-2 bg-gray-50 dark:bg-gray-900/30">
+        <div class="border-t border-gray-200 dark:border-gray-800 px-6 py-4 space-y-2 bg-gray-50 dark:bg-gray-900/30">
           <div class="flex justify-between text-sm text-app-text/60">
             <span>Subtotal</span><span>{{ currency(subtotal) }}</span>
           </div>
@@ -140,7 +140,7 @@ function submit() {
       </div>
 
       <!-- Notes -->
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6">
+      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-6">
         <div class="flex flex-col gap-1">
           <label class="text-sm font-medium text-app-text">Notes</label>
           <textarea v-model="form.notes" rows="3"

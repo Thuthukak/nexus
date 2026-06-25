@@ -98,7 +98,7 @@ const logoUrl = page.props.app?.logo_url ?? null
         </div>
 
         <!-- Mobile nav -->
-        <div v-if="navOpen" class="sm:hidden pb-3 border-t border-gray-100 dark:border-gray-800 pt-2 space-y-1">
+        <div v-if="navOpen" class="sm:hidden pb-3 border-t border-gray-200 dark:border-gray-800 pt-2 space-y-1">
           <a v-for="item in nav" :key="item.href"
              :href="item.href"
              @click="navOpen = false"

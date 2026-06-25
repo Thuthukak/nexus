@@ -34,7 +34,7 @@ const statusColour = {
       </div>
       <div v-else class="overflow-x-auto">
         <table class="w-full text-sm">
-          <thead class="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+          <thead class="bg-primary text-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
             <tr>
               <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-400">Reference</th>
               <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-400">Issue Date</th>
@@ -49,7 +49,7 @@ const statusColour = {
                 class="hover:bg-gray-50 dark:hover:bg-gray-800/50">
               <td class="px-5 py-3.5">
                 <a :href="`/portal/quotations/${q.id}`"
-                   class="font-semibold text-primary hover:underline">
+                    class="font-semibold text-primary hover:underline">
                   {{ q.reference }}
                 </a>
               </td>
@@ -69,13 +69,13 @@ const statusColour = {
               <td class="px-5 py-3.5 text-right">
                 <div class="flex items-center justify-end gap-2">
                   <a v-if="q.status === 'sent' && q.quote_url"
-                     :href="q.quote_url"
-                     class="text-xs font-semibold px-3 py-1 rounded-lg text-white"
-                     style="background-color: var(--color-primary);">
+                      :href="q.quote_url"
+                      class="text-xs font-semibold px-3 py-1 rounded-lg text-white"
+                      style="background-color: var(--color-primary);">
                     Respond
                   </a>
                   <a :href="`/portal/quotations/${q.id}`"
-                     class="text-xs text-gray-500 hover:text-gray-700">
+                      class="text-xs text-gray-500 hover:text-gray-700">
                     View
                   </a>
                 </div>

@@ -78,7 +78,7 @@ const hasFilters = ref(
     </div>
 
     <!-- Filters -->
-    <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-4 mb-6 space-y-3">
+    <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-4 mb-6 space-y-3">
       <div class="flex flex-wrap gap-3 items-end">
         <div class="flex-1 min-w-44">
           <label class="text-xs font-medium text-app-text/50 mb-1 block">Search</label>
@@ -124,7 +124,7 @@ const hasFilters = ref(
     </div>
 
     <!-- Activity list -->
-    <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
+    <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
       <div v-if="!activities.data?.length"
            class="px-6 py-16 text-center text-app-text/40">
         <svg class="w-10 h-10 mx-auto mb-3 text-app-text/20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -198,14 +198,14 @@ const hasFilters = ref(
                 <table class="w-full text-xs">
                   <thead>
                     <tr class="bg-gray-100 dark:bg-gray-800">
-                      <th class="px-3 py-2 text-left font-semibold text-app-text/50 uppercase tracking-wide">Field</th>
-                      <th class="px-3 py-2 text-left font-semibold text-app-text/50 uppercase tracking-wide">Before</th>
-                      <th class="px-3 py-2 text-left font-semibold text-app-text/50 uppercase tracking-wide">After</th>
+                      <th class="px-3 py-2 text-left font-semibold bg-primary text-white uppercase tracking-wide">Field</th>
+                      <th class="px-3 py-2 text-left font-semibold bg-primary text-white uppercase tracking-wide">Before</th>
+                      <th class="px-3 py-2 text-left font-semibold bg-primary text-white uppercase tracking-wide">After</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr v-for="change in activity.changes" :key="change.field"
-                        class="border-t border-gray-200 dark:border-gray-700">
+                        class="border border-gray-200 dark:border-gray-700">
                       <td class="px-3 py-2 font-medium text-app-text/70 capitalize">{{ change.field }}</td>
                       <td class="px-3 py-2 font-mono text-red-600 dark:text-red-400 line-through max-w-xs truncate">
                         {{ change.old || '—' }}

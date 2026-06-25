@@ -68,7 +68,7 @@ function currency(val) {
     <!-- Contact details row -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
       <div v-if="customer.contact_name || customer.email || customer.phone"
-            class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-5">
+            class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-5">
         <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider mb-3">Contact</h2>
         <p v-if="customer.contact_name" class="text-sm font-medium text-app-text">{{ customer.contact_name }}</p>
         <p v-if="customer.email" class="text-sm text-app-text/60 mt-1">{{ customer.email }}</p>
@@ -76,7 +76,7 @@ function currency(val) {
       </div>
 
       <div v-if="customer.address?.city || customer.address?.line1"
-            class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-5">
+            class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-5">
         <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider mb-3">Address</h2>
         <div class="text-sm text-app-text/70 space-y-0.5">
           <p v-if="customer.address?.line1">{{ customer.address.line1 }}</p>
@@ -88,7 +88,7 @@ function currency(val) {
         </div>
       </div>
 
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-5">
+      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-5">
         <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider mb-3">Summary</h2>
         <dl class="space-y-2 text-sm">
           <div class="flex justify-between">
@@ -106,7 +106,7 @@ function currency(val) {
     </div>
 
     <!-- Portal access card -->
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-5 mb-6">
+      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-5 mb-6">
         <div class="flex items-center justify-between">
           <div>
             <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider mb-1">Client Portal</h2>
@@ -138,8 +138,8 @@ function currency(val) {
       </div>
 
     <!-- Invoices — full width -->
-    <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
-      <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
+    <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
         <h2 class="text-sm font-semibold text-app-text">Invoices</h2>
         <span class="text-xs text-app-text/40">{{ customer.invoices?.length ?? 0 }} total</span>
       </div>

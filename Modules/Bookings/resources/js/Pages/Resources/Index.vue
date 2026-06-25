@@ -27,7 +27,7 @@ defineProps({ resources: { type: Array, default: () => [] } })
         No resources yet. Add your first resource to get started.
       </div>
       <div v-for="resource in resources" :key="resource.id"
-           class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6">
+           class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-6">
         <div class="flex items-center gap-3 mb-3">
           <div class="w-3 h-3 rounded-full" :style="{ backgroundColor: resource.colour }"></div>
           <h3 class="font-semibold text-app-text">{{ resource.name }}</h3>

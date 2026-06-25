@@ -46,7 +46,7 @@ function submit() {
     <form @submit.prevent="submit" class="space-y-6">
 
       <!-- Banner upload -->
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
+      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
         <div class="relative h-48 bg-gradient-to-br from-primary/20 to-primary/5 cursor-pointer group"
              @click="bannerInput.click()">
           <img v-if="bannerPreview" :src="bannerPreview"
@@ -71,7 +71,7 @@ function submit() {
       </div>
 
       <!-- Event details -->
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6 space-y-4">
+      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-6 space-y-4">
         <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider">Event Details</h2>
 
         <Input v-model="form.title" label="Event Title" required :error="form.errors.title" />
@@ -97,7 +97,7 @@ function submit() {
       </div>
 
       <!-- Organiser -->
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6 space-y-4">
+      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-6 space-y-4">
         <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider">Organiser</h2>
         <div class="grid grid-cols-2 gap-4">
           <Input v-model="form.organiser_name"  label="Organiser Name" />
@@ -106,7 +106,7 @@ function submit() {
       </div>
 
       <!-- Settings -->
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6 space-y-4">
+      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-6 space-y-4">
         <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider">Settings</h2>
         <div class="flex items-center gap-6">
           <div class="flex flex-col gap-1">

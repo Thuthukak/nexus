@@ -165,7 +165,7 @@ function submit() {
     <form @submit.prevent="submit" class="space-y-6">
 
       <!-- Details -->
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6">
+      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-6">
         <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider mb-4">Quotation Details</h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
@@ -250,8 +250,8 @@ function submit() {
       </div>
 
       <!-- Line items -->
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-800">
+      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-800">
           <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider">Line Items</h2>
         </div>
         <div class="p-6 space-y-4">
@@ -346,7 +346,7 @@ function submit() {
         </div>
 
         <!-- Totals -->
-        <div class="border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/30">
+        <div class="border-t border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/30">
           <div class="flex justify-end px-6 py-4">
             <div class="w-64 space-y-2">
               <div class="flex justify-between text-sm text-app-text/60">
@@ -365,14 +365,14 @@ function submit() {
 
       <!-- Notes + Terms -->
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6">
+        <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-6">
           <div class="flex flex-col gap-1">
             <label class="text-sm font-medium text-app-text">Notes</label>
             <textarea v-model="form.notes" rows="3" placeholder="Any notes for the customer…"
                       class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none" />
           </div>
         </div>
-        <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6">
+        <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-6">
           <div class="flex flex-col gap-1">
             <label class="text-sm font-medium text-app-text">Terms & Conditions</label>
             <textarea v-model="form.terms" rows="3" placeholder="Any terms that apply to this quotation…"

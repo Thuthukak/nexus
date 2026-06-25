@@ -17,7 +17,7 @@ const user = page.props.auth?.user
       </p>
     </div>
 
-    <div class="bg-surface rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-800">
+    <div class="bg-surface rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-800">
       <h2 class="text-lg font-semibold text-app-text mb-2">Platform ready</h2>
       <p class="text-sm text-app-text/60 leading-relaxed">
         Nexus is up and running. Modules can be activated from the Module Manager.

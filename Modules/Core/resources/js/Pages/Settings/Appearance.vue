@@ -117,7 +117,7 @@ function applyPreset(preset) {
       <div class="lg:col-span-2 space-y-6">
 
         <!-- Presets -->
-        <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6">
+        <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-6">
           <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider mb-4">
             Preset Palettes
           </h2>
@@ -142,7 +142,7 @@ function applyPreset(preset) {
         </div>
 
         <!-- Colour tokens -->
-        <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6">
+        <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-6">
           <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider mb-4">
             Colour Tokens
           </h2>

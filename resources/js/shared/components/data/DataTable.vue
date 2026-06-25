@@ -35,11 +35,11 @@ const sortedRows = computed(() => {
 </script>
 
 <template>
-  <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden shadow-sm">
+  <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden shadow-sm">
     <div class="overflow-x-auto">
       <table class="w-full text-sm">
         <!-- Head -->
-        <thead class="border-b border-gray-100 text-white dark:border-gray-800 bg-primary dark:bg-gray-900/50">
+        <thead class="border-b border-gray-200 text-white dark:border-gray-800 bg-primary dark:bg-gray-900/50">
           <tr>
             <th
               v-for="col in columns"

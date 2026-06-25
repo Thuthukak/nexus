@@ -39,7 +39,7 @@ const dotColour = {
            class="fixed inset-y-0 right-0 z-50 flex flex-col bg-surface w-96 shadow-2xl border-l border-gray-200 dark:border-gray-800">
 
         <!-- Header -->
-        <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-gray-800 flex-shrink-0">
+        <div class="flex items-center justify-between px-5 py-4 border-b border-gray-200 dark:border-gray-800 flex-shrink-0">
           <div class="flex items-center gap-3">
             <h2 class="font-semibold text-app-text">Notifications</h2>
             <span v-if="store.unreadCount > 0"
@@ -128,7 +128,7 @@ const dotColour = {
         </div>
 
         <!-- Footer -->
-        <div class="px-5 py-3 border-t border-gray-100 dark:border-gray-800 flex-shrink-0">
+        <div class="px-5 py-3 border-t border-gray-200 dark:border-gray-800 flex-shrink-0">
           <a href="/profile/notifications"
              @click="store.isOpen = false"
              class="text-xs text-primary hover:underline">

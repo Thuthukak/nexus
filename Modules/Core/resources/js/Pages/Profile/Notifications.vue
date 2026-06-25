@@ -40,8 +40,8 @@ function submit() {
 
     <form @submit.prevent="submit" class="space-y-6">
       <div v-for="{ module, types } in notificationTypes" :key="module"
-          class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
-        <div class="px-6 py-3 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50">
+          class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+        <div class="px-6 py-3 border border-gray-200 bg-primary text-white dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50">
           <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider">
             {{ module }}
           </h2>
@@ -49,7 +49,7 @@ function submit() {
 
         <table class="w-full text-sm">
           <thead>
-            <tr class="border-b border-gray-50 dark:border-gray-800">
+            <tr class="border border-gray-50 dark:border-gray-800">
               <th class="px-6 py-2 text-left text-xs text-app-text/40 font-medium">Notification</th>
               <th class="px-6 py-2 text-center text-xs text-app-text/40 font-medium w-24">In-App</th>
               <th class="px-6 py-2 text-center text-xs text-app-text/40 font-medium w-24">Email</th>

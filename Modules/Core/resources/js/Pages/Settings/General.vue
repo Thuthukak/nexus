@@ -82,7 +82,7 @@ const timezones = [
     <div class="space-y-6">
 
       <!-- Logos -->
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6">
+      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-6">
         <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider mb-4">
           Application Logo
         </h2>
@@ -115,7 +115,7 @@ const timezones = [
             </div>
           </div>
 
-          <div class="border-t border-gray-100 dark:border-gray-800" />
+          <div class="border-t border-gray-200 dark:border-gray-800" />
 
           <!-- Icon (collapsed sidebar) -->
           <div>
@@ -151,7 +151,7 @@ const timezones = [
 
       <!-- App settings -->
       <form @submit.prevent="submit">
-        <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6 space-y-4">
+        <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-6 space-y-4">
           <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider">Application</h2>
           <Input 
             v-model="form.app_name"

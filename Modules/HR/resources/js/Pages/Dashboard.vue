@@ -30,20 +30,20 @@ const cards = [
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
       <div v-for="card in cards" :key="card.key"
-           class="bg-surface rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-800">
+           class="bg-surface rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-800">
         <p class="text-sm font-medium text-app-text/60 mb-3">{{ card.label }}</p>
         <p class="text-2xl font-bold text-app-text">{{ stats[card.key] ?? 0 }}</p>
       </div>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm">
-        <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
+      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-800 flex justify-between items-center">
           <h2 class="text-sm font-semibold text-app-text">Quick Links</h2>
         </div>
         <div class="p-6 grid grid-cols-2 gap-3">
           <a v-for="link in quickLinks" :key="link.href" :href="link.href"
-             class="flex items-center gap-3 p-3 rounded-lg border border-gray-100 dark:border-gray-700 hover:border-primary/30 hover:bg-primary/5 transition-colors">
+             class="flex items-center gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-primary/30 hover:bg-primary/5 transition-colors">
             <span class="text-sm font-medium text-app-text">{{ link.label }}</span>
           </a>
         </div>

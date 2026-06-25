@@ -32,33 +32,33 @@ function currency(val) {
 
     <!-- Stats -->
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 px-4 py-3 text-center">
+      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 px-4 py-3 text-center">
         <p class="text-2xl font-bold text-app-text">{{ stats.total_orders }}</p>
         <p class="text-xs text-app-text/50 mt-1">Total Orders</p>
       </div>
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 px-4 py-3 text-center">
+      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 px-4 py-3 text-center">
         <p class="text-2xl font-bold text-green-600">{{ stats.paid_orders }}</p>
         <p class="text-xs text-app-text/50 mt-1">Paid</p>
       </div>
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 px-4 py-3 text-center">
+      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 px-4 py-3 text-center">
         <p class="text-2xl font-bold text-app-text">{{ stats.tickets_sold }}</p>
         <p class="text-xs text-app-text/50 mt-1">Tickets Sold</p>
       </div>
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 px-4 py-3 text-center">
+      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 px-4 py-3 text-center">
         <p class="text-xl font-bold text-green-600">{{ currency(stats.total_revenue) }}</p>
         <p class="text-xs text-app-text/50 mt-1">Revenue</p>
       </div>
     </div>
 
     <!-- Orders table -->
-    <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
+    <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
       <div v-if="!orders.length"
            class="px-6 py-10 text-center text-app-text/40 text-sm">
         No orders yet.
       </div>
       <div v-else class="overflow-x-auto">
         <table class="w-full text-sm">
-          <thead class="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-800">
+          <thead class="bg-gray-50 bg-primary text-white dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-800">
             <tr>
               <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-app-text/50">Order</th>
               <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-app-text/50">Customer</th>

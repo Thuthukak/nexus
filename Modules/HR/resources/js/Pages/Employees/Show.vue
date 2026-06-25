@@ -179,7 +179,7 @@ const leaveColumns = [
           </div>
         </div>
         <a :href="`/hr/employees/${employee.id}/edit`"
-           class="px-4 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg text-app-text/70 hover:text-app-text transition-colors">
+            class="px-4 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg text-app-text/70 hover:text-app-text transition-colors">
           Edit Employee
         </a>
       </div>
@@ -187,7 +187,7 @@ const leaveColumns = [
 
     <!-- Expiry warning banner -->
     <div v-if="expiringDocs.length"
-         class="mb-4 px-4 py-3 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-xl">
+          class="mb-4 px-4 py-3 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-xl">
       <p class="text-sm font-semibold text-orange-700 dark:text-orange-400 mb-1">
         Document expiry warning
       </p>
@@ -200,12 +200,12 @@ const leaveColumns = [
     </div>
 
     <!-- Tabs -->
-    <div class="flex gap-1 mb-6 bg-gray-100 dark:bg-gray-800 rounded-xl p-1 w-fit">
+    <div class="flex gap-1 mb-6 bg-gray-100 border border-gray-200 dark:bg-gray-800 rounded-xl p-1 w-fit">
       <button v-for="tab in tabs" :key="tab.key"
               @click="activeTab = tab.key"
               class="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
               :class="activeTab === tab.key
-                ? 'bg-surface text-app-text shadow-sm'
+                ? 'bg-primary text-white shadow-sm'
                 : 'text-app-text/50 hover:text-app-text'">
         {{ tab.label }}
         <span v-if="tab.count"
@@ -217,8 +217,8 @@ const leaveColumns = [
 
     <!-- ── DETAILS TAB ──────────────────────────────────────── -->
     <div v-if="activeTab === 'details'"
-         class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-5">
+          class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-5">
         <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider mb-3">Contact</h2>
         <dl class="space-y-2 text-sm">
           <div v-if="employee.email">
@@ -231,7 +231,7 @@ const leaveColumns = [
           </div>
         </dl>
       </div>
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-5">
+      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-5">
         <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider mb-3">Employment</h2>
         <dl class="space-y-2 text-sm">
           <div>
@@ -246,7 +246,7 @@ const leaveColumns = [
           </div>
         </dl>
       </div>
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-5">
+      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-5">
         <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider mb-3">Organisation</h2>
         <dl class="space-y-2 text-sm">
           <div v-if="employee.department">
@@ -274,15 +274,15 @@ const leaveColumns = [
       </div>
 
       <div v-if="!documents.length"
-           class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 px-6 py-12 text-center text-app-text/40 text-sm">
+            class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 px-6 py-12 text-center text-app-text/40 text-sm">
         No documents uploaded yet.
       </div>
 
       <div v-else class="space-y-3">
         <div v-for="doc in documents" :key="doc.id"
-             class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-4"
-             :class="doc.is_expired ? 'border-red-200 dark:border-red-900/40' :
-                     doc.is_expiring ? 'border-orange-200 dark:border-orange-900/40' : ''">
+              class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-4"
+              :class="doc.is_expired ? 'border-red-200 dark:border-red-900/40' :
+                    doc.is_expiring ? 'border-orange-200 dark:border-orange-900/40' : ''">
           <div class="flex items-start justify-between gap-4">
             <div class="flex items-start gap-3 flex-1 min-w-0">
               <!-- File icon -->
@@ -321,7 +321,7 @@ const leaveColumns = [
 
             <div class="flex items-center gap-2 flex-shrink-0">
               <a :href="`/hr/employees/${employee.id}/documents/${doc.id}/download`"
-                 class="px-3 py-1.5 text-xs font-medium border border-gray-200 dark:border-gray-700 rounded-lg text-app-text/60 hover:text-primary hover:border-primary/30 transition-colors">
+                  class="px-3 py-1.5 text-xs font-medium border border-gray-200 dark:border-gray-700 rounded-lg text-app-text/60 hover:text-primary hover:border-primary/30 transition-colors">
                 Download
               </a>
               <button @click="promptDocDelete(doc.id)"
@@ -347,13 +347,13 @@ const leaveColumns = [
       </div>
 
       <div v-if="!payslips.length"
-           class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 px-6 py-12 text-center text-app-text/40 text-sm">
+            class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 px-6 py-12 text-center text-app-text/40 text-sm">
         No payslips uploaded yet.
       </div>
 
-      <div v-else class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
+      <div v-else class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
         <table class="w-full text-sm">
-          <thead class="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-800">
+          <thead class="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 bg-primary text-white dark:border-gray-800">
             <tr>
               <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-app-text/50">Period</th>
               <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-app-text/50">Gross</th>
@@ -372,7 +372,7 @@ const leaveColumns = [
               <td class="px-4 py-3 text-right">
                 <div class="flex items-center justify-end gap-2">
                   <a :href="`/hr/employees/${employee.id}/payslips/${slip.id}/download`"
-                     class="text-xs text-primary hover:underline">Download</a>
+                      class="text-xs text-primary hover:underline">Download</a>
                   <button @click="promptPayslipDelete(slip.id)"
                           class="text-xs text-red-400 hover:text-red-600 transition-colors">Delete</button>
                 </div>
@@ -386,12 +386,12 @@ const leaveColumns = [
     <!-- ── LEAVE TAB ────────────────────────────────────────── -->
     <div v-if="activeTab === 'leave'">
       <div v-if="!employee.leave?.length"
-           class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 px-6 py-12 text-center text-app-text/40 text-sm">
+            class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 px-6 py-12 text-center text-app-text/40 text-sm">
         No leave history.
       </div>
-      <div v-else class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
+      <div v-else class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
         <table class="w-full text-sm">
-          <thead class="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-800">
+          <thead class="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 bg-primary text-white dark:border-gray-800">
             <tr>
               <th v-for="col in leaveColumns" :key="col.key"
                   class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-app-text/50">
@@ -431,7 +431,7 @@ const leaveColumns = [
         <div class="col-span-2 flex flex-col gap-1">
           <label class="text-sm font-medium text-app-text">Document Name <span class="text-red-500">*</span></label>
           <input v-model="docForm.name" type="text"
-                 class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
+                  class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
           <p v-if="docForm.errors.name" class="text-xs text-red-500">{{ docForm.errors.name }}</p>
         </div>
 
@@ -455,7 +455,7 @@ const leaveColumns = [
         <div class="flex flex-col gap-1">
           <label class="text-sm font-medium text-app-text">Expiry Date <span class="text-app-text/40 font-normal">(optional)</span></label>
           <input v-model="docForm.expiry_date" type="date"
-                 class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
+                  class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
         </div>
 
         <div v-if="docForm.visibility === 'customer'" class="flex flex-col gap-1">
@@ -471,8 +471,8 @@ const leaveColumns = [
           <label class="text-sm font-medium text-app-text">File <span class="text-red-500">*</span></label>
           <div class="flex items-center gap-3">
             <input ref="docFileInput" type="file"
-                   accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                   class="hidden" @change="onDocFileChange" />
+                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                    class="hidden" @change="onDocFileChange" />
             <button type="button" @click="docFileInput.click()"
                     class="px-4 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg text-app-text/60 hover:text-app-text transition-colors">
               Choose File
@@ -506,8 +506,8 @@ const leaveColumns = [
         <div class="flex flex-col gap-1">
           <label class="text-sm font-medium text-app-text">Year</label>
           <input v-model.number="payslipForm.period_year" type="number"
-                 :min="2000" :max="2099"
-                 class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
+                  :min="2000" :max="2099"
+                  class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
         </div>
         <div class="flex flex-col gap-1">
           <label class="text-sm font-medium text-app-text">Month</label>
@@ -520,19 +520,19 @@ const leaveColumns = [
         <div class="flex flex-col gap-1">
           <label class="text-sm font-medium text-app-text">Gross Amount <span class="text-app-text/40 font-normal">(optional)</span></label>
           <input v-model.number="payslipForm.gross_amount" type="number" step="0.01" min="0"
-                 class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
+                  class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
         </div>
         <div class="flex flex-col gap-1">
           <label class="text-sm font-medium text-app-text">Net Amount <span class="text-app-text/40 font-normal">(optional)</span></label>
           <input v-model.number="payslipForm.net_amount" type="number" step="0.01" min="0"
-                 class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
+                  class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
         </div>
 
         <div class="col-span-2 flex flex-col gap-1">
           <label class="text-sm font-medium text-app-text">PDF File <span class="text-red-500">*</span></label>
           <div class="flex items-center gap-3">
             <input ref="payslipFileInput" type="file" accept=".pdf"
-                   class="hidden" @change="onPayslipFileChange" />
+                    class="hidden" @change="onPayslipFileChange" />
             <button type="button" @click="payslipFileInput.click()"
                     class="px-4 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg text-app-text/60 hover:text-app-text transition-colors">
               Choose PDF

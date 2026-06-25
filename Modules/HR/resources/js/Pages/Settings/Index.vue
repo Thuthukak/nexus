@@ -30,14 +30,14 @@ function submit() {
 
     <form @submit.prevent="submit" class="space-y-6">
 
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6 space-y-4">
+      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-6 space-y-4">
         <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider">Company</h2>
         <Input v-model="form.company_name" label="Company Name"
                hint="Used on payslips and HR documents"
                :error="form.errors.company_name" />
       </div>
 
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6 space-y-4">
+      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-6 space-y-4">
         <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider">Documents</h2>
         <div class="flex flex-col gap-1">
           <label class="text-sm font-medium text-app-text">
@@ -56,7 +56,7 @@ function submit() {
         </div>
       </div>
 
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6 space-y-4">
+      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-6 space-y-4">
         <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider">Payroll</h2>
         <div class="flex flex-col gap-1">
           <label class="text-sm font-medium text-app-text">Payroll Period Start Day</label>

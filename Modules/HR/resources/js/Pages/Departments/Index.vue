@@ -25,9 +25,9 @@ function submit() {
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <div class="lg:col-span-2">
-        <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
+        <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
           <table class="w-full text-sm">
-            <thead class="border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50">
+            <thead class="border-b border-gray-200 bg-primary text-white dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50">
               <tr>
                 <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-app-text/50">Name</th>
                 <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-app-text/50">Employees</th>
@@ -48,7 +48,7 @@ function submit() {
       </div>
 
       <div>
-        <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6">
+        <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-6">
           <h2 class="text-sm font-semibold text-app-text mb-4">Add Department</h2>
           <form @submit.prevent="submit" class="space-y-4">
             <Input v-model="form.name" label="Department Name" required :error="form.errors.name" />

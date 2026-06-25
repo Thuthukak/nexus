@@ -130,18 +130,18 @@ function currency(val) {
       </div>
       <div class="flex items-center gap-2">
         <a :href="`/events-admin/events/${event.id}/orders`"
-           class="px-4 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg text-app-text/60 hover:text-app-text transition-colors">
+            class="px-4 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg text-app-text/60 hover:text-app-text transition-colors">
           View Orders
         </a>
         <a :href="`/events/${event.slug}`" target="_blank"
-           class="px-4 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg text-app-text/60 hover:text-app-text transition-colors">
+            class="px-4 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg text-app-text/60 hover:text-app-text transition-colors">
           Public Page ↗
         </a>
       </div>
     </div>
 
     <!-- Tabs -->
-    <div class="flex gap-1 mb-6 bg-gray-100 dark:bg-gray-800 rounded-xl p-1 w-fit">
+    <div class="flex gap-1 mb-6 bg-gray-100 border border-gray-200 dark:bg-gray-800 rounded-xl p-1 w-fit">
       <button v-for="tab in [
         { key: 'details', label: 'Details' },
         { key: 'tickets', label: `Ticket Types (${event.ticket_types?.length ?? 0})` },
@@ -149,7 +149,7 @@ function currency(val) {
               @click="activeTab = tab.key"
               class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
               :class="activeTab === tab.key
-                ? 'bg-surface text-app-text shadow-sm'
+                ? 'bg-primary text-white shadow-sm'
                 : 'text-app-text/50 hover:text-app-text'">
         {{ tab.label }}
       </button>
@@ -159,15 +159,15 @@ function currency(val) {
     <div v-if="activeTab === 'details'" class="space-y-6">
 
       <!-- Banner -->
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
+      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
         <div class="relative h-44 bg-gradient-to-br from-primary/20 to-primary/5 cursor-pointer group"
-             @click="bannerInput.click()">
+              @click="bannerInput.click()">
           <img v-if="bannerPreview" :src="bannerPreview"
-               class="absolute inset-0 w-full h-full object-cover" />
+                class="absolute inset-0 w-full h-full object-cover" />
           <div class="absolute inset-0 flex items-center justify-center gap-2 text-sm font-medium"
-               :class="bannerPreview
-                 ? 'bg-black/40 text-white opacity-0 group-hover:opacity-100 transition-opacity'
-                 : 'text-primary/50'">
+                :class="bannerPreview
+                  ? 'bg-black/40 text-white opacity-0 group-hover:opacity-100 transition-opacity'
+                  : 'text-primary/50'">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14" />
@@ -176,11 +176,11 @@ function currency(val) {
           </div>
         </div>
         <input ref="bannerInput" type="file" accept="image/*" class="hidden"
-               @change="onBannerChange" />
+                @change="onBannerChange" />
       </div>
 
       <form @submit.prevent="saveEvent" class="space-y-4">
-        <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6 space-y-4">
+        <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-6 space-y-4">
           <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider">Event Details</h2>
           <Input v-model="form.title" label="Title" required :error="form.errors.title" />
           <div class="flex flex-col gap-1">
@@ -196,7 +196,7 @@ function currency(val) {
           <Input v-model="form.venue_address" label="Venue Address" />
         </div>
 
-        <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6 space-y-4">
+        <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-6 space-y-4">
           <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider">Settings</h2>
           <div class="flex items-end gap-6">
             <div class="flex flex-col gap-1">
@@ -211,7 +211,7 @@ function currency(val) {
             </div>
             <label class="flex items-center gap-2 cursor-pointer">
               <input v-model="form.is_featured" type="checkbox"
-                     class="w-4 h-4 rounded border-gray-300 text-primary" />
+                      class="w-4 h-4 rounded border-gray-300 text-primary" />
               <span class="text-sm font-medium text-app-text">Featured event</span>
             </label>
           </div>
@@ -237,13 +237,13 @@ function currency(val) {
       </div>
 
       <div v-if="!event.ticket_types?.length"
-           class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 px-6 py-10 text-center text-app-text/40 text-sm">
+            class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 px-6 py-10 text-center text-app-text/40 text-sm">
         No ticket types yet. Add at least one ticket type to allow purchases.
       </div>
 
       <div v-else class="space-y-3">
         <div v-for="tt in event.ticket_types" :key="tt.id"
-             class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-5 flex items-center justify-between gap-4">
+            class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-5 flex items-center justify-between gap-4">
           <div class="flex-1 min-w-0">
             <div class="flex items-center gap-3 mb-1">
               <h3 class="font-semibold text-app-text">{{ tt.name }}</h3>
@@ -285,13 +285,13 @@ function currency(val) {
 
   <!-- Ticket Type Modal -->
   <Modal :show="showTicketModal"
-         :title="editingTicketType ? 'Edit Ticket Type' : 'Add Ticket Type'"
-         size="md"
-         @close="showTicketModal = false">
+          :title="editingTicketType ? 'Edit Ticket Type' : 'Add Ticket Type'"
+          size="md"
+          @close="showTicketModal = false">
     <div class="space-y-4">
       <Input v-model="ticketForm.name" label="Ticket Type Name"
-             placeholder="e.g. General Admission, VIP, Early Bird"
-             required :error="ticketForm.errors.name" />
+              placeholder="e.g. General Admission, VIP, Early Bird"
+              required :error="ticketForm.errors.name" />
 
       <div class="flex flex-col gap-1">
         <label class="text-sm font-medium text-app-text">Description</label>
@@ -304,17 +304,17 @@ function currency(val) {
         <div class="flex flex-col gap-1">
           <label class="text-sm font-medium text-app-text">Price (R)</label>
           <input v-model.number="ticketForm.price" type="number" min="0" step="0.01"
-                 class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
+                  class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
         </div>
         <div class="flex flex-col gap-1">
           <label class="text-sm font-medium text-app-text">Total Qty</label>
           <input v-model.number="ticketForm.quantity_total" type="number" min="1"
-                 class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
+                  class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
         </div>
         <div class="flex flex-col gap-1">
           <label class="text-sm font-medium text-app-text">Max / Order</label>
           <input v-model.number="ticketForm.max_per_order" type="number" min="1" max="100"
-                 class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
+                  class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
         </div>
       </div>
 
@@ -322,18 +322,18 @@ function currency(val) {
         <div class="flex flex-col gap-1">
           <label class="text-sm font-medium text-app-text">Sale Opens</label>
           <input v-model="ticketForm.sale_starts_at" type="datetime-local"
-                 class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
+                  class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
         </div>
         <div class="flex flex-col gap-1">
           <label class="text-sm font-medium text-app-text">Sale Closes</label>
           <input v-model="ticketForm.sale_ends_at" type="datetime-local"
-                 class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
+                  class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
         </div>
       </div>
 
       <label class="flex items-center gap-2 cursor-pointer">
         <input v-model="ticketForm.is_active" type="checkbox"
-               class="w-4 h-4 rounded border-gray-300 text-primary" />
+                class="w-4 h-4 rounded border-gray-300 text-primary" />
         <span class="text-sm font-medium text-app-text">Active (available for purchase)</span>
       </label>
     </div>

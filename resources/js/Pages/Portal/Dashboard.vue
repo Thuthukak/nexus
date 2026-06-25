@@ -99,7 +99,7 @@ function currency(val) {
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- Recent invoices -->
       <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
-        <div class="px-5 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
+        <div class="px-5 py-4 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
           <h2 class="text-sm font-semibold text-gray-900 dark:text-white">Recent Invoices</h2>
           <a href="/portal/invoices" class="text-xs text-primary hover:underline">View all →</a>
         </div>
@@ -131,7 +131,7 @@ function currency(val) {
 
       <!-- Pending quotations -->
       <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
-        <div class="px-5 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
+        <div class="px-5 py-4 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
           <h2 class="text-sm font-semibold text-gray-900 dark:text-white">Pending Quotations</h2>
           <a href="/portal/quotations" class="text-xs text-primary hover:underline">View all →</a>
         </div>
@@ -165,7 +165,7 @@ function currency(val) {
       <!-- Upcoming bookings -->
       <div v-if="upcomingBookings.length"
            class="lg:col-span-2 bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
-        <div class="px-5 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
+        <div class="px-5 py-4 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
           <h2 class="text-sm font-semibold text-gray-900 dark:text-white">Upcoming Bookings</h2>
           <a href="/portal/bookings" class="text-xs text-primary hover:underline">View all →</a>
         </div>

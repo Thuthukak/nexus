@@ -84,26 +84,26 @@ function currency(val) {
 
     <!-- Stats -->
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 px-4 py-3">
+      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 px-4 py-3">
         <p class="text-xs text-app-text/50 mb-1">Total Quotes</p>
         <p class="text-2xl font-bold text-app-text">{{ stats.total }}</p>
       </div>
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 px-4 py-3">
+      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 px-4 py-3">
         <p class="text-xs text-app-text/50 mb-1">Pending Value</p>
         <p class="text-xl font-bold text-blue-600">{{ currency(stats.pending_value) }}</p>
       </div>
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 px-4 py-3">
+      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 px-4 py-3">
         <p class="text-xs text-app-text/50 mb-1">Accepted</p>
         <p class="text-2xl font-bold text-green-600">{{ stats.accepted_count }}</p>
       </div>
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 px-4 py-3">
+      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 px-4 py-3">
         <p class="text-xs text-app-text/50 mb-1">Acceptance Rate</p>
         <p class="text-2xl font-bold text-app-text">{{ stats.acceptance_rate }}%</p>
       </div>
     </div>
 
     <!-- Filters -->
-    <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-4 mb-4 flex flex-wrap gap-3 items-end">
+    <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-4 mb-4 flex flex-wrap gap-3 items-end">
       <div class="flex-1 min-w-44">
         <label class="text-xs font-medium text-app-text/50 mb-1 block">Search</label>
         <input v-model="search" @keyup.enter="applyFilters" placeholder="Reference or customer…"

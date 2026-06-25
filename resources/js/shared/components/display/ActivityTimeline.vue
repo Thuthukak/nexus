@@ -70,7 +70,7 @@ function colour(event) {
 
           <!-- Content -->
           <div
-            class="bg-surface rounded-lg border border-gray-100 dark:border-gray-800 px-4 py-3"
+            class="bg-surface rounded-lg border border-gray-200 dark:border-gray-800 px-4 py-3"
             :class="activity.changes ? 'cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/40' : ''"
             @click="activity.changes ? toggleExpand(activity.id) : null"
           >
@@ -99,9 +99,9 @@ function colour(event) {
               enter-to-class="opacity-100 translate-y-0"
             >
               <div v-if="expanded === activity.id && activity.changes"
-                   class="mt-3 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+                    class="mt-3 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
                 <table class="w-full text-xs">
-                  <thead class="bg-gray-100 dark:bg-gray-800">
+                  <thead class="bg-primary text-white dark:bg-gray-800">
                     <tr>
                       <th class="px-3 py-1.5 text-left text-app-text/50 font-semibold uppercase tracking-wide">Field</th>
                       <th class="px-3 py-1.5 text-left text-app-text/50 font-semibold uppercase tracking-wide">Before</th>
@@ -110,7 +110,7 @@ function colour(event) {
                   </thead>
                   <tbody>
                     <tr v-for="change in activity.changes" :key="change.field"
-                        class="border-t border-gray-100 dark:border-gray-700">
+                        class="border-t border-gray-200 dark:border-gray-700">
                       <td class="px-3 py-1.5 font-medium text-app-text/70 capitalize">{{ change.field }}</td>
                       <td class="px-3 py-1.5 font-mono text-red-600 dark:text-red-400 line-through max-w-24 truncate">
                         {{ change.old || '—' }}

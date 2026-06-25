@@ -33,7 +33,7 @@ function submit() {
     <form @submit.prevent="submit" class="space-y-6">
 
       <!-- Gateway selection -->
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6">
+      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-6">
         <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider mb-4">Payment Gateway</h2>
 
         <div class="grid grid-cols-3 gap-3 mb-4">
@@ -66,7 +66,7 @@ function submit() {
 
       <!-- PayFast credentials -->
       <Transition enter-active-class="transition-all duration-200 ease-out" enter-from-class="opacity-0 -translate-y-2" enter-to-class="opacity-100 translate-y-0">
-        <div v-if="isPayfast" class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6 space-y-4">
+        <div v-if="isPayfast" class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-6 space-y-4">
           <div class="flex items-center gap-3 mb-2">
             <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider">PayFast Credentials</h2>
             <a href="https://www.payfast.co.za/registration" target="_blank"
@@ -87,7 +87,7 @@ function submit() {
 
       <!-- Paystack credentials -->
       <Transition enter-active-class="transition-all duration-200 ease-out" enter-from-class="opacity-0 -translate-y-2" enter-to-class="opacity-100 translate-y-0">
-        <div v-if="isPaystack" class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6 space-y-4">
+        <div v-if="isPaystack" class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-6 space-y-4">
           <div class="flex items-center gap-3 mb-2">
             <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider">Paystack Credentials</h2>
             <a href="https://dashboard.paystack.com" target="_blank"
@@ -104,7 +104,7 @@ function submit() {
       </Transition>
 
       <!-- Bank / EFT details -->
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6 space-y-4">
+      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-6 space-y-4">
         <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider mb-2">
           EFT / Bank Transfer Details
         </h2>

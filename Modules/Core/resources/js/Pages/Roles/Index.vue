@@ -84,7 +84,7 @@ const moduleNames = computed(() => Object.keys(props.permissions))
     <!-- Roles list -->
     <div class="space-y-3">
       <div v-for="role in roles" :key="role.id"
-           class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-5">
+           class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-5">
         <div class="flex items-start justify-between gap-4">
           <div class="flex-1 min-w-0">
             <div class="flex items-center gap-3 mb-2">
@@ -153,7 +153,7 @@ const moduleNames = computed(() => Object.keys(props.permissions))
           </h3>
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
             <label v-for="perm in permissions[module]" :key="perm"
-                   class="flex items-center gap-2 p-2 rounded-lg border border-gray-100 dark:border-gray-800 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                   class="flex items-center gap-2 p-2 rounded-lg border border-gray-200 dark:border-gray-800 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
               <input :checked="editPermissions.includes(perm)"
                      @change="togglePermission(perm)"
                      type="checkbox"

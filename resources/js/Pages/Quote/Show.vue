@@ -94,7 +94,7 @@ const statusColour = {
           </div>
         </div>
 
-        <div class="px-6 py-5 border-b border-gray-100">
+        <div class="px-6 py-5 border-b border-gray-200">
           <div class="flex justify-between text-sm text-gray-500 mb-3">
             <span>Prepared for</span>
             <span>Valid until {{ quotation.valid_until }}</span>
@@ -105,7 +105,7 @@ const statusColour = {
 
         <!-- Line items -->
         <table class="w-full text-sm">
-          <thead class="bg-gray-50">
+          <thead class="bg-primary text-white">
             <tr>
               <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-400">Item</th>
               <th class="px-6 py-3 text-right text-xs font-semibold uppercase text-gray-400">Qty</th>

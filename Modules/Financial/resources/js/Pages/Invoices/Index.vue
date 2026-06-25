@@ -87,7 +87,7 @@ function currency(val) {
     </div>
 
     <!-- Filters -->
-    <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-4 mb-4 flex flex-wrap items-end gap-3">
+    <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-4 mb-4 flex flex-wrap items-end gap-3">
       <div class="flex-1 min-w-48">
         <label class="text-xs font-medium text-app-text/50 mb-1 block">Search</label>
         <input

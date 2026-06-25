@@ -126,7 +126,7 @@ function currency(val) {
                 {{ event.venue }}
               </p>
 
-              <div class="flex items-center justify-between mt-auto pt-3 border-t border-gray-100">
+              <div class="flex items-center justify-between mt-auto pt-3 border-t border-gray-200">
                 <span class="text-sm font-bold text-gray-900">{{ currency(event.min_price) }}</span>
                 <span class="text-xs font-semibold px-3 py-1.5 rounded-lg text-white"
                       style="background-color: var(--color-primary, #1E3A5F);">

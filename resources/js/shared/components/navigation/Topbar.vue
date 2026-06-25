@@ -103,7 +103,7 @@ function toggleNotifications() {
           <div
             v-if="menuOpen"
             v-click-outside="() => menuOpen = false"
-            class="absolute right-0 top-full mt-1 w-52 bg-surface rounded-xl shadow-lg border border-gray-100 dark:border-gray-800 py-1 z-50"
+            class="absolute right-0 top-full mt-1 w-52 bg-surface rounded-xl shadow-lg border border-gray-200 dark:border-gray-800 py-1 z-50"
           >
             <a href="/profile"
                @click="menuOpen = false"
@@ -123,7 +123,7 @@ function toggleNotifications() {
               </svg>
               Notifications
             </a>
-            <div class="my-1 border-t border-gray-100 dark:border-gray-800" />
+            <div class="my-1 border-t border-gray-200 dark:border-gray-800" />
             <button
               @click="logout"
               class="w-full flex items-center gap-2.5 px-4 py-2 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"

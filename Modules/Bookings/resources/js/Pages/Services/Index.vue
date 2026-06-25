@@ -26,7 +26,7 @@ defineProps({ services: { type: Array, default: () => [] } })
         No services yet. Add your first service to accept bookings.
       </div>
       <div v-for="service in services" :key="service.id"
-           class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6">
+           class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-6">
         <h3 class="font-semibold text-app-text mb-3">{{ service.name }}</h3>
         <div class="space-y-1 text-sm text-app-text/60">
           <p>Duration: {{ service.duration_minutes }} min</p>

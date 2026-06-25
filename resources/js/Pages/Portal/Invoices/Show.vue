@@ -77,11 +77,11 @@ const statusColour = {
 
     <!-- Line items -->
     <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden mb-6">
-      <div class="px-5 py-4 border-b border-gray-100 dark:border-gray-800">
+      <div class="px-5 py-4 border-b border-gray-200 dark:border-gray-800">
         <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Line Items</h2>
       </div>
       <table class="w-full text-sm">
-        <thead class="bg-gray-50 dark:bg-gray-800">
+        <thead class="bg-primary text-white dark:bg-gray-800">
           <tr>
             <th class="px-5 py-3 text-left text-xs font-semibold text-gray-400 uppercase">Item</th>
             <th class="px-5 py-3 text-right text-xs font-semibold text-gray-400 uppercase">Qty</th>
@@ -114,7 +114,7 @@ const statusColour = {
     <!-- Payment history -->
     <div v-if="invoice.payments?.length"
          class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden mb-6">
-      <div class="px-5 py-4 border-b border-gray-100 dark:border-gray-800">
+      <div class="px-5 py-4 border-b border-gray-200 dark:border-gray-800">
         <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Payment History</h2>
       </div>
       <div class="divide-y divide-gray-50 dark:divide-gray-800">

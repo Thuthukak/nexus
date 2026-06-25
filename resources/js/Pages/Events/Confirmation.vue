@@ -39,7 +39,7 @@ defineProps({
 
       <!-- Order card -->
       <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden mb-6">
-        <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
+        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
           <div class="flex items-center justify-between">
             <div>
               <p class="text-xs text-gray-400 mb-0.5">Order Reference</p>
@@ -62,7 +62,7 @@ defineProps({
             <p v-if="order.event.venue" class="text-sm text-gray-500">📍 {{ order.event.venue }}</p>
           </div>
 
-          <div class="border-t border-gray-100 pt-3">
+          <div class="border-t border-gray-200 pt-3">
             <div v-for="item in order.items" :key="item.name"
                  class="flex items-center justify-between text-sm py-1">
               <span class="text-gray-600">{{ item.name }} × {{ item.quantity }}</span>

@@ -28,7 +28,7 @@ function submit() {
     </div>
 
     <form @submit.prevent="submit" class="space-y-6">
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6 space-y-4">
+      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-6 space-y-4">
         <Input v-model="form.name" label="Service Name" required :error="form.errors.name" />
 
         <div class="grid grid-cols-2 gap-4">

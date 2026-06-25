@@ -220,7 +220,7 @@ function openRecurring() {
               leave-to-class="opacity-0 scale-95"
             >
               <div v-if="kebabOpen"
-                   class="absolute right-0 top-full mt-1 w-64 bg-white rounded-xl shadow-lg border border-gray-100 dark:border-gray-800 py-1 z-30">
+                   class="absolute right-0 top-full mt-1 w-64 bg-white rounded-xl shadow-lg border border-gray-200 dark:border-gray-800 py-1 z-30">
 
                 <!-- Download PDF -->
                 <a :href="`/financial/invoices/${invoice.id}/download-pdf`"
@@ -279,7 +279,7 @@ function openRecurring() {
                   Make Recurring
                 </button>
 
-                <div class="my-1 border-t border-gray-100 dark:border-gray-800" />
+                <div class="my-1 border-t border-gray-200 dark:border-gray-800" />
 
                 <!-- Cancel -->
                 <button v-if="canCancel"
@@ -300,19 +300,19 @@ function openRecurring() {
 
     <!-- ── Summary bar ─────────────────────────────────────── -->
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 px-4 py-3">
+      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 px-4 py-3">
         <p class="text-xs text-app-text/50 mb-1">Subtotal</p>
         <p class="text-sm font-semibold text-app-text">{{ currency(invoice.subtotal) }}</p>
       </div>
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 px-4 py-3">
+      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 px-4 py-3">
         <p class="text-xs text-app-text/50 mb-1">Tax</p>
         <p class="text-sm font-semibold text-app-text">{{ currency(invoice.tax_total) }}</p>
       </div>
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 px-4 py-3">
+      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 px-4 py-3">
         <p class="text-xs text-app-text/50 mb-1">Total</p>
         <p class="text-sm font-bold text-app-text">{{ currency(invoice.total) }}</p>
       </div>
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 px-4 py-3"
+      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 px-4 py-3"
            :class="invoice.balance_due > 0 ? 'border-red-200 dark:border-red-900/40' : ''">
         <p class="text-xs text-app-text/50 mb-1">Balance Due</p>
         <p class="text-sm font-bold"
@@ -346,7 +346,7 @@ function openRecurring() {
 
       <!-- Customer + Details row -->
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6">
+        <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-6">
           <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider mb-3">Bill To</h2>
           <a :href="`/financial/customers/${invoice.customer?.id}`"
              class="font-semibold text-primary hover:underline text-base">
@@ -363,7 +363,7 @@ function openRecurring() {
           </p>
         </div>
 
-        <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6">
+        <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-6">
           <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider mb-3">Details</h2>
           <dl class="grid grid-cols-2 gap-x-4 gap-y-3">
             <div>
@@ -408,8 +408,8 @@ function openRecurring() {
       </div>
 
       <!-- Line items -->
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-800">
+      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200 bg-primary text-white dark:border-gray-800">
           <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider">Line Items</h2>
         </div>
         <div class="overflow-x-auto">
@@ -439,8 +439,8 @@ function openRecurring() {
 
       <!-- Payments -->
       <div v-if="invoice.payments?.length"
-           class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-800">
+           class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200 bg-primary text-white dark:border-gray-800">
           <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider">Payment History</h2>
         </div>
         <div class="overflow-x-auto">
@@ -466,13 +466,13 @@ function openRecurring() {
       </div>
 
       <!-- Activity -->
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6">
+      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-6">
         <ActivityTimeline type="invoice" :id="invoice.id" />
       </div>
 
       <!-- Notes -->
       <div v-if="invoice.notes"
-           class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6">
+           class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-6">
         <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider mb-2">Notes</h2>
         <p class="text-sm text-app-text/70 leading-relaxed whitespace-pre-line">{{ invoice.notes }}</p>
       </div>

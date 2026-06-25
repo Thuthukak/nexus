@@ -62,7 +62,7 @@ function currency(val) {
         </div>
 
         <!-- Line items -->
-        <div class="border-t border-gray-100">
+        <div class="border-t border-gray-200">
           <table class="w-full text-sm">
             <thead class="bg-gray-50">
               <tr>
@@ -102,7 +102,7 @@ function currency(val) {
 
       <!-- Payment options -->
       <div v-if="gateway.configured" class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-        <div class="px-6 py-5 border-b border-gray-100">
+        <div class="px-6 py-5 border-b border-gray-200">
           <h2 class="font-semibold text-gray-900">Pay Online</h2>
           <p class="text-sm text-gray-500 mt-1">Secure payment via {{ gateway.name }}</p>
         </div>
@@ -141,7 +141,7 @@ function currency(val) {
 
       <!-- Bank transfer details -->
       <div v-if="bank.account_number" class="bg-white rounded-2xl border border-gray-200 shadow-sm">
-        <div class="px-6 py-5 border-b border-gray-100">
+        <div class="px-6 py-5 border-b border-gray-200">
           <h2 class="font-semibold text-gray-900">Pay via EFT / Bank Transfer</h2>
         </div>
         <div class="px-6 py-5">

@@ -85,7 +85,7 @@ function handleDelete() {
 
     <!-- Details -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6">
+      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-6">
         <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider mb-4">Account</h2>
         <dl class="space-y-3">
           <div>

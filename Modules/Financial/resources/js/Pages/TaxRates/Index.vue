@@ -50,9 +50,9 @@ function handleDelete() {
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- Tax rates list -->
-      <div class="lg:col-span-2 bg-surface rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
+      <div class="lg:col-span-2 bg-surface rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
         <table class="w-full text-sm">
-          <thead class="border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50">
+          <thead class="border-b border-gray-200 bg-primary text-white dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50">
             <tr>
               <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-app-text/50">Name</th>
               <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-app-text/50">Rate</th>
@@ -90,7 +90,7 @@ function handleDelete() {
       </div>
 
       <!-- Add tax rate -->
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6">
+      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-6">
         <h2 class="text-sm font-semibold text-app-text mb-4">Add Tax Rate</h2>
         <form @submit.prevent="submit" class="space-y-4">
           <Input v-model="form.name" label="Name" placeholder="e.g. VAT 15%" required :error="form.errors.name" />

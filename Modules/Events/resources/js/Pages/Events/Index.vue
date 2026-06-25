@@ -54,13 +54,13 @@ function currency(val) {
     </div>
 
     <div v-if="!events.length"
-          class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 px-6 py-16 text-center text-app-text/40 text-sm">
+          class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 px-6 py-16 text-center text-app-text/40 text-sm">
       No events yet. Create your first event to start selling tickets.
     </div>
 
     <div v-else class="space-y-4">
       <div v-for="event in events" :key="event.id"
-            class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden hover:shadow-md transition-shadow">
+            class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden hover:shadow-md transition-shadow">
         <div class="flex items-stretch">
 
           <!-- Banner thumbnail -->
@@ -171,7 +171,7 @@ function currency(val) {
             </div>
 
             <!-- Bottom row: stats -->
-            <div class="flex items-center gap-6 pt-4 border-t border-gray-100 dark:border-gray-800">
+            <div class="flex items-center gap-6 pt-4 border-t border-gray-200 dark:border-gray-800">
 
               <!-- Tickets sold progress -->
               <div class="flex-1 min-w-0">

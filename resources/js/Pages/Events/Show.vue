@@ -77,7 +77,7 @@ function currency(val) {
           <span v-else class="font-bold text-gray-900 text-lg">{{ app.name }}</span>
         </a>
         <a href="/events"
-           class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 transition-colors">
+            class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 transition-colors">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
           </svg>
@@ -95,17 +95,17 @@ function currency(val) {
           <!-- Hero banner -->
           <div class="relative rounded-3xl overflow-hidden shadow-lg">
             <img v-if="event.banner_url"
-                 :src="event.banner_url"
-                 class="w-full h-64 sm:h-80 object-cover" />
+                  :src="event.banner_url"
+                  class="w-full h-64 sm:h-80 object-cover" />
             <div v-else
-                 class="h-64 sm:h-80 flex items-center justify-center"
-                 style="background: linear-gradient(135deg, var(--color-primary, #1E3A5F) 0%, #2E86AB 100%);">
+                  class="h-64 sm:h-80 flex items-center justify-center"
+                  style="background: linear-gradient(135deg, var(--color-primary, #1E3A5F) 0%, #2E86AB 100%);">
               <h1 class="text-3xl font-bold text-white text-center px-8 drop-shadow">{{ event.title }}</h1>
             </div>
 
             <!-- Sold out ribbon -->
             <div v-if="event.is_sold_out"
-                 class="absolute inset-0 bg-black/50 flex items-center justify-center">
+                  class="absolute inset-0 bg-black/50 flex items-center justify-center">
               <div class="bg-red-500 text-white font-black text-2xl tracking-widest uppercase
                           px-8 py-3 rotate-[-15deg] shadow-2xl rounded">
                 Sold Out
@@ -114,9 +114,9 @@ function currency(val) {
 
             <!-- Featured badge -->
             <div v-if="event.is_featured"
-                 class="absolute top-4 left-4">
+                  class="absolute top-4 left-4">
               <span class="inline-flex items-center gap-1.5 bg-yellow-400 text-yellow-900
-                           text-xs font-bold px-3 py-1.5 rounded-full shadow">
+                            text-xs font-bold px-3 py-1.5 rounded-full shadow">
                 <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                 </svg>
@@ -134,7 +134,7 @@ function currency(val) {
               <div class="inline-flex items-center gap-2 bg-white border border-gray-200
                           rounded-xl px-4 py-2.5 text-sm text-gray-700 shadow-sm">
                 <svg class="w-4 h-4 flex-shrink-0 text-primary" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"
-                     style="color: var(--color-primary, #1E3A5F);">
+                      style="color: var(--color-primary, #1E3A5F);">
                   <path stroke-linecap="round" stroke-linejoin="round"
                     d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                 </svg>
@@ -146,10 +146,10 @@ function currency(val) {
               </div>
 
               <div v-if="event.venue"
-                   class="inline-flex items-center gap-2 bg-white border border-gray-200
+                    class="inline-flex items-center gap-2 bg-white border border-gray-200
                           rounded-xl px-4 py-2.5 text-sm text-gray-700 shadow-sm">
                 <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"
-                     style="color: var(--color-primary, #1E3A5F);">
+                      style="color: var(--color-primary, #1E3A5F);">
                   <path stroke-linecap="round" stroke-linejoin="round"
                     d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                   <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -161,10 +161,10 @@ function currency(val) {
               </div>
 
               <div v-if="event.organiser"
-                   class="inline-flex items-center gap-2 bg-white border border-gray-200
+                    class="inline-flex items-center gap-2 bg-white border border-gray-200
                           rounded-xl px-4 py-2.5 text-sm text-gray-700 shadow-sm">
                 <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"
-                     style="color: var(--color-primary, #1E3A5F);">
+                      style="color: var(--color-primary, #1E3A5F);">
                   <path stroke-linecap="round" stroke-linejoin="round"
                     d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                 </svg>
@@ -175,7 +175,7 @@ function currency(val) {
 
           <!-- Description -->
           <div v-if="event.description"
-               class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+                class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
             <h2 class="text-base font-bold text-gray-900 mb-3">About this event</h2>
             <div class="prose prose-sm max-w-none text-gray-700" v-html="event.description" />
           </div>
@@ -186,8 +186,8 @@ function currency(val) {
           <div class="bg-white rounded-2xl border border-gray-200 shadow-md overflow-hidden sticky top-20">
 
             <!-- Widget header -->
-            <div class="px-5 py-4 border-b border-gray-100"
-                 style="background: linear-gradient(135deg, var(--color-primary, #1E3A5F) 0%, #2E86AB 100%);">
+            <div class="px-5 py-4 border-b border-gray-200"
+                  style="background: linear-gradient(135deg, var(--color-primary, #1E3A5F) 0%, #2E86AB 100%);">
               <h2 class="font-bold text-white text-base">Get Tickets</h2>
               <p v-if="!event.is_sold_out" class="text-white/70 text-xs mt-0.5">
                 Select your tickets below
@@ -209,8 +209,8 @@ function currency(val) {
             <!-- Ticket types -->
             <div v-else class="divide-y divide-gray-100">
               <div v-for="tt in event.ticket_types" :key="tt.id"
-                   class="px-5 py-4 transition-colors"
-                   :class="tt.is_available ? 'hover:bg-gray-50' : 'opacity-50 bg-gray-50'">
+                    class="px-5 py-4 transition-colors"
+                    :class="tt.is_available ? 'hover:bg-gray-50' : 'opacity-50 bg-gray-50'">
 
                 <div class="flex items-start justify-between gap-3 mb-3">
                   <div class="flex-1 min-w-0">
@@ -219,7 +219,7 @@ function currency(val) {
                       {{ tt.description }}
                     </p>
                     <p v-if="tt.sale_ends_at"
-                       class="inline-flex items-center gap-1 text-xs text-orange-500 mt-1 font-medium">
+                        class="inline-flex items-center gap-1 text-xs text-orange-500 mt-1 font-medium">
                       <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round"
                           d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -230,7 +230,7 @@ function currency(val) {
                   <div class="text-right flex-shrink-0">
                     <p class="font-black text-gray-900 text-base">{{ currency(tt.price) }}</p>
                     <p class="text-xs mt-0.5"
-                       :class="tt.quantity_remaining <= 10 ? 'text-orange-500 font-medium' : 'text-gray-400'">
+                        :class="tt.quantity_remaining <= 10 ? 'text-orange-500 font-medium' : 'text-gray-400'">
                       {{ tt.quantity_remaining <= 10
                           ? `Only ${tt.quantity_remaining} left!`
                           : `${tt.quantity_remaining} available` }}
@@ -240,7 +240,7 @@ function currency(val) {
 
                 <!-- Quantity stepper -->
                 <div v-if="tt.is_available"
-                     class="flex items-center justify-between">
+                      class="flex items-center justify-between">
                   <span class="text-xs text-gray-400">
                     Max {{ tt.max_per_order }} per order
                   </span>
@@ -248,8 +248,8 @@ function currency(val) {
                     <button @click="decrement(tt.id)"
                             :disabled="(quantities[tt.id] ?? 0) === 0"
                             class="w-8 h-8 rounded-full border-2 border-gray-200 flex items-center
-                                   justify-center text-gray-500 disabled:opacity-30
-                                   hover:border-gray-400 hover:text-gray-700 transition-all font-bold text-base">
+                                    justify-center text-gray-500 disabled:opacity-30
+                                    hover:border-gray-400 hover:text-gray-700 transition-all font-bold text-base">
                       −
                     </button>
                     <span class="w-5 text-center font-black text-gray-900 text-sm tabular-nums">
@@ -258,7 +258,7 @@ function currency(val) {
                     <button @click="increment(tt.id, Math.min(tt.quantity_remaining, tt.max_per_order))"
                             :disabled="(quantities[tt.id] ?? 0) >= Math.min(tt.quantity_remaining, tt.max_per_order)"
                             class="w-8 h-8 rounded-full border-2 flex items-center justify-center
-                                   font-bold disabled:opacity-30 transition-all text-base"
+                                    font-bold disabled:opacity-30 transition-all text-base"
                             style="border-color: var(--color-primary, #1E3A5F); color: var(--color-primary, #1E3A5F);">
                       +
                     </button>
@@ -276,14 +276,14 @@ function currency(val) {
                 leave-from-class="opacity-100 max-h-[500px]"
                 leave-to-class="opacity-0 max-h-0">
                 <div v-if="showForm && totalTickets > 0"
-                     class="px-5 py-4 space-y-3 bg-gray-50 overflow-hidden">
+                      class="px-5 py-4 space-y-3 bg-gray-50 overflow-hidden">
                   <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Your Details</p>
 
                   <div class="flex flex-col gap-1">
                     <input v-model="formData.name" type="text" placeholder="Full Name *"
-                           class="w-full px-3 py-2.5 rounded-xl border text-sm bg-white
+                            class="w-full px-3 py-2.5 rounded-xl border text-sm bg-white
                                   focus:outline-none focus:ring-2 focus:border-transparent transition-shadow"
-                           :class="errors.customer_name ? 'border-red-300 ring-red-200' : 'border-gray-200'" />
+                            :class="errors.customer_name ? 'border-red-300 ring-red-200' : 'border-gray-200'" />
                     <p v-if="errors.customer_name" class="text-xs text-red-500 flex items-center gap-1">
                       <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd"
@@ -296,9 +296,9 @@ function currency(val) {
 
                   <div class="flex flex-col gap-1">
                     <input v-model="formData.email" type="email" placeholder="Email Address *"
-                           class="w-full px-3 py-2.5 rounded-xl border text-sm bg-white
+                            class="w-full px-3 py-2.5 rounded-xl border text-sm bg-white
                                   focus:outline-none focus:ring-2 focus:border-transparent transition-shadow"
-                           :class="errors.customer_email ? 'border-red-300 ring-red-200' : 'border-gray-200'" />
+                            :class="errors.customer_email ? 'border-red-300 ring-red-200' : 'border-gray-200'" />
                     <p v-if="errors.customer_email" class="text-xs text-red-500 flex items-center gap-1">
                       <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd"
@@ -310,7 +310,7 @@ function currency(val) {
                   </div>
 
                   <input v-model="formData.phone" type="tel" placeholder="Phone Number (optional)"
-                         class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm bg-white
+                          class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm bg-white
                                 focus:outline-none focus:ring-2 focus:border-transparent transition-shadow" />
                 </div>
               </Transition>
@@ -326,8 +326,8 @@ function currency(val) {
                 <button @click="checkout"
                         :disabled="submitting || !formData.name || !formData.email"
                         class="w-full py-3.5 rounded-xl font-bold text-sm text-white
-                               disabled:opacity-50 transition-all hover:opacity-90 active:scale-[0.98]
-                               shadow-md"
+                                disabled:opacity-50 transition-all hover:opacity-90 active:scale-[0.98]
+                                shadow-md"
                         style="background: linear-gradient(135deg, var(--color-primary, #1E3A5F) 0%, #2E86AB 100%);">
                   <span v-if="submitting" class="flex items-center justify-center gap-2">
                     <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">

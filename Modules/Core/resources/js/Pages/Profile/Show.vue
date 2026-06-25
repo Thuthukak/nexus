@@ -44,7 +44,7 @@ function updatePassword() {
 
     <div class="space-y-6">
       <!-- Avatar + roles -->
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6">
+      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-6">
         <div class="flex items-center gap-4">
           <div class="w-16 h-16 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
             <span class="text-2xl font-bold text-primary-text">
@@ -68,7 +68,7 @@ function updatePassword() {
       </div>
 
       <!-- Profile details -->
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6">
+      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-6">
         <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider mb-4">
           Personal Details
         </h2>
@@ -96,7 +96,7 @@ function updatePassword() {
       </div>
 
       <!-- Password -->
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6">
+      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-6">
         <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider mb-4">
           Change Password
         </h2>

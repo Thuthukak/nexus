@@ -114,7 +114,7 @@ const initials = computed(() =>
       <aside class="lg:w-64 flex-shrink-0">
 
         <!-- Avatar card -->
-        <div class="bg-surface rounded-2xl border border-gray-100 dark:border-gray-800 p-6 text-center mb-4">
+        <div class="bg-surface rounded-2xl border border-gray-200 dark:border-gray-800 p-6 text-center mb-4">
           <!-- Avatar -->
           <div class="w-20 h-20 rounded-2xl bg-primary flex items-center justify-center mx-auto mb-3">
             <span class="text-3xl font-bold text-primary-text">{{ initials }}</span>
@@ -133,7 +133,7 @@ const initials = computed(() =>
 
           <!-- Employee info if applicable -->
           <div v-if="employee"
-                class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800 text-left space-y-1.5">
+                class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-800 text-left space-y-1.5">
             <div v-if="employee.department" class="flex items-center gap-2 text-xs text-app-text/60">
               <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -158,7 +158,7 @@ const initials = computed(() =>
           </div>
 
           <!-- Account meta -->
-          <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800 text-left space-y-1">
+          <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-800 text-left space-y-1">
             <div class="flex items-center gap-2 text-xs text-app-text/40">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -177,7 +177,7 @@ const initials = computed(() =>
         </div>
 
         <!-- Navigation -->
-        <nav class="bg-surface rounded-2xl border border-gray-100 dark:border-gray-800 p-2 space-y-0.5">
+        <nav class="bg-surface rounded-2xl border border-gray-200 dark:border-gray-800 p-2 space-y-0.5">
           <button
             v-for="tab in tabs"
             :key="tab.key"
@@ -224,24 +224,24 @@ const initials = computed(() =>
           <!-- Stats row -->
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <div v-if="modules.hr && employee"
-                  class="bg-surface rounded-2xl border border-gray-100 dark:border-gray-800 px-4 py-4 text-center">
+                  class="bg-surface rounded-2xl border border-gray-200 dark:border-gray-800 px-4 py-4 text-center">
               <p class="text-2xl font-bold text-app-text">{{ payslips.length }}</p>
               <p class="text-xs text-app-text/50 mt-1">Payslips</p>
             </div>
             <div v-if="modules.hr && employee"
-                  class="bg-surface rounded-2xl border border-gray-100 dark:border-gray-800 px-4 py-4 text-center">
+                  class="bg-surface rounded-2xl border border-gray-200 dark:border-gray-800 px-4 py-4 text-center">
               <p class="text-2xl font-bold text-app-text">{{ documents.length }}</p>
               <p class="text-xs text-app-text/50 mt-1">Documents</p>
             </div>
             <div v-if="modules.lms"
-                  class="bg-surface rounded-2xl border border-gray-100 dark:border-gray-800 px-4 py-4 text-center">
+                  class="bg-surface rounded-2xl border border-gray-200 dark:border-gray-800 px-4 py-4 text-center">
               <p class="text-2xl font-bold text-green-600">
                 {{ enrollments.filter(e => e.status === 'completed').length }}
               </p>
               <p class="text-xs text-app-text/50 mt-1">Courses Done</p>
             </div>
             <div v-if="modules.events"
-                  class="bg-surface rounded-2xl border border-gray-100 dark:border-gray-800 px-4 py-4 text-center">
+                  class="bg-surface rounded-2xl border border-gray-200 dark:border-gray-800 px-4 py-4 text-center">
               <p class="text-2xl font-bold text-blue-600">{{ ticketOrders.length }}</p>
               <p class="text-xs text-app-text/50 mt-1">Ticket Orders</p>
             </div>
@@ -249,8 +249,8 @@ const initials = computed(() =>
 
           <!-- Active courses preview -->
           <div v-if="modules.lms && enrollments.length"
-                class="bg-surface rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden">
-            <div class="px-5 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
+                class="bg-surface rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+            <div class="px-5 py-4 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
               <h2 class="text-sm font-semibold text-app-text">My Learning</h2>
               <button 
                 @click="activeTab = 'learning'"
@@ -285,8 +285,8 @@ const initials = computed(() =>
           </div>
 
           <!-- Recent activity -->
-          <div class="bg-surface rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden">
-            <div class="px-5 py-4 border-b border-gray-100 dark:border-gray-800">
+          <div class="bg-surface rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+            <div class="px-5 py-4 border-b border-gray-200 dark:border-gray-800">
               <h2 class="text-sm font-semibold text-app-text">Recent Activity</h2>
             </div>
             <div v-if="!recentActivity.length"
@@ -312,7 +312,7 @@ const initials = computed(() =>
 
         <!-- ═══ PERSONAL DETAILS ════════════════════════════ -->
         <template v-if="activeTab === 'details'">
-          <div class="bg-surface rounded-2xl border border-gray-100 dark:border-gray-800 p-6">
+          <div class="bg-surface rounded-2xl border border-gray-200 dark:border-gray-800 p-6">
             <h2 class="text-base font-semibold text-app-text mb-5">Personal Details</h2>
             <form @submit.prevent="updateProfile" class="space-y-4 max-w-md">
               <Input 
@@ -342,7 +342,7 @@ const initials = computed(() =>
 
         <!-- ═══ SECURITY ════════════════════════════════════ -->
         <template v-if="activeTab === 'security'">
-          <div class="bg-surface rounded-2xl border border-gray-100 dark:border-gray-800 p-6">
+          <div class="bg-surface rounded-2xl border border-gray-200 dark:border-gray-800 p-6">
             <h2 class="text-base font-semibold text-app-text mb-1">Change Password</h2>
             <p class="text-sm text-app-text/50 mb-5">
               Choose a strong password with at least 8 characters,
@@ -379,7 +379,7 @@ const initials = computed(() =>
           </div>
 
           <!-- Account info card -->
-          <div class="bg-surface rounded-2xl border border-gray-100 dark:border-gray-800 p-6">
+          <div class="bg-surface rounded-2xl border border-gray-200 dark:border-gray-800 p-6">
             <h2 class="text-base font-semibold text-app-text mb-4">Account Info</h2>
             <dl class="space-y-3">
               <div class="flex items-center justify-between">
@@ -408,8 +408,8 @@ const initials = computed(() =>
 
         <!-- ═══ PAYSLIPS ════════════════════════════════════ -->
         <template v-if="activeTab === 'payslips'">
-          <div class="bg-surface rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden">
-            <div class="px-5 py-4 border-b border-gray-100 dark:border-gray-800">
+          <div class="bg-surface rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+            <div class="px-5 py-4 border-b border-gray-200 dark:border-gray-800">
               <h2 class="text-base font-semibold text-app-text">My Payslips</h2>
               <p class="text-sm text-app-text/50 mt-0.5">Your payslip history</p>
             </div>
@@ -424,7 +424,7 @@ const initials = computed(() =>
             </div>
             <div v-else>
               <table class="w-full text-sm">
-                <thead class="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-800">
+                <thead class="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-800">
                   <tr>
                     <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-app-text/50">Period</th>
                     <th class="px-5 py-3 text-right text-xs font-semibold uppercase tracking-wider text-app-text/50">Gross</th>
@@ -459,8 +459,8 @@ const initials = computed(() =>
 
         <!-- ═══ DOCUMENTS ═══════════════════════════════════ -->
         <template v-if="activeTab === 'documents'">
-          <div class="bg-surface rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden">
-            <div class="px-5 py-4 border-b border-gray-100 dark:border-gray-800">
+          <div class="bg-surface rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+            <div class="px-5 py-4 border-b border-gray-200 dark:border-gray-800">
               <h2 class="text-base font-semibold text-app-text">My Documents</h2>
               <p class="text-sm text-app-text/50 mt-0.5">Documents on file for you</p>
             </div>
@@ -519,8 +519,8 @@ const initials = computed(() =>
 
         <!-- ═══ LEAVE ════════════════════════════════════════ -->
         <template v-if="activeTab === 'leave'">
-          <div class="bg-surface rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden">
-            <div class="px-5 py-4 border-b border-gray-100 dark:border-gray-800">
+          <div class="bg-surface rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+            <div class="px-5 py-4 border-b border-gray-200 dark:border-gray-800">
               <h2 class="text-base font-semibold text-app-text">Leave History</h2>
             </div>
             <div v-if="!leaveHistory.length"
@@ -529,7 +529,7 @@ const initials = computed(() =>
             </div>
             <div v-else>
               <table class="w-full text-sm">
-                <thead class="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-800">
+                <thead class="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-800">
                   <tr>
                     <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-app-text/50">Type</th>
                     <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-app-text/50">From</th>
@@ -561,13 +561,13 @@ const initials = computed(() =>
         <!-- ═══ LEARNING ═════════════════════════════════════ -->
         <template v-if="activeTab === 'learning'">
           <div v-if="!enrollments.length"
-                class="bg-surface rounded-2xl border border-gray-100 dark:border-gray-800
+                class="bg-surface rounded-2xl border border-gray-200 dark:border-gray-800
                       px-5 py-12 text-center text-sm text-app-text/40">
             You are not enrolled in any courses.
           </div>
           <div v-else class="space-y-4">
             <div v-for="e in enrollments" :key="e.id"
-                  class="bg-surface rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden">
+                  class="bg-surface rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
               <div class="flex items-stretch gap-0">
                 <!-- Thumbnail -->
                 <div class="w-24 flex-shrink-0 bg-gradient-to-br from-primary/30 to-primary/10 relative overflow-hidden">
@@ -627,13 +627,13 @@ const initials = computed(() =>
         <!-- ═══ TICKETS ══════════════════════════════════════ -->
         <template v-if="activeTab === 'tickets'">
           <div v-if="!ticketOrders.length"
-                class="bg-surface rounded-2xl border border-gray-100 dark:border-gray-800
+                class="bg-surface rounded-2xl border border-gray-200 dark:border-gray-800
                       px-5 py-12 text-center text-sm text-app-text/40">
             No ticket orders yet.
           </div>
           <div v-else class="space-y-4">
             <div v-for="order in ticketOrders" :key="order.id"
-                  class="bg-surface rounded-2xl border border-gray-100 dark:border-gray-800 p-5">
+                  class="bg-surface rounded-2xl border border-gray-200 dark:border-gray-800 p-5">
               <div class="flex items-start justify-between gap-4 mb-3">
                 <div>
                   <p class="font-semibold text-app-text">{{ order.event_title }}</p>
@@ -647,7 +647,7 @@ const initials = computed(() =>
                   <p class="text-xs text-app-text/40 mt-0.5">{{ order.tickets_count }} ticket(s)</p>
                 </div>
               </div>
-              <div class="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-gray-800">
+              <div class="flex items-center justify-between pt-3 border-t border-gray-200 dark:border-gray-800">
                 <span class="text-xs font-mono text-app-text/50">{{ order.reference }}</span>
                 <div class="flex items-center gap-2">
                   <span class="text-xs text-app-text/40">Paid {{ order.paid_at }}</span>

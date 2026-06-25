@@ -32,12 +32,12 @@ function currency(val) {
 
     <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
       <div v-if="!invoices.length"
-           class="px-6 py-16 text-center text-gray-400">
+            class="px-6 py-16 text-center text-gray-400">
         No invoices yet.
       </div>
       <div v-else class="overflow-x-auto">
         <table class="w-full text-sm">
-          <thead class="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+          <thead class="dark:bg-gray-800 border-b border-gray-200 bg-primary text-white dark:border-gray-700">
             <tr>
               <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-400">Invoice</th>
               <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-400">Issue Date</th>
@@ -53,7 +53,7 @@ function currency(val) {
                 class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
               <td class="px-5 py-3.5">
                 <a :href="`/portal/invoices/${inv.id}`"
-                   class="font-semibold text-primary hover:underline">
+                    class="font-semibold text-primary hover:underline">
                   {{ inv.reference }}
                 </a>
               </td>
@@ -75,13 +75,13 @@ function currency(val) {
               <td class="px-5 py-3.5 text-right">
                 <div class="flex items-center justify-end gap-2">
                   <a v-if="inv.payment_url && inv.balance_due > 0"
-                     :href="inv.payment_url"
-                     class="text-xs font-semibold px-3 py-1.5 rounded-lg text-white"
-                     style="background-color: var(--color-primary);">
+                      :href="inv.payment_url"
+                      class="text-xs font-semibold px-3 py-1.5 rounded-lg text-white"
+                      style="background-color: var(--color-primary);">
                     Pay Now
                   </a>
                   <a :href="`/portal/invoices/${inv.id}`"
-                     class="text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+                      class="text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
                     View
                   </a>
                 </div>

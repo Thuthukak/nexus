@@ -179,7 +179,7 @@ function submit() {
     <form @submit.prevent="submit" class="space-y-6">
 
       <!-- ── Invoice Details ──────────────────────────────────── -->
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6">
+      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-6">
         <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider mb-4">Invoice Details</h2>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -211,7 +211,7 @@ function submit() {
           <Transition enter-active-class="transition-all duration-200 ease-out"
                       enter-from-class="opacity-0 -translate-y-2" enter-to-class="opacity-100 translate-y-0">
             <div v-if="showNewCustomer"
-                 class="sm:col-span-2 p-4 rounded-xl border-2 border-primary/20 bg-primary/5 dark:bg-primary/10 p-5">
+                  class="sm:col-span-2 p-4 rounded-xl border-2 border-primary/20 bg-primary/5 dark:bg-primary/10 p-5">
               <div class="flex items-center justify-between mb-3">
                 <p class="text-sm font-semibold text-primary">New Customer</p>
                 <button type="button" @click="showNewCustomer = false"
@@ -221,31 +221,31 @@ function submit() {
                 <div class="sm:col-span-2 flex flex-col gap-1">
                   <label class="text-sm font-medium text-app-text">Company Name <span class="text-red-500">*</span></label>
                   <input v-model="newCustomer.company_name" type="text" placeholder="Acme Corporation"
-                         class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
-                         :class="customerErrors.company_name ? 'border-red-400' : ''" />
+                          class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                          :class="customerErrors.company_name ? 'border-red-400' : ''" />
                   <p v-if="customerErrors.company_name" class="text-xs text-red-500">{{ customerErrors.company_name?.[0] }}</p>
                 </div>
                 <div class="flex flex-col gap-1">
                   <label class="text-sm font-medium text-app-text">Contact Person</label>
                   <input v-model="newCustomer.contact_name" type="text" placeholder="John Smith"
-                         class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
+                          class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
                 </div>
                 <div class="flex flex-col gap-1">
                   <label class="text-sm font-medium text-app-text">Email</label>
                   <input v-model="newCustomer.email" type="email"
-                         class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
-                         :class="customerErrors.email ? 'border-red-400' : ''" />
+                          class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                          :class="customerErrors.email ? 'border-red-400' : ''" />
                   <p v-if="customerErrors.email" class="text-xs text-red-500">{{ customerErrors.email?.[0] }}</p>
                 </div>
                 <div class="flex flex-col gap-1">
                   <label class="text-sm font-medium text-app-text">Phone</label>
                   <input v-model="newCustomer.phone" type="text"
-                         class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
+                          class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
                 </div>
                 <div class="flex flex-col gap-1">
                   <label class="text-sm font-medium text-app-text">VAT Number</label>
                   <input v-model="newCustomer.vat_number" type="text"
-                         class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
+                          class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
                 </div>
               </div>
               <div class="mt-4 flex justify-end gap-2">
@@ -260,7 +260,7 @@ function submit() {
 
           <!-- Issue date -->
           <Input v-model="form.issue_date" label="Issue Date" type="date" required
-                 :error="form.errors.issue_date" />
+                  :error="form.errors.issue_date" />
 
           <!-- Net terms + due date -->
           <div class="flex flex-col gap-1">
@@ -274,8 +274,8 @@ function submit() {
                 </option>
               </select>
               <input v-model="form.due_date" type="date"
-                     class="w-36 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
-                     :class="form.errors.due_date ? 'border-red-400' : ''" />
+                      class="w-36 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      :class="form.errors.due_date ? 'border-red-400' : ''" />
             </div>
             <p v-if="form.errors.due_date" class="text-xs text-red-500">{{ form.errors.due_date }}</p>
           </div>
@@ -283,8 +283,8 @@ function submit() {
       </div>
 
       <!-- ── Line Items ─────────────────────────────────────── -->
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-800">
+      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-800">
           <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider">Line Items</h2>
         </div>
 
@@ -303,20 +303,20 @@ function submit() {
                     <option value="__new__">+ New…</option>
                   </select>
                   <input v-model="line.description" type="text" placeholder="Description"
-                         class="flex-1 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
+                          class="flex-1 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
                 </div>
               </div>
               <!-- Qty -->
               <div class="col-span-3 sm:col-span-2">
                 <label v-if="i === 0" class="text-sm font-medium text-app-text block mb-1">Qty</label>
                 <input v-model.number="line.qty" type="number" min="0.01" step="0.01"
-                       class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 text-right" />
+                        class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 text-right" />
               </div>
               <!-- Unit price -->
               <div class="col-span-4 sm:col-span-2">
                 <label v-if="i === 0" class="text-sm font-medium text-app-text block mb-1">Unit Price</label>
                 <input v-model.number="line.unit_price" type="number" min="0" step="0.01"
-                       class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 text-right" />
+                        class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 text-right" />
               </div>
               <!-- Tax -->
               <div class="col-span-4 sm:col-span-2">
@@ -344,7 +344,7 @@ function submit() {
             <Transition enter-active-class="transition-all duration-200 ease-out"
                         enter-from-class="opacity-0 -translate-y-1" enter-to-class="opacity-100 translate-y-0">
               <div v-if="showNewProduct.index === i"
-                   class="ml-4 rounded-xl border-2 border-accent/30 bg-accent/5 p-4">
+                    class="ml-4 rounded-xl border-2 border-accent/30 bg-accent/5 p-4">
                 <div class="flex items-center justify-between mb-3">
                   <p class="text-sm font-semibold text-app-text">New Product / Service</p>
                   <button type="button" @click="showNewProduct = { index: -1 }"
@@ -354,18 +354,18 @@ function submit() {
                   <div class="col-span-2 flex flex-col gap-1">
                     <label class="text-sm font-medium text-app-text">Name <span class="text-red-500">*</span></label>
                     <input v-model="newProduct.name" type="text" placeholder="e.g. Consulting (hourly)"
-                           class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
-                           :class="productErrors.name ? 'border-red-400' : ''" />
+                            class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                            :class="productErrors.name ? 'border-red-400' : ''" />
                   </div>
                   <div class="flex flex-col gap-1">
                     <label class="text-sm font-medium text-app-text">Default Price</label>
                     <input v-model.number="newProduct.default_price" type="number" min="0" step="0.01"
-                           class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
+                            class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
                   </div>
                   <div class="flex flex-col gap-1">
                     <label class="text-sm font-medium text-app-text">Unit</label>
                     <input v-model="newProduct.unit" type="text" placeholder="hour, item, day…"
-                           class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
+                            class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
                   </div>
                 </div>
                 <div class="mt-3 flex justify-end gap-2">
@@ -389,7 +389,7 @@ function submit() {
         </div>
 
         <!-- Totals -->
-        <div class="border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/30">
+        <div class="border-t border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/30">
           <div class="flex justify-end px-6 py-4">
             <div class="w-64 space-y-2">
               <div class="flex justify-between text-sm text-app-text/60">
@@ -407,7 +407,7 @@ function submit() {
       </div>
 
       <!-- ── Deposit ─────────────────────────────────────────── -->
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6">
+      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-6">
         <div class="flex items-center justify-between mb-4">
           <div>
             <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider">Deposit Required?</h2>
@@ -463,14 +463,14 @@ function submit() {
                   <span v-if="form.deposit_type === 'fixed'"
                         class="text-sm font-medium text-app-text/50 flex-shrink-0">R</span>
                   <input v-if="form.deposit_type === 'percentage'"
-                         v-model.number="form.deposit_percentage"
-                         type="number" min="1" max="99" step="1"
-                         class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 text-center" />
+                        v-model.number="form.deposit_percentage"
+                        type="number" min="1" max="99" step="1"
+                        class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 text-center" />
                   <input v-else
-                         v-model.number="form.deposit_amount"
-                         type="number" min="0" step="0.01"
-                         :max="grandTotal"
-                         class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 text-right" />
+                        v-model.number="form.deposit_amount"
+                        type="number" min="0" step="0.01"
+                        :max="grandTotal"
+                        class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 text-right" />
                   <span v-if="form.deposit_type === 'percentage'"
                         class="text-sm font-medium text-app-text/50 flex-shrink-0">%</span>
                 </div>
@@ -497,7 +497,7 @@ function submit() {
       </div>
 
       <!-- ── Notes ───────────────────────────────────────────── -->
-      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 p-6">
+      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-6">
         <div class="flex flex-col gap-1">
           <label class="text-sm font-medium text-app-text">Notes</label>
           <textarea v-model="form.notes" rows="3"
@@ -509,7 +509,7 @@ function submit() {
       <!-- ── Actions ─────────────────────────────────────────── -->
       <div class="flex items-center justify-between">
         <a href="/financial/invoices"
-           class="px-4 py-2 text-sm text-app-text/60 hover:text-app-text">Cancel</a>
+            class="px-4 py-2 text-sm text-app-text/60 hover:text-app-text">Cancel</a>
         <div class="flex items-center gap-3">
           <span class="text-sm text-app-text/40">
             Total: <strong class="text-app-text">{{ currency(grandTotal) }}</strong>
