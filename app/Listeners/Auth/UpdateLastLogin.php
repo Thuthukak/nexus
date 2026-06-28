@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Listeners;
+namespace App\Listeners\Auth;
 
 use Illuminate\Auth\Events\Login;
 

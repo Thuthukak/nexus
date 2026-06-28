@@ -72,15 +72,27 @@ class Invoice extends Model
 
     public function recalculate(): void
     {
+        // line_total is always qty × unit_price (the gross/entered price).
+        // For inclusive tax: tax is extracted FROM line_total, total = subtotal.
+        // For exclusive tax: tax is added ON TOP,           total = subtotal + tax.
         $subtotal = $this->lines->sum('line_total');
-        $taxTotal = $this->lines->sum(function ($line) {
-            return $line->line_total * ($line->tax_rate / 100);
+
+        $taxTotal = $this->lines->sum(fn ($line) => $line->taxAmount());
+
+        // For a fully-inclusive invoice, total = subtotal (tax is already inside).
+        // For exclusive, total = subtotal + tax.
+        // Mixed: we sum each line's final total individually.
+        $total = $this->lines->sum(function ($line) {
+            if ($line->is_tax_inclusive) {
+                return (float) $line->line_total; // tax already inside
+            }
+            return (float) $line->line_total + $line->taxAmount();
         });
 
         $this->update([
             'subtotal'   => $subtotal,
             'tax_total'  => $taxTotal,
-            'total'      => $subtotal + $taxTotal,
+            'total'      => $total,   // inclusive: stays at subtotal; exclusive: subtotal + tax
             'paid_total' => $this->paid_total ?? 0,
         ]);
     }

@@ -300,12 +300,14 @@ function openRecurring() {
 
     <!-- ── Summary bar ─────────────────────────────────────── -->
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 px-4 py-3">
-        <p class="text-xs text-app-text/50 mb-1">Subtotal</p>
+      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 px-4 py-3">
+        <p class="text-xs text-app-text/50 mb-1">
+          {{ invoice.has_inclusive_tax ? 'Total (incl. VAT)' : 'Subtotal (excl. VAT)' }}
+        </p>
         <p class="text-sm font-semibold text-app-text">{{ currency(invoice.subtotal) }}</p>
       </div>
-      <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 px-4 py-3">
-        <p class="text-xs text-app-text/50 mb-1">Tax</p>
+      <div class="bg-surface rounded-xl border border-gray-100 dark:border-gray-800 px-4 py-3">
+        <p class="text-xs text-app-text/50 mb-1">{{ invoice.has_inclusive_tax ? "VAT (incl. in price)" : "VAT" }}</p>
         <p class="text-sm font-semibold text-app-text">{{ currency(invoice.tax_total) }}</p>
       </div>
       <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 px-4 py-3">
@@ -429,7 +431,7 @@ function openRecurring() {
                 <td class="px-4 py-3 text-app-text">{{ line.description }}</td>
                 <td class="px-4 py-3 text-right text-app-text/70">{{ line.qty }}</td>
                 <td class="px-4 py-3 text-right text-app-text/70">{{ currency(line.unit_price) }}</td>
-                <td class="px-4 py-3 text-right text-app-text/70">{{ line.tax_rate }}%</td>
+                <td class="px-4 py-3 text-right text-app-text/70">{{ line.tax_rate }}%{{ line.is_tax_inclusive ? ' incl.' : '' }}</td>
                 <td class="px-4 py-3 text-right font-medium text-app-text">{{ currency(line.line_total) }}</td>
               </tr>
             </tbody>

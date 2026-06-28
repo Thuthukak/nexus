@@ -364,7 +364,7 @@
         <td class="description">{{ $line->description }}</td>
         <td class="text-right">{{ rtrim(rtrim(number_format($line->qty, 2), '0'), '.') }}</td>
         <td class="text-right">{{ $currency }} {{ number_format($line->unit_price, 2) }}</td>
-        <td class="text-right">{{ $line->tax_rate }}%</td>
+        <td class="text-right">{{ $line->tax_rate }}%{{ $line->is_tax_inclusive ? ' incl.' : '' }}</td>
         <td class="text-right">{{ $currency }} {{ number_format($line->line_total, 2) }}</td>
       </tr>
       @endforeach
@@ -374,18 +374,55 @@
   <!-- Totals -->
   <div class="totals-section">
     <table class="totals-table">
-      <tr>
-        <td>Subtotal</td>
-        <td>{{ $currency }} {{ number_format($invoice->subtotal, 2) }}</td>
-      </tr>
-      <tr>
-        <td>Tax</td>
-        <td>{{ $currency }} {{ number_format($invoice->tax_total, 2) }}</td>
-      </tr>
-      <tr class="total-row">
-        <td>Total</td>
-        <td>{{ $currency }} {{ number_format($invoice->total, 2) }}</td>
-      </tr>
+      @php
+        $allInclusive = $invoice->lines->isNotEmpty()
+            && $invoice->lines->every(fn($l) => $l->is_tax_inclusive);
+        $allExclusive = $invoice->lines->every(fn($l) => ! $l->is_tax_inclusive);
+      @endphp
+
+      @if($allInclusive)
+        {{-- SA standard: price includes VAT, show total first then VAT breakdown --}}
+        <tr class="total-row">
+          <td>Total (incl. VAT)</td>
+          <td>{{ $currency }} {{ number_format($invoice->total, 2) }}</td>
+        </tr>
+        <tr>
+          <td>VAT {{ $invoice->lines->first()?->tax_rate ?? 0 }}% (incl.)</td>
+          <td>{{ $currency }} {{ number_format($invoice->tax_total, 2) }}</td>
+        </tr>
+        <tr>
+          <td style="color:#6b7280;">Net (excl. VAT)</td>
+          <td style="color:#6b7280;">{{ $currency }} {{ number_format($invoice->total - $invoice->tax_total, 2) }}</td>
+        </tr>
+      @elseif($allExclusive)
+        {{-- Exclusive: net + tax = total --}}
+        <tr>
+          <td>Subtotal (excl. VAT)</td>
+          <td>{{ $currency }} {{ number_format($invoice->subtotal, 2) }}</td>
+        </tr>
+        <tr>
+          <td>VAT</td>
+          <td>{{ $currency }} {{ number_format($invoice->tax_total, 2) }}</td>
+        </tr>
+        <tr class="total-row">
+          <td>Total</td>
+          <td>{{ $currency }} {{ number_format($invoice->total, 2) }}</td>
+        </tr>
+      @else
+        {{-- Mixed: show all three rows --}}
+        <tr>
+          <td>Subtotal</td>
+          <td>{{ $currency }} {{ number_format($invoice->subtotal, 2) }}</td>
+        </tr>
+        <tr>
+          <td>Tax</td>
+          <td>{{ $currency }} {{ number_format($invoice->tax_total, 2) }}</td>
+        </tr>
+        <tr class="total-row">
+          <td>Total</td>
+          <td>{{ $currency }} {{ number_format($invoice->total, 2) }}</td>
+        </tr>
+      @endif
       @if($invoice->paid_total > 0)
       <tr class="paid-row">
         <td>Paid</td>

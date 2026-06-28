@@ -88,7 +88,10 @@ async function createProduct(lineIndex) {
 function applyProduct(lineIndex, product) {
   form.lines[lineIndex].description = product.name
   form.lines[lineIndex].unit_price  = Number(product.default_price)
-  form.lines[lineIndex].tax_rate    = Number(product.default_tax_rate) || defaultTaxRate.value
+  form.lines[lineIndex].tax_rate         = Number(product.default_tax_rate) || defaultTaxRate.value
+  // Find the matching tax rate object to get is_tax_inclusive
+  const matchedRate = props.taxRates?.find(r => Number(r.rate) === form.lines[lineIndex].tax_rate)
+  form.lines[lineIndex].is_tax_inclusive = matchedRate?.is_inclusive ?? defaultTaxInclusive.value
 }
 
 function onProductSelect(lineIndex, productId) {
@@ -104,7 +107,8 @@ function onProductSelect(lineIndex, productId) {
 
 // ─── Form ─────────────────────────────────────────────────────
 const urlParams      = new URLSearchParams(window.location.search)
-const defaultTaxRate = computed(() => Number(props.taxRates.find(r => r.is_default)?.rate ?? 0))
+const defaultTaxRate      = computed(() => Number(props.taxRates.find(r => r.is_default)?.rate ?? 0))
+const defaultTaxInclusive = computed(() => props.taxRates.find(r => r.is_default)?.is_inclusive ?? true)
 
 const form = useForm({
   customer_id:        urlParams.get('customer_id') ?? '',
@@ -117,7 +121,7 @@ const form = useForm({
   deposit_percentage: 50,
   deposit_amount:     0,
   lines: [
-    { _productId: '', description: '', qty: 1, unit_price: 0, tax_rate: defaultTaxRate.value },
+    { _productId: '', description: '', qty: 1, unit_price: 0, tax_rate: defaultTaxRate.value, is_tax_inclusive: defaultTaxInclusive.value },
   ],
 })
 
@@ -126,8 +130,23 @@ applyNetTerm('net_30')
 
 // Keep deposit_amount in sync with live total when using percentage
 const subtotal    = computed(() => form.lines.reduce((s, l) => s + l.qty * l.unit_price, 0))
-const taxTotal    = computed(() => form.lines.reduce((s, l) => s + l.qty * l.unit_price * l.tax_rate / 100, 0))
-const grandTotal  = computed(() => subtotal.value + taxTotal.value)
+const taxTotal = computed(() => form.lines.reduce((s, l) => {
+  const lineTotal = l.qty * l.unit_price
+  if (l.is_tax_inclusive) {
+    // Extract VAT from inclusive price
+    return s + (lineTotal - lineTotal / (1 + l.tax_rate / 100))
+  }
+  // Add VAT on top
+  return s + lineTotal * l.tax_rate / 100
+}, 0))
+
+const grandTotal = computed(() => form.lines.reduce((s, l) => {
+  const lineTotal = l.qty * l.unit_price
+  if (l.is_tax_inclusive) {
+    return s + lineTotal // tax already inside
+  }
+  return s + lineTotal + lineTotal * l.tax_rate / 100
+}, 0))
 
 const depositPreview = computed(() => {
   if (! form.deposit_required) return 0
@@ -149,7 +168,7 @@ watch(() => form.deposit_type, (type) => {
 })
 
 function addLine() {
-  form.lines.push({ _productId: '', description: '', qty: 1, unit_price: 0, tax_rate: defaultTaxRate.value })
+  form.lines.push({ _productId: '', description: '', qty: 1, unit_price: 0, tax_rate: defaultTaxRate.value, is_tax_inclusive: defaultTaxInclusive.value })
 }
 
 function removeLine(i) {

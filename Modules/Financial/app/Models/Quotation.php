@@ -75,14 +75,18 @@ class Quotation extends Model
     public function recalculate(): void
     {
         $subtotal = $this->lines->sum('line_total');
-        $taxTotal = $this->lines->sum(function ($line) {
-            return $line->line_total * ($line->tax_rate / 100);
+        $taxTotal = $this->lines->sum(fn ($line) => $line->taxAmount());
+        $total    = $this->lines->sum(function ($line) {
+            if ($line->is_tax_inclusive) {
+                return (float) $line->line_total;
+            }
+            return (float) $line->line_total + $line->taxAmount();
         });
 
         $this->update([
             'subtotal'  => $subtotal,
             'tax_total' => $taxTotal,
-            'total'     => $subtotal + $taxTotal,
+            'total'     => $total,
         ]);
     }
 

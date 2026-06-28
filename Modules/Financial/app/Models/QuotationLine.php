@@ -15,7 +15,7 @@ class QuotationLine extends Model
     protected $table    = 'fin_quotation_lines';
     protected $fillable = [
         'quotation_id', 'description', 'qty',
-        'unit_price', 'tax_rate', 'line_total', 'sort_order',
+        'unit_price', 'tax_rate', 'is_tax_inclusive', 'line_total', 'sort_order',
     ];
 
     protected function casts(): array
@@ -24,12 +24,33 @@ class QuotationLine extends Model
             'qty'        => 'decimal:2',
             'unit_price' => 'decimal:2',
             'tax_rate'   => 'decimal:2',
-            'line_total' => 'decimal:2',
+            'line_total'       => 'decimal:2',
+            'is_tax_inclusive' => 'boolean',
         ];
     }
 
     public function quotation(): BelongsTo
     {
         return $this->belongsTo(Quotation::class, 'quotation_id');
+    }
+    public function taxAmount(): float
+    {
+        if ($this->tax_rate == 0) return 0;
+
+        $total = (float) $this->line_total;
+
+        if ($this->is_tax_inclusive) {
+            return round($total - ($total / (1 + (float) $this->tax_rate / 100)), 2);
+        }
+
+        return round($total * ((float) $this->tax_rate / 100), 2);
+    }
+
+    public function netAmount(): float
+    {
+        if ($this->is_tax_inclusive) {
+            return round((float) $this->line_total - $this->taxAmount(), 2);
+        }
+        return (float) $this->line_total;
     }
 }

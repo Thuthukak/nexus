@@ -13,15 +13,16 @@ class TaxRate extends Model
     use HasUuids;
 
     protected $table    = 'fin_tax_rates';
-    protected $fillable = ['name', 'rate', 'is_compound', 'is_default', 'is_active'];
+    protected $fillable = ['name', 'rate', 'is_compound', 'is_default', 'is_active', 'is_inclusive'];
 
     protected function casts(): array
     {
         return [
             'rate'        => 'decimal:2',
-            'is_compound' => 'boolean',
-            'is_default'  => 'boolean',
-            'is_active'   => 'boolean',
+            'is_compound'  => 'boolean',
+            'is_default'   => 'boolean',
+            'is_active'    => 'boolean',
+            'is_inclusive' => 'boolean',
         ];
     }
 

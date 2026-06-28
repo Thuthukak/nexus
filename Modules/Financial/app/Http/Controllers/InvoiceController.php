@@ -290,6 +290,7 @@ class InvoiceController extends Controller
             ]),
             'subtotal'    => $invoice->subtotal,
             'tax_total'   => $invoice->tax_total,
+            'has_inclusive_tax'  => $invoice->lines->isNotEmpty() && $invoice->lines->every(fn($l) => $l->is_tax_inclusive),
             'total'       => $invoice->total,
             'paid_total'  => $invoice->paid_total,
             'balance_due' => $invoice->balance_due,

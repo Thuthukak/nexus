@@ -23,7 +23,8 @@ class TaxRateController extends Controller
         $validated = $request->validate([
             'name'        => 'required|string|max:100',
             'rate'        => 'required|numeric|min:0|max:100',
-            'is_compound' => 'boolean',
+            'is_inclusive' => 'boolean',
+            'is_compound'  => 'boolean',
             'is_default'  => 'boolean',
         ]);
 
@@ -44,7 +45,8 @@ class TaxRateController extends Controller
         $validated = $request->validate([
             'name'        => 'required|string|max:100',
             'rate'        => 'required|numeric|min:0|max:100',
-            'is_compound' => 'boolean',
+            'is_inclusive' => 'boolean',
+            'is_compound'  => 'boolean',
             'is_default'  => 'boolean',
             'is_active'   => 'boolean',
         ]);

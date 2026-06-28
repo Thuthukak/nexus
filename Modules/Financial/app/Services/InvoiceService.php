@@ -173,15 +173,20 @@ class InvoiceService
         $invoice->lines()->delete();
 
         foreach ($lines as $i => $line) {
-            $lineTotal = round($line['qty'] * $line['unit_price'], 2);
+            // line_total is always qty × unit_price (the entered price).
+            // Whether that price is tax-inclusive or exclusive is tracked
+            // separately — the calculation is done in InvoiceLine::taxAmount().
+            $lineTotal = round((float) $line['qty'] * (float) $line['unit_price'], 2);
+
             InvoiceLine::create([
-                'invoice_id'  => $invoice->id,
-                'description' => $line['description'],
-                'qty'         => $line['qty'],
-                'unit_price'  => $line['unit_price'],
-                'tax_rate'    => $line['tax_rate'] ?? 0,
-                'line_total'  => $lineTotal,
-                'sort_order'  => $i,
+                'invoice_id'      => $invoice->id,
+                'description'     => $line['description'],
+                'qty'             => $line['qty'],
+                'unit_price'      => $line['unit_price'],
+                'tax_rate'        => $line['tax_rate'] ?? 0,
+                'is_tax_inclusive'=> $line['is_tax_inclusive'] ?? true,
+                'line_total'      => $lineTotal,
+                'sort_order'      => $i,
             ]);
         }
     }
