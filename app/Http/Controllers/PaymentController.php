@@ -77,34 +77,94 @@ class PaymentController extends Controller
     {
         $invoice = $this->findByToken($token);
 
+        // ── Paystack redirect verification ────────────────────
+        // Paystack appends ?reference=xxx to the callback URL.
+        // We verify the transaction immediately here rather than
+        // waiting for the webhook, giving the user instant feedback.
+        $paystackRef = $request->query('reference') ?? $request->query('trxref');
+
+        if ($paystackRef && $this->gatewayManager->gatewayName() === 'paystack') {
+            $this->verifyPaystackReturn($invoice, $paystackRef);
+            $invoice->refresh();
+        }
+
+        // ── Render appropriate page ───────────────────────────
+        $appProps = [
+            'name'     => Settings::group('general')->get('app_name', config('app.name')),
+            'logo_url' => Settings::group('general')->get('logo_url'),
+        ];
+
         if ($invoice->status === 'paid') {
             return inertia('Payment/Success', [
                 'invoice' => $this->formatInvoice($invoice),
-                'app'     => [
-                    'name'     => Settings::group('general')->get('app_name', config('app.name')),
-                    'logo_url' => Settings::group('general')->get('logo_url'),
-                ],
+                'app'     => $appProps,
             ]);
         }
 
         if ($invoice->status === 'cancelled') {
             return inertia('Payment/Cancelled', [
                 'invoice' => $this->formatInvoice($invoice),
-                'app'     => [
-                    'name'     => Settings::group('general')->get('app_name', config('app.name')),
-                    'logo_url' => Settings::group('general')->get('logo_url'),
-                ],
+                'app'     => $appProps,
             ]);
         }
 
-        // ITN hasn't arrived yet — show processing page
+        // PayFast: ITN hasn't arrived yet — show processing page.
+        // Paystack: if we reach here, verification didn't succeed yet.
         return inertia('Payment/Processing', [
             'invoice' => $this->formatInvoice($invoice),
-            'app'     => [
-                'name'     => Settings::group('general')->get('app_name', config('app.name')),
-                'logo_url' => Settings::group('general')->get('logo_url'),
-            ],
+            'app'     => $appProps,
         ]);
+    }
+
+    /**
+     * Verify a Paystack transaction immediately on redirect return.
+     * This gives instant feedback vs waiting for the webhook.
+     * The webhook will also fire — processSuccessfulPayment() in
+     * WebhookController guards against double-processing.
+     */
+    private function verifyPaystackReturn(
+        \Modules\Financial\app\Models\Invoice $invoice,
+        string $reference,
+    ): void {
+        if ($invoice->status === 'paid') return; // already handled
+
+        $gateway = $this->gatewayManager->active();
+
+        if (! $gateway instanceof \App\PaymentGateways\PaystackGateway) return;
+
+        $result = $gateway->verifyTransaction($reference);
+
+        if (! $result) {
+            \Illuminate\Support\Facades\Log::warning('Paystack return: verification failed', [
+                'reference' => $reference,
+                'invoice'   => $invoice->reference,
+            ]);
+            return;
+        }
+
+        // Verify the amount matches what we expect
+        $expected = $invoice->amountDueNow();
+        if (abs($result['amount'] - $expected) > 0.05) {
+            \Illuminate\Support\Facades\Log::error('Paystack return: amount mismatch', [
+                'expected'  => $expected,
+                'received'  => $result['amount'],
+                'reference' => $reference,
+            ]);
+            return;
+        }
+
+        $this->invoiceService->recordPayment($invoice, [
+            'amount'    => $result['amount'],
+            'method'    => 'paystack',
+            'reference' => $reference,
+            'notes'     => 'Online payment via Paystack',
+            'paid_at'   => now()->format('Y-m-d H:i:s'),
+        ]);
+
+        $invoice->refresh();
+        if ($invoice->status === 'paid') {
+            \App\Jobs\SendReceiptJob::dispatch($invoice->id);
+        }
     }
 
     public function handleCancel(string $token)

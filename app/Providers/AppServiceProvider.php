@@ -29,7 +29,7 @@ use App\Listeners\Financial\NotifyInvoiceOverdue;
 use App\Listeners\HR\NotifyLeaveSubmitted;
 use App\Listeners\HR\NotifyLeaveDecision;
 use App\Listeners\Bookings\NotifyBookingStatusChange;
-use App\Listeners\UpdateLastLogin;
+use App\Listeners\Auth\UpdateLastLogin;
 use App\Listeners\Events\HandleEventOrderPaid;
 
 class AppServiceProvider extends ServiceProvider
@@ -55,9 +55,9 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        // if (app()->environment('local')) {
-        //     \Illuminate\Support\Facades\URL::forceScheme('https');
-        // }
+        if (app()->environment('local')) {
+            \Illuminate\Support\Facades\URL::forceScheme('https');
+        }
         
         $this->app->booting(function () {
             $loader = \Illuminate\Foundation\AliasLoader::getInstance();

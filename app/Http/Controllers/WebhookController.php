@@ -102,9 +102,11 @@ class WebhookController extends Controller
             return;
         }
 
-        // Guard against duplicate ITNs — PayFast can send the same ITN multiple times
+        // Guard against duplicate processing.
+        // Paystack: redirect verify + webhook can both fire. PayFast: ITN retries.
+        // In all cases the second call is a safe no-op.
         if ($invoice->status === 'paid') {
-            Log::info("Webhook: invoice {$invoice->reference} already paid, skipping duplicate ITN");
+            Log::info("Webhook: invoice {$invoice->reference} already paid — duplicate ignored", ['method' => $method]);
             return;
         }
 

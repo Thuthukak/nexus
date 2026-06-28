@@ -8,6 +8,8 @@ import Checkbox    from '@shared/components/buttons/Checkbox.vue'
 
 defineOptions({ layout: AppLayout })
 
+const appUrl = window.location.origin
+
 const props = defineProps({ settings: { type: Object, required: true } })
 
 const form = useForm({ ...props.settings })
@@ -15,6 +17,7 @@ const form = useForm({ ...props.settings })
 const isPayfast  = computed(() => form.gateway === 'payfast')
 const isPaystack = computed(() => form.gateway === 'paystack')
 const isNone     = computed(() => form.gateway === 'none')
+const webhookUrl  = window.location.origin + '/webhooks/paystack'
 
 function submit() {
   form.patch('/financial/settings/payments')
@@ -96,9 +99,27 @@ function submit() {
           <p v-if="form.test_mode" class="text-xs text-yellow-600 bg-yellow-50 dark:bg-yellow-900/20 px-3 py-2 rounded-lg">
             Test mode: use your Paystack test keys (prefix: pk_test_ / sk_test_)
           </p>
+
+          <!-- Webhook URL helper -->
+          <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 rounded-lg px-4 py-3">
+            <p class="text-xs font-semibold text-blue-800 dark:text-blue-300 mb-1">Webhook URL</p>
+            <p class="text-xs text-blue-700 dark:text-blue-400 mb-2">
+              Register this URL in your Paystack Dashboard → Settings → API Keys &amp; Webhooks:
+            </p>
+            <code class="text-xs bg-white dark:bg-gray-900 border border-blue-200 dark:border-blue-700
+                         px-2 py-1 rounded font-mono text-blue-800 dark:text-blue-300 break-all">
+              {{ webhookUrl }}
+            </code>
+          </div>
+
           <div class="grid grid-cols-1 gap-4">
-            <Input v-model="form.paystack_public_key" label="Public Key"  hint="Starts with pk_test_ or pk_live_" :error="form.errors.paystack_public_key" />
-            <Input v-model="form.paystack_secret_key" label="Secret Key"  hint="Starts with sk_test_ or sk_live_ — keep this private" :error="form.errors.paystack_secret_key" />
+            <Input v-model="form.paystack_public_key" label="Public Key"
+                   hint="Starts with pk_test_ or pk_live_"
+                   :error="form.errors.paystack_public_key" />
+            <Input v-model="form.paystack_secret_key" label="Secret Key"
+                   type="password"
+                   hint="Starts with sk_test_ or sk_live_ — never share this"
+                   :error="form.errors.paystack_secret_key" />
           </div>
         </div>
       </Transition>
