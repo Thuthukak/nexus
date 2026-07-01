@@ -57,6 +57,15 @@ class SettingsController extends Controller
             'settings' => [
                 'app_name' => Settings::group('general')->get('app_name', config('app.name')),
                 'timezone' => Settings::group('general')->get('timezone', 'Africa/Johannesburg'),
+                'street_address' => Settings::group('general')->get('street_address'),
+                'suburb' => Settings::group('general')->get('suburb'),
+                'city' => Settings::group('general')->get('city'),
+                'province' => Settings::group('general')->get('province'),
+                'country' => Settings::group('general')->get('country'),
+                'postal_code' => Settings::group('general')->get('postal_code'),
+                'telephone' => Settings::group('general')->get('telephone'),
+                'mobile' => Settings::group('general')->get('mobile'),
+                'website' => Settings::group('general')->get('website'),
             ],
         ]);
     }
@@ -66,6 +75,15 @@ class SettingsController extends Controller
         $validated = $request->validate([
             'app_name' => 'required|string|max:100',
             'timezone' => 'required|string|timezone',
+            'street_address' => 'nullable|string|max:255',
+            'suburb' => 'nullable|string|max:255',
+            'city' => 'nullable|string|max:255',
+            'province' => 'nullable|string|max:255',
+            'country' => 'nullable|string|max:255',
+            'postal_code' => 'nullable|string|max:20',
+            'telephone' => 'nullable|string|max:20',
+            'mobile' => 'nullable|string|max:20',
+            'website' => 'nullable|url|max:255',
         ]);
 
         $settings = Settings::group('general');

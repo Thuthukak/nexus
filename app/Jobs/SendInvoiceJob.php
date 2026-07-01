@@ -39,10 +39,10 @@ class SendInvoiceJob implements ShouldQueue
         }
 
         Log::info("SendInvoiceJob invoice {$invoice->reference}", [
-        'total'       => $invoice->total,
-        'paid_total'  => $invoice->paid_total,
-        'balance_due' => $invoice->balance_due,
-        'payment_token'       => $invoice->payment_token,
+        'total'         => $invoice->total,
+        'paid_total'    => $invoice->paid_total,
+        'balance_due'   => $invoice->balance_due,
+        'payment_token' => $invoice->payment_token,
     ]);
 
         // Generate/refresh payment token
