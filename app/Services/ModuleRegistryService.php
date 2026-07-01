@@ -17,7 +17,7 @@ class ModuleRegistryService
     private const KNOWN_MODULES = [
         'Core' => [
             'alias'       => 'core',
-            'version'     => '1.0.0',
+            'version'     => '2.0.0',
             'is_core'     => true,
             'description' => 'Core platform — auth, users, roles, settings',
             'requires'    => [],
@@ -25,7 +25,7 @@ class ModuleRegistryService
         ],
         'Financial' => [
             'alias'       => 'financial',
-            'version'     => '1.0.0',
+            'version'     => '2.0.0',
             'is_core'     => false,
             'description' => 'Invoicing, quotations, payments and financial reporting',
             'requires'    => ['Core'],
