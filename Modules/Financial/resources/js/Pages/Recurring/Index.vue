@@ -179,7 +179,7 @@ function handleDelete() {
         </div>
 
         <!-- Footer -->
-        <div class="flex items-center justify-between px-4 py-2.5 bg-gray-50 dark:bg-gray-900/40 border-t border-gray-200 dark:border-gray-800">
+        <div class="flex items-center justify-between px-4 py-2.5 bg-white dark:bg-gray-900/40 border-t border-gray-200 dark:border-gray-800">
           <span class="text-xs text-app-text/40">Sends to {{ s.customer_email ?? '—' }}</span>
           <div class="flex gap-2">
             <button v-if="s.status === 'active'" @click="pause(s.id)" class="px-3 py-1.5 rounded-lg text-xs font-medium border border-yellow-300 text-yellow-700 dark:border-yellow-700 dark:text-yellow-400 hover:bg-yellow-50 dark:hover:bg-yellow-900/20 transition-colors">Pause</button>

@@ -65,7 +65,7 @@ function toggleNotifications() {
         <!-- Unread badge -->
         <span
           v-if="notifications.unreadCount > 0"
-          class="absolute top-1 right-1 flex items-center justify-center w-4 h-4 text-white text-[10px] font-bold rounded-full"
+          class="absolute top-1 right-0 -translate-x-0 -translate-y-1/2 flex items-center justify-center w-5 h-5 text-white text-[10px] font-bold rounded-full"
           style="background-color: var(--color-primary);"
         >
           {{ notifications.unreadCount > 9 ? '9+' : notifications.unreadCount }}

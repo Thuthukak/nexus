@@ -13,6 +13,15 @@ const page  = usePage()
 const form = useForm({
   app_name: props.settings.app_name,
   timezone: props.settings.timezone,
+  street_address: props.settings.street_address,
+  suburb: props.settings.suburb,
+  city: props.settings.city,
+  province: props.settings.province,
+  country: props.settings.country,
+  postal_code: props.settings.postal_code,
+  telephone: props.settings.telephone,
+  mobile: props.settings.mobile,
+  website: props.settings.website,
 })
 
 function submit() {
@@ -149,14 +158,89 @@ const timezones = [
         </div>
       </div>
 
-      <!-- App settings -->
+      <!-- Organization -->
       <form @submit.prevent="submit">
         <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-6 space-y-4">
+          <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider">Organization</h2>
+          <Input 
+            v-model="form.street_address"
+            label="Street Address"
+            placeholder="The street address of your organization"
+            :error="form.errors.street_address"
+          />
+          <div class="flex flex-col gap-1">
+            <Input 
+            v-model="form.suburb"
+            label="Suburb"
+            placeholder="The suburb of your organization"
+            :error="form.errors.suburb"
+          />
+          </div>
+          <div class="flex flex-col gap-1">
+            <Input 
+            v-model="form.city"
+            label="City"
+            placeholder="The city of your organization"
+            :error="form.errors.city"
+          />
+          </div>
+          <div class="flex flex-col gap-1">
+            <Input 
+            v-model="form.province"
+            label="Province"
+            placeholder="The province of your organization"
+            :error="form.errors.province"
+          />
+          </div>
+          <div class="flex flex-col gap-1">
+            <Input 
+            v-model="form.country"
+            label="Country"
+            placeholder="The country of your organization"
+            :error="form.errors.country"
+          />
+          </div>
+            <div class="flex flex-col gap-1">
+            <Input 
+            v-model="form.postal_code"
+            label="Postal Code"
+            placeholder="The postal code of your organization"
+            :error="form.errors.postal_code"
+          />
+          </div>
+            <div class="flex flex-col gap-1">
+            <Input 
+            v-model="form.telephone"
+            label="Telephone"
+            placeholder="The telephone number of your organization"
+            :error="form.errors.telephone"
+          />
+          </div>
+            <div class="flex flex-col gap-1">
+            <Input 
+            v-model="form.mobile"
+            label="Mobile"
+            placeholder="The mobile number of your organization"
+            :error="form.errors.mobile"
+          />
+          </div>
+            <div class="flex flex-col gap-1">
+            <Input 
+            v-model="form.website"
+            label="Website"
+            placeholder="The website URL of your organization"
+            :error="form.errors.website"
+          />
+          </div>
+        </div>
+
+        <!-- App settings -->
+        <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 mt-5 p-6 space-y-4">
           <h2 class="text-xs font-semibold text-app-text/50 uppercase tracking-wider">Application</h2>
           <Input 
             v-model="form.app_name"
-            label="Application Name"
-            hint="Displayed in the browser tab and sidebar header"
+            label="Application/Organization Name"
+            hint="Displayed application wide and in emails and documents"
             :error="form.errors.app_name"
           />
           <div class="flex flex-col gap-1">

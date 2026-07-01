@@ -31,12 +31,21 @@ class InvoicePdfService
         }
 
         $pdf = Pdf::loadView('financial::pdf.invoice', [
-            'invoice'      => $invoice,
-            'logoUrl'      => $this->resolveLogoUrl(),
-            'primaryColor' => Settings::group('theme')->get('primary', '#1E3A5F'),
-            'appName'      => Settings::group('general')->get('app_name', config('app.name')),
-            'currency'     => config('financial.currency', 'ZAR'),
-            'stamp'        => $stamp,
+            'invoice'       => $invoice,
+            'logoUrl'       => $this->resolveLogoUrl(),
+            'primaryColor'  => Settings::group('theme')->get('primary', '#1E3A5F'),
+            'appName'       => Settings::group('general')->get('app_name', config('app.name')),
+            'streetAddress' => Settings::group('general')->get('street_address'),
+            'suburb'        => Settings::group('general')->get('suburb'),
+            'city'          => Settings::group('general')->get('city'),
+            'province'      => Settings::group('general')->get('province'),
+            'country'       => Settings::group('general')->get('country'),
+            'postalCode'   => Settings::group('general')->get('postal_code'),
+            'telephone'     => Settings::group('general')->get('telephone'),
+            'mobile'        => Settings::group('general')->get('mobile'),
+            'website'       => Settings::group('general')->get('website'),
+            'currency'      => config('financial.currency', 'ZAR'),
+            'stamp'         => $stamp,
         ]);
 
         $pdf->setPaper('A4', 'portrait');
