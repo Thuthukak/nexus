@@ -74,7 +74,7 @@ class Invoice extends Model
     {
         // line_total is always qty × unit_price (the gross/entered price).
         // For inclusive tax: tax is extracted FROM line_total, total = subtotal.
-        // For exclusive tax: tax is added ON TOP,           total = subtotal + tax.
+        // For exclusive tax: tax is added ON TOP, total = subtotal + tax.
         $subtotal = $this->lines->sum('line_total');
 
         $taxTotal = $this->lines->sum(fn ($line) => $line->taxAmount());

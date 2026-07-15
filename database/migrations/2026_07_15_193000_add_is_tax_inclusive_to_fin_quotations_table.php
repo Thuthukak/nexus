@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('fin_invoice_lines', function (Blueprint $table) {
-            //
+        Schema::table('fin_quotation_lines', function (Blueprint $table) {
+            $table->boolean('is_tax_inclusive')->default(true)->after('tax_rate');
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('fin_invoice_lines', function (Blueprint $table) {
-            //
+        Schema::table('fin_quotations', function (Blueprint $table) {
+            $table->dropColumn('is_tax_inclusive');
         });
     }
 };

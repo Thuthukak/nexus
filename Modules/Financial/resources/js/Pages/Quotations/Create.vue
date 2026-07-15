@@ -72,6 +72,8 @@ function applyProduct(lineIndex, product) {
   form.lines[lineIndex].description = product.name
   form.lines[lineIndex].unit_price  = Number(product.default_price)
   form.lines[lineIndex].tax_rate    = Number(product.default_tax_rate) || defaultTaxRate.value
+  const matchedRate = props.taxRates?.find(r => Number(r.rate) === form.lines[lineIndex].tax_rate)
+  form.lines[lineIndex].is_tax_inclusive = matchedRate?.is_inclusive ?? defaultTaxInclusive.value
 }
 
 function onProductSelect(lineIndex, productId) {
@@ -88,7 +90,8 @@ function onProductSelect(lineIndex, productId) {
 // Net terms
 const today          = new Date().toISOString().split('T')[0]
 const selectedTerm = ref(props.quotation?.net_terms ?? 'valid_30')
-const defaultTaxRate = computed(() => Number(props.taxRates.find(r => r.is_default)?.rate ?? 15))
+const defaultTaxRate      = computed(() => Number(props.taxRates.find(r => r.is_default)?.rate ?? 0))
+const defaultTaxInclusive = computed(() => props.taxRates.find(r => r.is_default)?.is_inclusive ?? true)
 
 function applyNetTerm(termKey) {
   selectedTerm.value = termKey
@@ -115,7 +118,7 @@ const form = useForm({
     unit_price:  Number(l.unit_price),
     tax_rate:    Number(l.tax_rate),
   })) ?? [
-    { _productId: '', description: '', qty: 1, unit_price: 0, tax_rate: defaultTaxRate.value },
+    { _productId: '', description: '', qty: 1, unit_price: 0, tax_rate: defaultTaxRate.value, is_tax_inclusive: defaultTaxInclusive.value },
   ],
 })
 
@@ -124,7 +127,7 @@ if (!isEditing.value) {
 }
 
 function addLine() {
-  form.lines.push({ _productId: '', description: '', qty: 1, unit_price: 0, tax_rate: defaultTaxRate.value })
+  form.lines.push({ _productId: '', description: '', qty: 1, unit_price: 0, tax_rate: defaultTaxRate.value, is_tax_inclusive: defaultTaxInclusive.value })
 }
 
 function removeLine(i) {
@@ -132,8 +135,23 @@ function removeLine(i) {
 }
 
 const subtotal   = computed(() => form.lines.reduce((s, l) => s + l.qty * l.unit_price, 0))
-const taxTotal   = computed(() => form.lines.reduce((s, l) => s + l.qty * l.unit_price * l.tax_rate / 100, 0))
-const grandTotal = computed(() => subtotal.value + taxTotal.value)
+const taxTotal = computed(() => form.lines.reduce((s, l) => {
+  const lineTotal = l.qty * l.unit_price
+  if (l.is_tax_inclusive) {
+    // Extract VAT from inclusive price
+    return s + (lineTotal - lineTotal / (1 + l.tax_rate / 100))
+  }
+  // Add VAT on top
+  return s + lineTotal * l.tax_rate / 100
+}, 0))
+
+const grandTotal = computed(() => form.lines.reduce((s, l) => {
+  const lineTotal = l.qty * l.unit_price
+  if (l.is_tax_inclusive) {
+    return s + lineTotal // tax already inside
+  }
+  return s + lineTotal + lineTotal * l.tax_rate / 100
+}, 0))
 
 function currency(val) {
   return 'R ' + Number(val ?? 0).toLocaleString('en-ZA', { minimumFractionDigits: 2 })
