@@ -6,9 +6,7 @@ use Modules\Core\app\Http\Controllers\ProfileController;
 use Modules\Core\app\Http\Controllers\SettingsController;
 
 // Dashboard
-Route::get('/dashboard', function () {
-    return inertia('Core/Pages/Dashboard');
-})->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
 // Profile
 Route::prefix('profile')->name('profile.')->group(function () {
