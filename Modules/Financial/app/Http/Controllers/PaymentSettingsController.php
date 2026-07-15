@@ -88,7 +88,7 @@ class PaymentSettingsController extends Controller
             'bank_account_name'    => '',
             'bank_account_number'  => '',
             'bank_branch_code'     => '',
-            'bank_reference_prefix'=> 'INV-',
+            'bank_reference_prefix'=> '',
             'payment_instructions' => '',
             'grace_days'           => 7,
             'reminder_interval_days' => 7,

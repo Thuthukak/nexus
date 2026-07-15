@@ -137,7 +137,7 @@ function submit() {
           <Input v-model="form.bank_name"           label="Bank Name"    :error="form.errors.bank_name" />
           <Input v-model="form.bank_account_number" label="Account Number" :error="form.errors.bank_account_number" />
           <Input v-model="form.bank_branch_code"    label="Branch Code"  :error="form.errors.bank_branch_code" />
-          <Input v-model="form.bank_reference_prefix" label="Payment Reference Prefix"
+          <Input v-model="form.bank_reference_prefix" label="Payment Reference Prefix" class="hidden"
                  hint="e.g. INV- → customer uses INV-0042 as reference" :error="form.errors.bank_reference_prefix" />
         </div>
         <div class="flex flex-col gap-1">

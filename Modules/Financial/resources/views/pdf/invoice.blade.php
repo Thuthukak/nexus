@@ -235,7 +235,6 @@
           @if($website)   <div class="website-text">{{ $website }}</div> @endif
         </div>
 
-        <div class="badge badge-{{ $invoice->status }}">{{ strtoupper($invoice->status) }}</div>
       </td>
     </tr>
   </table>

@@ -36,7 +36,7 @@ class PaymentController extends Controller
                 'bank_name'       => $payment->get('bank_name'),
                 'account_number'  => $payment->get('bank_account_number'),
                 'branch_code'     => $payment->get('bank_branch_code'),
-                'reference'       => ($payment->get('bank_reference_prefix') ?? 'INV-') . $invoice->reference,
+                'reference'       => $payment->get('bank_reference_prefix') . $invoice->reference,
                 'instructions'    => $payment->get('payment_instructions'),
             ],
             'app' => [

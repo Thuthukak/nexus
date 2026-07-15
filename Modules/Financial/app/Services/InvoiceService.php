@@ -191,17 +191,59 @@ class InvoiceService
         }
     }
 
+    /**
+     * Generates the next sequential reference for the current MM-YYYY period,
+     * e.g. INV-07-2026-0001. Must be called from within a DB::transaction()
+     * so the row lock actually protects against concurrent inserts.
+     */
     private function nextReference(): string
     {
-        $prefix = config('financial.invoice_prefix', 'INV-');
-        $last   = Invoice::withTrashed()
-                        ->orderByDesc('created_at')
+        $prefix = config('financial.invoice_prefix');
+        $month  = now()->format('m');
+        $year   = now()->format('Y');
+
+        $currentPrefix = "{$prefix}{$year}-{$month}-";
+
+        $last = Invoice::withTrashed()
+                        ->where('reference', 'like', $currentPrefix . '%')
+                        ->orderByDesc('reference')
+                        ->lockForUpdate()
                         ->value('reference');
 
-        if (! $last) return $prefix . '0001';
+        $number = $last
+            ? (int) str_replace($currentPrefix, '', $last)
+            : 0;
 
-        $number = (int) str_replace($prefix, '', $last);
-        return $prefix . str_pad((string) ($number + 1), 4, '0', STR_PAD_LEFT);
+        return $currentPrefix . str_pad((string) ($number + 1), 4, '0', STR_PAD_LEFT);
+    }
+
+    /**
+     * Retries an invoice-creating callback if it fails due to a unique
+     * constraint violation on `reference` (belt-and-braces alongside the
+     * row lock in nextReference — protects against edge cases where the
+     * lock scope doesn't fully serialize, e.g. no existing row to lock on
+     * the very first invoice of a new month under concurrent requests).
+     */
+    private function withUniqueRetry(callable $callback, int $maxAttempts = 5)
+    {
+        $attempts = 0;
+
+        while (true) {
+            $attempts++;
+
+            try {
+                return $callback();
+            } catch (QueryException $e) {
+                $isUniqueViolation = in_array($e->getCode(), ['23000', '23505'], true);
+
+                if ($isUniqueViolation && $attempts < $maxAttempts) {
+                    usleep(50_000 * $attempts);
+                    continue;
+                }
+
+                throw $e;
+            }
+        }
     }
 
     public function queueSend(Invoice $invoice): void
