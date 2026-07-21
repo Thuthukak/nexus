@@ -35,6 +35,7 @@ class RecurringInvoice extends Model
             'due_days'         => 'integer',
             'max_occurrences'  => 'integer',
             'occurrences_count'=> 'integer',
+            'created_by'       => 'integer',
         ];
     }
 

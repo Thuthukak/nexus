@@ -40,12 +40,18 @@ class RecurringInvoiceService
         $due       = RecurringInvoice::dueToday()->with(['sourceInvoice.lines', 'customer'])->get();
         $processed = 0;
 
+        //alerting (not just logging) on repeated failures for the same schedule ID so these don't go unnoticed.
+        $failureCount = [];
         foreach ($due as $schedule) {
             try {
                 $this->processSchedule($schedule);
                 $processed++;
             } catch (\Throwable $e) {
                 Log::error("RecurringInvoice [{$schedule->id}] failed: " . $e->getMessage());
+                $failureCount[$schedule->id] = ($failureCount[$schedule->id] ?? 0) + 1;
+                if ($failureCount[$schedule->id] >= 3) {
+                    Log::alert("RecurringInvoice [{$schedule->id}] has failed 3 times.");
+                }
             }
         }
 
@@ -71,7 +77,7 @@ class RecurringInvoiceService
                     'unit_price'  => $l->unit_price,
                     'tax_rate'    => $l->tax_rate,
                 ])->toArray(),
-            ], $schedule->created_by);
+            ], (int) $schedule->created_by);
 
             // Auto-send if configured
             if ($schedule->auto_send && $schedule->customer->email) {
