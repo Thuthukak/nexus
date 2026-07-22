@@ -11,24 +11,23 @@ class RouteServiceProvider extends ServiceProvider
 {
     protected string $moduleName = 'LMS';
 
-    /**
-     * Called before routes are registered.
-     *
-     * Register any model bindings or pattern based filters.
-     */
     public function boot(): void
     {
         parent::boot();
     }
 
-    /**
-     * Define the routes for the application.
-     */
     public function map(): void
     {
+        // Admin / teacher LMS routes
         Route::middleware(['web', 'auth', 'module:LMS'])
             ->prefix('lms')
             ->name('lms.')
             ->group(module_path($this->moduleName, 'routes/web.php'));
+
+        // Student portal routes — separate prefix, same web+auth middleware
+        Route::middleware(['web', 'auth'])
+            ->prefix('student')
+            ->name('student.')
+            ->group(module_path($this->moduleName, 'routes/student.php'));
     }
 }

@@ -101,6 +101,23 @@ class InstalledModulesSeeder extends Seeder
             ],
         ],
 
+        [
+            'name'        => 'LMS',
+            'alias'       => 'lms',
+            'version'     => '1.0.0',
+            'is_core'     => false,
+            'is_enabled'  => false,
+            'is_licensed' => false,
+            'metadata'    => [
+                'alias'       => 'lms',
+                'order'       => 40,
+                'is_core'     => false,
+                'version'     => '1.0.0',
+                'requires'    => ['Core'],
+                'description' => 'Learning Management System — courses, cohorts, quizzes and certificates',
+            ],
+        ],
+
         // Add new modules here as you build them.
         // [
         //     'name'        => 'Reporting',

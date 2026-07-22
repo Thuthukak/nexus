@@ -13,6 +13,25 @@ use Modules\LMS\app\Models\QuizAttempt;
 
 class ReportController extends Controller
 {
+    public function index()
+    {
+        $courses = \Modules\LMS\app\Models\Course::withCount(['cohorts'])
+            ->with(['cohorts.enrollments'])
+            ->where('status', 'published')
+            ->get()
+            ->map(fn ($c) => [
+                'id'           => $c->id,
+                'title'        => $c->title,
+                'total'        => $c->cohorts->flatMap->enrollments->count(),
+                'completed'    => $c->cohorts->flatMap->enrollments->where('status', 'completed')->count(),
+                'cohorts'      => $c->cohorts_count,
+            ]);
+
+        return \Inertia\Inertia::render('LMS/Pages/Reports/Index', [
+            'courses' => $courses,
+        ]);
+    }
+
     public function courseReport(Course $course)
     {
         $course->load(['sections.lessons', 'cohorts.enrollments.student']);

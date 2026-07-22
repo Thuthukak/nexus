@@ -18,8 +18,9 @@ class WizardMiddleware
             || str_starts_with($path, 'up');
         $isPayPath  = str_starts_with($path, 'pay')
             || str_starts_with($path, 'webhooks');
+        $isStudent  = str_starts_with($path, 'student');
 
-        if ($isAsset || $isPayPath) {
+        if ($isAsset || $isPayPath || $isStudent) {
             return $next($request);
         }
 

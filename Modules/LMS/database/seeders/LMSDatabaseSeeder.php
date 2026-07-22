@@ -1,5 +1,8 @@
 <?php
-namespace Modules\LMS\Database\Seeders;
+
+declare(strict_types=1);
+
+namespace Modules\LMS\database\seeders;
 
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
@@ -20,6 +23,8 @@ class LMSDatabaseSeeder extends Seeder
             'lms.course.manage',
             'lms.cohorts.view',
             'lms.cohorts.manage',
+            'lms.assignments.view',
+            'lms.assignments.manage',
             'lms.grades.manage',
             'lms.reports.view',
             'lms.student.access',
@@ -32,28 +37,44 @@ class LMSDatabaseSeeder extends Seeder
             ]);
         }
 
-        $admin = Role::findByName('Super Admin', 'web');
-        $admin->givePermissionTo($permissions);
+        $rolePermissions = [
+            'Super Admin' => $permissions,
+            'Admin'       => $permissions,
+            'Manager'     => [
+                'lms.course.view',
+                'lms.cohorts.view',
+                'lms.cohorts.manage',
+                'lms.assignments.view',
+                'lms.reports.view',
+                'lms.student.access',
+            ],
+            'Staff' => [
+                'lms.course.view',
+                'lms.cohorts.view',
+                'lms.student.access',
+            ],
+            'Teacher' => [
+                'lms.course.view',
+                'lms.course.manage',
+                'lms.cohorts.view',
+                'lms.cohorts.manage',
+                'lms.assignments.view',
+                'lms.assignments.manage',
+                'lms.grades.manage',
+                'lms.reports.view',
+                'lms.student.access',
+            ],
+        ];
 
-        $manager = Role::findByName('Manager', 'web');
-        $manager->givePermissionTo([
-            'lms.course.view',
-            'lms.cohorts.view',
-            'lms.cohorts.manage',
-            'lms.reports.view',
-            'lms.student.access',
-        ]);
+        foreach ($rolePermissions as $roleName => $perms) {
+            $role = Role::where('name', $roleName)->where('guard_name', 'web')->first();
+            if ($role) {
+                $role->givePermissionTo(
+                    Permission::whereIn('name', $perms)->where('guard_name', 'web')->get()
+                );
+            }
+        }
 
-        $staff = Role::findByName('Staff', 'web');
-        $staff->givePermissionTo([
-            'lms.course.view',
-            'lms.course.manage',
-            'lms.cohorts.view',
-            'lms.grades.manage',
-            'lms.reports.view',
-            'lms.student.access',
-        ]);
-
-        $this->command->info('lms permissions seeded.');
+        $this->command?->info('LMS permissions seeded.');
     }
 }
