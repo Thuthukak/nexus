@@ -62,6 +62,19 @@ Route::prefix('pay')->name('pay.')->group(function () {
 });
 
 // PayFast ITN webhook (no CSRF — excluded below)
+// EFT / Proof of Payment routes (public — token authenticated)
+Route::post('/pay/{token}/pop',          [\App\Http\Controllers\PaymentController::class, 'uploadPop'])->name('pay.pop.upload');
+
+// EFT admin routes (auth required)
+Route::middleware(['web', 'auth'])->group(function () {
+    Route::get('/financial/invoices/{invoice}/pop/download',
+        [\App\Http\Controllers\PaymentController::class, 'downloadPop'])->name('pay.pop.download');
+    Route::post('/financial/invoices/{invoice}/pop/approve',
+        [\App\Http\Controllers\PaymentController::class, 'approvePop'])->name('pay.pop.approve');
+    Route::post('/financial/invoices/{invoice}/pop/reject',
+        [\App\Http\Controllers\PaymentController::class, 'rejectPop'])->name('pay.pop.reject');
+});
+
 Route::post('/webhooks/payfast',  [\App\Http\Controllers\WebhookController::class, 'payfast'])->name('webhooks.payfast');
 Route::post('/webhooks/paystack', [\App\Http\Controllers\WebhookController::class, 'paystack'])->name('webhooks.paystack');
 

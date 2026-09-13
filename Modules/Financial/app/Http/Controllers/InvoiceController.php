@@ -23,7 +23,12 @@ class InvoiceController extends Controller
 
         // Filter by status if provided
         if ($request->filled('status')) {
-            $query->where('status', $request->status);
+            if ($request->status === 'pop_pending') {
+                // Virtual filter: invoices with PoP awaiting review
+                $query->where('pop_status', 'pending');
+            } else {
+                $query->where('status', $request->status);
+            }
         }
 
         // Search by reference or customer name
@@ -43,6 +48,7 @@ class InvoiceController extends Controller
             'total'     => $inv->total,
             'paid_total'=> $inv->paid_total,
             'status'    => $inv->status,
+            'pop_status' => $inv->pop_status ?? 'none',
             'due_date'  => $inv->due_date?->format('d M Y'),
             'issue_date'=> $inv->issue_date?->format('d M Y'),
         ]);
@@ -50,7 +56,7 @@ class InvoiceController extends Controller
         return Inertia::render('Financial/Pages/Invoices/Index', [
             'invoices' => $invoices,
             'filters'  => $request->only(['status', 'search']),
-            'statuses' => ['draft', 'approved', 'sent', 'part_paid', 'paid', 'overdue', 'cancelled'],
+            'statuses' => ['draft', 'approved', 'sent', 'part_paid', 'paid', 'overdue', 'cancelled', 'pop_pending'],
         ]);
     }
 
@@ -129,7 +135,7 @@ class InvoiceController extends Controller
 
     public function show(Invoice $invoice)
     {
-        $invoice->load(['customer', 'lines', 'payments', 'createdBy']);
+        $invoice->load(['customer', 'lines', 'payments', 'createdBy', 'popReviewedBy']);
 
         return Inertia::render('Financial/Pages/Invoices/Show', [
             'invoice' => $this->formatInvoice($invoice),
@@ -312,6 +318,16 @@ class InvoiceController extends Controller
             'deposit_paid_at'    => $invoice->deposit_paid_at?->format('d M Y H:i'),
             'amount_due_now'     => $invoice->amountDueNow(),
             'payment_stage'      => $invoice->paymentStageLabel(),
+            // EFT / PoP fields
+            'eft_hold_expires_at' => $invoice->eft_hold_expires_at?->toISOString(),
+            'eft_hold_active'     => $invoice->isEftHoldActive(),
+            'pop_status'          => $invoice->pop_status ?? 'none',
+            'pop_uploaded_at'     => $invoice->pop_uploaded_at?->format('d M Y H:i'),
+            'pop_original_name'   => $invoice->pop_original_name,
+            'pop_notes'           => $invoice->pop_notes,
+            'pop_rejection_reason'=> $invoice->pop_rejection_reason,
+            'pop_reviewed_at'     => $invoice->pop_reviewed_at?->format('d M Y H:i'),
+            'pop_reviewed_by'     => $invoice->popReviewedBy?->name ?? null,
         ];
     }
 

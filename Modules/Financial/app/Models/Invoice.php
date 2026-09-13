@@ -23,7 +23,10 @@ class Invoice extends Model
         'reference', 'customer_id', 'created_by', 'status',
         'issue_date', 'due_date', 'currency',
         'subtotal', 'tax_total', 'total', 'paid_total', 'notes',
-        'payment_token', 'payment_token_expires_at', 'deposit_required', 
+        'payment_token', 'payment_token_expires_at', 'deposit_required',
+        'eft_hold_expires_at',
+        'pop_path', 'pop_original_name', 'pop_uploaded_at', 'pop_notes',
+        'pop_status', 'pop_rejection_reason', 'pop_reviewed_by', 'pop_reviewed_at', 
         'deposit_type', 'deposit_percentage', 'deposit_amount', 'deposit_paid_at',
         'receipt_sent_at', 'last_sent_at', 'last_reminder_sent_at',
     ];
@@ -37,6 +40,9 @@ class Invoice extends Model
             'last_sent_at'      => 'datetime',
             'deposit_paid_at'            => 'datetime',
             'payment_token_expires_at'   => 'datetime',
+            'eft_hold_expires_at'        => 'datetime',
+            'pop_uploaded_at'            => 'datetime',
+            'pop_reviewed_at'            => 'datetime',
             'last_reminder_sent_at'      => 'datetime',
             'deposit_required'  => 'boolean',
             'deposit_type'      => 'string',
@@ -199,4 +205,41 @@ class Invoice extends Model
 
         return 'Balance Payment';
     }
+    // ── EFT helpers ───────────────────────────────────────────
+
+    public function popReviewedBy(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(\App\Models\User::class, 'pop_reviewed_by');
+    }
+
+    public function isEftHoldActive(): bool
+    {
+        return $this->eft_hold_expires_at
+            && $this->eft_hold_expires_at->isFuture()
+            && $this->status !== 'paid'
+            && $this->status !== 'cancelled';
+    }
+
+    public function hasPopPending(): bool
+    {
+        return $this->pop_status === 'pending';
+    }
+
+    public function hasPopApproved(): bool
+    {
+        return $this->pop_status === 'approved';
+    }
+
+    /**
+     * Set a 48-hour EFT hold and keep invoice in 'sent' status.
+     * Called when a customer reaches the payment page with no gateway configured.
+     */
+    public function setEftHold(int $hours = 48): void
+    {
+        if (! $this->eft_hold_expires_at) {
+            $this->update(['eft_hold_expires_at' => now()->addHours($hours)]);
+        }
+    }
+
+
 }

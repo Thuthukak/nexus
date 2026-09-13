@@ -140,6 +140,26 @@ function openRecurring() {
   kebabOpen.value     = false
   showRecurring.value = true
 }
+
+// ── PoP review ────────────────────────────────────────────────
+const showRejectModal  = ref(false)
+const rejectForm       = useForm({ reason: '' })
+const popStatusConfig  = {
+  none:     null,
+  pending:  { colour: 'yellow', label: 'Pending verification' },
+  approved: { colour: 'green',  label: 'Verified' },
+  rejected: { colour: 'red',    label: 'Rejected' },
+}
+
+function approvePop() {
+  router.post(`/financial/invoices/${props.invoice.id}/pop/approve`)
+}
+
+function submitReject() {
+  rejectForm.post(`/financial/invoices/${props.invoice.id}/pop/reject`, {
+    onSuccess: () => { showRejectModal.value = false; rejectForm.reset() },
+  })
+}
 </script>
 
 <template>
@@ -154,6 +174,10 @@ function openRecurring() {
           <h1 class="text-2xl font-bold text-app-text">{{ invoice.reference }}</h1>
           <div class="flex items-center gap-3 mt-2 flex-wrap">
             <Badge :type="statusType[invoice.status]" dot>{{ invoice.status }}</Badge>
+            <span v-if="invoice.pop_status === 'pending'"
+                  class="inline-flex items-center gap-1 text-xs font-semibold text-yellow-700 bg-yellow-100 dark:bg-yellow-900/30 px-2 py-0.5 rounded-full border border-yellow-200 dark:border-yellow-700">
+              PoP awaiting review
+            </span>
             <span class="text-sm text-app-text/50">
               Issued {{ invoice.issue_date }} · Due {{ invoice.due_date }}
             </span>
@@ -469,7 +493,76 @@ function openRecurring() {
 
       <!-- Activity -->
       <div class="bg-surface rounded-xl border border-gray-200 dark:border-gray-800 p-6">
-        <ActivityTimeline type="invoice" :id="invoice.id" />
+        
+      <!-- ── Proof of Payment review panel ─────────────────── -->
+      <div v-if="invoice.pop_status && invoice.pop_status !== 'none'"
+           class="bg-surface rounded-xl border overflow-hidden"
+           :class="{
+             'border-yellow-200 dark:border-yellow-800': invoice.pop_status === 'pending',
+             'border-green-200 dark:border-green-800':  invoice.pop_status === 'approved',
+             'border-red-200 dark:border-red-800':      invoice.pop_status === 'rejected',
+           }">
+
+        <!-- Header -->
+        <div class="flex items-center justify-between px-5 py-4 border-b"
+             :class="{
+               'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-100 dark:border-yellow-800': invoice.pop_status === 'pending',
+               'bg-green-50 dark:bg-green-900/20 border-green-100 dark:border-green-800':    invoice.pop_status === 'approved',
+               'bg-red-50 dark:bg-red-900/20 border-red-100 dark:border-red-800':            invoice.pop_status === 'rejected',
+             }">
+          <div>
+            <h3 class="text-sm font-semibold text-app-text">Proof of Payment</h3>
+            <p class="text-xs mt-0.5"
+               :class="{
+                 'text-yellow-600': invoice.pop_status === 'pending',
+                 'text-green-600':  invoice.pop_status === 'approved',
+                 'text-red-600':    invoice.pop_status === 'rejected',
+               }">
+              {{ popStatusConfig[invoice.pop_status]?.label }}
+              <span v-if="invoice.pop_reviewed_at">
+                — {{ invoice.pop_reviewed_at }} by {{ invoice.pop_reviewed_by }}
+              </span>
+            </p>
+          </div>
+          <!-- Pending: approve / reject buttons -->
+          <div v-if="invoice.pop_status === 'pending'" class="flex items-center gap-2">
+            <a :href="`/financial/invoices/${invoice.id}/pop/download`"
+               class="px-3 py-1.5 text-xs border border-gray-200 dark:border-gray-700 rounded-lg text-app-text/60 hover:text-primary hover:border-primary/30 transition-colors">
+              ↓ Download PoP
+            </a>
+            <button @click="approvePop"
+                    class="px-3 py-1.5 text-xs font-semibold bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+              Approve
+            </button>
+            <button @click="showRejectModal = true"
+                    class="px-3 py-1.5 text-xs font-semibold bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors">
+              Reject
+            </button>
+          </div>
+          <!-- Approved: just download -->
+          <a v-else-if="invoice.pop_status === 'approved'"
+             :href="`/financial/invoices/${invoice.id}/pop/download`"
+             class="text-xs text-green-600 hover:underline">
+            ↓ Download PoP
+          </a>
+        </div>
+
+        <!-- Details -->
+        <div class="px-5 py-4 space-y-1 text-sm">
+          <div class="flex items-center gap-4 text-app-text/60 text-xs">
+            <span v-if="invoice.pop_uploaded_at">Uploaded {{ invoice.pop_uploaded_at }}</span>
+            <span v-if="invoice.pop_original_name" class="font-mono">{{ invoice.pop_original_name }}</span>
+          </div>
+          <p v-if="invoice.pop_notes" class="text-sm text-app-text/70 italic">
+            "{{ invoice.pop_notes }}"
+          </p>
+          <p v-if="invoice.pop_rejection_reason" class="text-sm text-red-600">
+            Rejection reason: {{ invoice.pop_rejection_reason }}
+          </p>
+        </div>
+      </div>
+
+      <ActivityTimeline type="invoice" :id="invoice.id" />
       </div>
 
       <!-- Notes -->
@@ -654,4 +747,28 @@ function openRecurring() {
     @confirm="cancel"
     @cancel="confirmCancel = false"
   />
+
+  <!-- ── PoP Reject modal ──────────────────────────────────── -->
+  <Modal :show="showRejectModal" title="Reject Proof of Payment" @close="showRejectModal = false">
+    <div class="space-y-4">
+      <p class="text-sm text-app-text/60">
+        The customer will be notified by email and asked to re-upload a valid proof of payment.
+      </p>
+      <div class="flex flex-col gap-1">
+        <label class="text-sm font-medium text-app-text">Reason (optional)</label>
+        <textarea v-model="rejectForm.reason" rows="3"
+                  placeholder="e.g. Screenshot is unclear, reference number missing, wrong amount…"
+                  class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none" />
+      </div>
+    </div>
+    <template #footer>
+      <button @click="showRejectModal = false"
+              class="px-4 py-2 text-sm text-app-text/60">Cancel</button>
+      <Button @click="submitReject" :loading="rejectForm.processing"
+              class="!bg-red-500 hover:!bg-red-600">
+        Reject & Notify Customer
+      </Button>
+    </template>
+  </Modal>
+
 </template>

@@ -100,7 +100,7 @@ class OrderService
             ], 1); // system user
 
             // Approve + mark as sent so payment flow works
-            $invoice->update(['status' => 'approved']);
+            $invoice->update(['status' => 'sent', 'last_sent_at' => now()]);
             $paymentToken = $invoice->generatePaymentToken();
 
             // Create order

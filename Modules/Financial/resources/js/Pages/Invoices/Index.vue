@@ -24,6 +24,17 @@ const columns = [
   { key: 'actions',    label: '',            sortable: false },
 ]
 
+const statusLabel = {
+  draft:       'Draft',
+  approved:    'Approved',
+  sent:        'Sent',
+  part_paid:   'Part Paid',
+  paid:        'Paid',
+  overdue:     'Overdue',
+  cancelled:   'Cancelled',
+  pop_pending: '⏳ PoP Pending',
+}
+
 const statusType = {
   paid: 'success', draft: 'neutral', overdue: 'danger',
   sent: 'info', approved: 'warning', part_paid: 'warning', cancelled: 'neutral',
@@ -104,7 +115,7 @@ function currency(val) {
           class="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-background text-app-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
         >
           <option value="">All statuses</option>
-          <option v-for="s in statuses" :key="s" :value="s" class="capitalize">{{ s }}</option>
+          <option v-for="s in statuses" :key="s" :value="s">{{ statusLabel[s] ?? s }}</option>
         </select>
       </div>
       <button @click="applyFilters"
@@ -127,8 +138,14 @@ function currency(val) {
       <template #cell-total="{ value }">
         <span class="font-medium">{{ currency(value) }}</span>
       </template>
-      <template #cell-status="{ value }">
-        <Badge :type="statusType[value] ?? 'neutral'" dot>{{ value }}</Badge>
+      <template #cell-status="{ value, row }">
+        <div class="flex items-center gap-2">
+          <Badge :type="statusType[value] ?? 'neutral'" dot>{{ value }}</Badge>
+          <span v-if="row.pop_status === 'pending'"
+                class="inline-flex items-center gap-1 text-xs font-semibold text-yellow-700 bg-yellow-100 dark:bg-yellow-900/30 px-2 py-0.5 rounded-full border border-yellow-200 dark:border-yellow-700">
+            PoP ⏳
+          </span>
+        </div>
       </template>
       <template #cell-actions="{ row }">
         <div class="flex items-center justify-end gap-1">
