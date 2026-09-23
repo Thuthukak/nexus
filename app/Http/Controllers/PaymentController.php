@@ -26,8 +26,10 @@ class PaymentController extends Controller
         $gateway = $this->gatewayManager;
         $payment = Settings::group('payments');
 
-        // Auto-set 48h EFT hold when no gateway configured
-        if (! $gateway->isConfigured() && $invoice->status !== 'paid') {
+        // Set 48h EFT hold whenever bank details are configured and invoice unpaid.
+        // Applies both for EFT-only and gateway+EFT scenarios.
+        $bankConfigured = (bool) \App\Facades\Settings::group('payments')->get('bank_account_number');
+        if ($bankConfigured && $invoice->status !== 'paid') {
             $invoice->setEftHold(48);
             $invoice->refresh();
         }
@@ -51,6 +53,7 @@ class PaymentController extends Controller
                 'name'     => Settings::group('general')->get('app_name', config('app.name')),
                 'logo_url' => Settings::group('general')->get('logo_url'),
             ],
+            'is_free' => $invoice->amountDueNow() <= 0,
             'eft' => [
                 'hold_expires_at' => $invoice->eft_hold_expires_at?->toISOString(),
                 'hold_active'     => $invoice->isEftHoldActive(),
@@ -75,7 +78,8 @@ class PaymentController extends Controller
         $amount = $invoice->amountDueNow();
 
         if ($amount <= 0) {
-            return redirect(route('pay.show', $token));
+            // Free invoice — no payment needed, auto-claim
+            return $this->processFreeInvoice($invoice, $token);
         }
 
         $returnUrl = route('pay.return', $token);
@@ -198,7 +202,58 @@ class PaymentController extends Controller
         ]);
     }
 
-     // ── EFT: set hold when customer views payment page with no gateway ────
+ 
+    // ── Free tickets / zero-amount invoices ──────────────────────────────
+
+    /**
+     * Called from the "Claim your free ticket" button on the payment page.
+     * Also called from initiate() when amount_due_now = 0 with a gateway.
+     */
+    public function claimFree(string $token)
+    {
+        $invoice = $this->findByToken($token);
+
+        if ($invoice->amountDueNow() > 0) {
+            return back()->with('toast', [
+                'type'    => 'warning',
+                'message' => 'This invoice has a balance due and cannot be claimed as free.',
+            ]);
+        }
+
+        return $this->processFreeInvoice($invoice, $token);
+    }
+
+    /**
+     * Shared logic: mark a zero-amount invoice as paid, fire events,
+     * queue receipt. Returns a redirect to the success page.
+     */
+    private function processFreeInvoice(
+        \Modules\Financial\app\Models\Invoice $invoice,
+        string $token,
+    ): \Illuminate\Http\RedirectResponse {
+        // Idempotent — already processed
+        if ($invoice->status === 'paid') {
+            return redirect(route('pay.return', $token));
+        }
+
+        $this->invoiceService->recordPayment($invoice, [
+            'amount'    => 0,
+            'method'    => 'free',
+            'reference' => 'FREE-' . $invoice->reference,
+            'notes'     => 'Free ticket — no payment required',
+            'paid_at'   => now()->format('Y-m-d H:i:s'),
+        ]);
+
+        $invoice->refresh();
+
+        if ($invoice->status === 'paid') {
+            \App\Jobs\SendReceiptJob::dispatch($invoice->id);
+        }
+
+        return redirect(route('pay.return', $token));
+    }
+
+    // ── EFT: set hold when customer views payment page with no gateway ────
 
     public function setEftHold(string $token)
     {

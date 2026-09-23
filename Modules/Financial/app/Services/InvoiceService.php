@@ -106,6 +106,7 @@ class InvoiceService
 
             $status = match (true) {
                 $fullyPaid  => 'paid',
+                ($data['method'] ?? '') === 'free'  => 'paid',
                 $depositPaid => 'deposit_paid',
                 $totalPaid > 0 => 'part_paid',
                 default     => $invoice->status,

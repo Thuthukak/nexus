@@ -8,6 +8,7 @@ const props = defineProps({
   bank:    { type: Object, required: true },
   app:     { type: Object, required: true },
   eft:     { type: Object, default: () => ({}) },
+  is_free: { type: Boolean, default: false },
 })
 
 // ── Online payment ────────────────────────────────────────────
@@ -73,6 +74,10 @@ function submitPop() {
 // ── Helpers ───────────────────────────────────────────────────
 function currency(val) {
   return 'R ' + Number(val ?? 0).toLocaleString('en-ZA', { minimumFractionDigits: 2 })
+}
+
+function claimFree() {
+  router.post(`/pay/${props.invoice.token}/claim-free`)
 }
 
 function copyRef() {
@@ -164,8 +169,23 @@ const holdActive = computed(() => props.eft?.hold_active && !expired.value)
         </div>
       </div>
 
-      <!-- ── Online payment gateway ── -->
-      <div v-if="gateway.configured"
+      <!-- ── Free ticket claim (zero amount, any gateway state) ── -->
+      <div v-if="is_free"
+           class="bg-white rounded-2xl border border-green-200 shadow-sm overflow-hidden">
+        <div class="px-6 py-5 border-b border-green-100 bg-green-50">
+          <h2 class="font-semibold text-green-800">Free Ticket</h2>
+          <p class="text-sm text-green-600 mt-1">No payment required — claim your ticket instantly.</p>
+        </div>
+        <div class="px-6 py-5">
+          <button @click="claimFree"
+                  class="w-full py-3.5 px-4 rounded-xl bg-green-600 text-white font-semibold text-sm hover:bg-green-700 transition-colors">
+            Claim Your Free Ticket
+          </button>
+        </div>
+      </div>
+
+      <!-- ── Online payment gateway (paid tickets only) ── -->
+      <div v-if="gateway.configured && !is_free"
            class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
         <div class="px-6 py-5 border-b border-gray-200">
           <h2 class="font-semibold text-gray-900">Pay Online</h2>
@@ -186,7 +206,7 @@ const holdActive = computed(() => props.eft?.hold_active && !expired.value)
       </div>
 
       <!-- ── EFT / Manual payment section ── -->
-      <div v-if="showBank" class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+      <div v-if="showBank && !is_free" class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
 
         <!-- EFT hold banner -->
         <div v-if="isEftOnly && holdActive"
@@ -259,8 +279,8 @@ const holdActive = computed(() => props.eft?.hold_active && !expired.value)
             {{ bank.instructions }}
           </p>
 
-          <!-- PoP upload section (EFT only, hold active or already uploaded) -->
-          <template v-if="isEftOnly && (holdActive || popStatus !== 'none')">
+          <!-- PoP upload section — shown for EFT-only and gateway+EFT cases -->
+          <template v-if="(holdActive || popStatus !== 'none') && !is_free">
 
             <!-- Status banners -->
             <div v-if="popStatus === 'pending'"
