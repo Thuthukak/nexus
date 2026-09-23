@@ -19,6 +19,15 @@ const isPaystack = computed(() => form.gateway === 'paystack')
 const isNone     = computed(() => form.gateway === 'none')
 const webhookUrl  = window.location.origin + '/webhooks/paystack'
 
+function selectGateway(value) {
+  form.gateway = value
+  // Auto-save gateway selection immediately so it takes effect right away
+  form.patch('/financial/settings/payments', {
+    preserveScroll: true,
+    only: [],
+  })
+}
+
 function submit() {
   form.patch('/financial/settings/payments')
 }
@@ -45,7 +54,7 @@ function submit() {
             { value: 'payfast',  label: 'PayFast',      desc: 'ZA preferred' },
             { value: 'paystack', label: 'Paystack',     desc: 'Multi-currency' },
           ]" :key="gw.value" type="button"
-                  @click="form.gateway = gw.value"
+                  @click="selectGateway(gw.value)"
                   class="flex flex-col items-center gap-1 p-4 rounded-xl border-2 transition-all text-center"
                   :class="form.gateway === gw.value
                     ? 'border-primary bg-primary/5'
@@ -148,7 +157,11 @@ function submit() {
         </div>
       </div>
 
-      <div class="flex justify-end">
+      <div class="flex items-center justify-between py-3 px-4 rounded-xl border transition-all"
+           :class="form.isDirty ? 'border-primary/30 bg-primary/5' : 'border-gray-200 dark:border-gray-800 bg-surface'">
+        <p class="text-sm" :class="form.isDirty ? 'text-primary font-medium' : 'text-app-text/40'">
+          {{ form.isDirty ? '● Unsaved changes — save to apply' : 'All changes saved' }}
+        </p>
         <Button type="submit" :loading="form.processing">Save Payment Settings</Button>
       </div>
     </form>

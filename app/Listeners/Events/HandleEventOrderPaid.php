@@ -26,3 +26,4 @@ class HandleEventOrderPaid
         $this->orderService->markPaid($order);
     }
 }
+ 
